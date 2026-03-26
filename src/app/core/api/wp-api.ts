@@ -1,12 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class WpApiService {
   private readonly http = inject(HttpClient);
 
-  readonly BASE = 'https://hackstore.mx/wp-json/wp/v2';
+  readonly BASE = environment.apiBaseUrl;
 
   get<T>(
     endpoint: string,
