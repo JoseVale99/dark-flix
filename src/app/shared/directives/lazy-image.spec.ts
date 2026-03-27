@@ -1,19 +1,11 @@
-import { Component } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { ElementRef, signal } from '@angular/core';
 import { LazyImageDirective } from './lazy-image';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-@Component({
-  template: '<img dfLazyImage [lazySrc]="source" />',
-  imports: [LazyImageDirective]
-})
-class TestHostComponent {
-  source: string | null = 'test.jpg';
-}
-
-describe('LazyImageDirective', () => {
-  let fixture: ComponentFixture<TestHostComponent>;
-  let imgEl: HTMLImageElement;
+describe('LazyImageDirective (Aislado)', () => {
+  let directive: LazyImageDirective;
+  let img: HTMLImageElement;
   let mockObserve: any;
   let mockDisconnect: any;
   let originalIntersectionObserver: any;
@@ -33,12 +25,24 @@ describe('LazyImageDirective', () => {
     
     global.IntersectionObserver = MockObserver as any;
 
-    await TestBed.configureTestingModule({
-      imports: [TestHostComponent]
-    }).compileComponents();
+    img = document.createElement('img');
+    const elRef = new ElementRef(img);
 
-    fixture = TestBed.createComponent(TestHostComponent);
-    imgEl = fixture.nativeElement.querySelector('img');
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: ElementRef, useValue: elRef }
+      ]
+    });
+
+    // Instanciar directiva en el contexto seguro de inyección
+    TestBed.runInInjectionContext(() => {
+      directive = new LazyImageDirective();
+      
+      // Sobrescribimos el Input Signal readonly para inyectarle un valor en testing aislado
+      Object.defineProperty(directive, 'lazySrc', {
+        get: () => signal('test.jpg')
+      });
+    });
   });
 
   afterEach(() => {
@@ -47,40 +51,52 @@ describe('LazyImageDirective', () => {
     vi.clearAllMocks();
   });
 
-  it('src está vacío antes de que el observer dispare', () => {
-    fixture.detectChanges(); // Trigger ngOnInit
-    expect(imgEl.getAttribute('src')).toBeNull();
-    expect(mockObserve).toHaveBeenCalledWith(imgEl);
+  // Helper para simular que afterNextRender se disparó 
+  // (ya que en testing aislado puro TestBed no flushea effects automáticamente)
+  const triggerAfterNextRender = async () => {
+    // Al instanciar `new LazyImageDirective()`, Angular encoló un effect de afterNextRender.
+    // Forzamos la detección de cambios global del TestBed para que ejecute afterNextRender.
+    TestBed.flushEffects(); 
+    await new Promise(r => setTimeout(r, 0));
+  };
+
+  it('src está vacío antes de que el observer dispare', async () => {
+    await triggerAfterNextRender();
+    
+    expect(img.getAttribute('src')).toBeNull();
+    expect(mockObserve).toHaveBeenCalledWith(img);
   });
 
-  it('src se asigna a lazySrc cuando isIntersecting es true', () => {
-    fixture.detectChanges();
+  it('src se asigna a lazySrc cuando isIntersecting es true', async () => {
+    await triggerAfterNextRender();
     
-    // Simular que el elemento entra en viewport
     const callback = (global as any).__intersectionObserverCallback;
     callback([{ isIntersecting: true }]);
     
-    expect(imgEl.src).toContain('test.jpg');
+    expect(img.src).toContain('test.jpg');
   });
 
-  it('disconnect() es llamado tras la primera intersección', () => {
-    fixture.detectChanges();
+  it('disconnect() es llamado tras la primera intersección', async () => {
+    await triggerAfterNextRender();
+    
     const callback = (global as any).__intersectionObserverCallback;
     callback([{ isIntersecting: true }]);
     
     expect(mockDisconnect).toHaveBeenCalled();
   });
 
-  it('fallback asigna src directamente cuando IntersectionObserver no existe en window', () => {
-    // Eliminar temporalmente IntersectionObserver para forzar fallback
+  it('fallback asigna src directamente cuando IntersectionObserver no existe en window', async () => {
     delete (global as any).IntersectionObserver;
 
-    const fallbackFixture = TestBed.createComponent(TestHostComponent);
-    fallbackFixture.detectChanges(); // trigger ngOnInit
+    // Reimitar directiva bajo el nuevo contexto (sin Observer nativo)
+    TestBed.runInInjectionContext(() => {
+      directive = new LazyImageDirective();
+      Object.defineProperty(directive, 'lazySrc', { get: () => signal('test.jpg') });
+    });
 
-    const fallbackImgEl = fallbackFixture.nativeElement.querySelector('img');
-    expect(fallbackImgEl.src).toContain('test.jpg');
-    // Observer no debió haber sido llamado porque no existe
+    await triggerAfterNextRender();
+
+    expect(img.src).toContain('test.jpg');
     expect(mockObserve).not.toHaveBeenCalled();
   });
 });
