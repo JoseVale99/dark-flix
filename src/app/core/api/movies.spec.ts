@@ -6,8 +6,8 @@ import {
 import { provideHttpClient } from '@angular/common/http';
 import * as fc from 'fast-check';
 
-import { MoviesService } from './movies';
-import type { WpPost } from '../models';
+import { MoviesService } from '@api/movies';
+import type { WpPost } from '@models';
 
 // Generador de WpPost mínimo
 const wpPostArb = (): fc.Arbitrary<WpPost> =>

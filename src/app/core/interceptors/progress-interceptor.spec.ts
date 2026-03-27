@@ -11,8 +11,8 @@ import {
 import { vi } from 'vitest';
 import * as fc from 'fast-check';
 
-import { progressInterceptor } from './progress-interceptor';
-import { ProgressBarService } from '../services/progress-bar';
+import { progressInterceptor } from '@interceptors/progress-interceptor';
+import { ProgressBarService } from '@services/progress-bar';
 
 describe('ProgressInterceptor', () => {
   let http: HttpClient;

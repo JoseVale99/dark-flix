@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
-import type { CatalogFilters, WpPaginatedResponse, WpPost } from '../models';
-import { WpApiService } from './wp-api';
-import { buildFilterParams } from './wp-api.utils';
+import type { CatalogFilters, WpPaginatedResponse, WpPost } from '@models';
+import { WpApiService } from '@api/wp-api';
+import { buildFilterParams } from '@api/wp-api.utils';
 
 @Injectable({ providedIn: 'root' })
 export class SeriesService {

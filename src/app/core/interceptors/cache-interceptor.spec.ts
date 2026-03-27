@@ -10,7 +10,7 @@ import {
 } from '@angular/common/http';
 import { vi } from 'vitest';
 import * as fc from 'fast-check';
-import { cacheInterceptor } from './cache-interceptor';
+import { cacheInterceptor } from '@interceptors/cache-interceptor';
 
 const HTTP_METHODS = ['POST', 'PUT', 'DELETE', 'PATCH'] as const;
 

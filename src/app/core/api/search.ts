@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
-import type { WpSearchResult } from '../models';
-import { WpApiService } from './wp-api';
+import type { WpSearchResult } from '@models';
+import { WpApiService } from '@api/wp-api';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {

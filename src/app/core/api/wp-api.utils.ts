@@ -1,4 +1,4 @@
-import type { CatalogFilters } from '../models';
+import type { CatalogFilters } from '@models';
 
 /**
  * Convierte un objeto CatalogFilters a los query params

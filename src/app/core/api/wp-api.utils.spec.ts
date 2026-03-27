@@ -1,6 +1,6 @@
 import * as fc from 'fast-check';
 import { buildFilterParams } from './wp-api.utils';
-import type { CatalogFilters } from '../models';
+import type { CatalogFilters } from '@models';
 
 /**
  * Propiedad 3: buildFilterParams mapea correctamente los filtros definidos
