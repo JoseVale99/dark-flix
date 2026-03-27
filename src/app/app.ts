@@ -1,12 +1,43 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  Router,
+  RouterOutlet,
+  NavigationStart,
+  NavigationEnd,
+  NavigationError,
+} from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
+
+import { ProgressBarComponent } from '@shared/components/progress-bar/progress-bar';
+import { ProgressBarService } from '@services/progress-bar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet, ProgressBarComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
-  protected readonly title = signal('dark-flix');
+  private readonly router      = inject(Router);
+  private readonly progressSvc = inject(ProgressBarService);
+
+  constructor() {
+    // takeUntilDestroyed() se desuscribe automáticamente cuando
+    // el componente se destruye — no necesita ngOnDestroy manual
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationStart),
+        takeUntilDestroyed()
+      )
+      .subscribe(() => this.progressSvc.start());
+
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationEnd || e instanceof NavigationError),
+        takeUntilDestroyed()
+      )
+      .subscribe(() => this.progressSvc.complete());
+  }
 }
