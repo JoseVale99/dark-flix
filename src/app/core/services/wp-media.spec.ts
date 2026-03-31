@@ -4,6 +4,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { WpMediaService } from './wp-media';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { WpPost } from '../models/wp-post.model';
+import { environment } from '../../../environments/environment';
 
 describe('WpMediaService', () => {
   let service: WpMediaService;
@@ -45,7 +46,7 @@ describe('WpMediaService', () => {
     });
 
     // Validar HTTP Request mock
-    const req = httpTesting.expectOne('https://hackstore.mx/wp-json/wp/v2/posts?_embed');
+    const req = httpTesting.expectOne(`${environment.apiBaseUrl}/posts?_embed`);
     expect(req.request.method).toEqual('GET');
 
     // Despachar mock data al pipeline que espera los resultados
