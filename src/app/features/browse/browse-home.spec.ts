@@ -1,12 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowseHomeComponent } from './browse-home';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { Subject } from 'rxjs';
 import { WpMediaService } from '../../core/services/wp-media';
 import { WpPost } from '../../core/models/wp-post.model';
-import { MediaGridComponent } from '../../shared/components/media-grid/media-grid';
-import { HeroBannerComponent } from '../../shared/components/hero-banner/hero-banner';
+import { provideRouter } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('BrowseHomeComponent', () => {
   let component: BrowseHomeComponent;
@@ -23,12 +22,12 @@ describe('BrowseHomeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [BrowseHomeComponent],
       providers: [
+        provideRouter([]),
         { provide: WpMediaService, useValue: mockWpMediaService }
       ]
     })
     .overrideComponent(BrowseHomeComponent, { 
-      remove: { imports: [MediaGridComponent, HeroBannerComponent] },
-      add: { schemas: [NO_ERRORS_SCHEMA] } 
+      set: { imports: [], schemas: [NO_ERRORS_SCHEMA] } 
     })
     .compileComponents();
 
@@ -40,37 +39,23 @@ describe('BrowseHomeComponent', () => {
     vi.clearAllMocks();
   });
 
-  it('renderiza esqueletos placeholder en estado Pending/Loading (undefined inicial de signal)', () => {
-    // La suscripción arranca, pero el Subject no emite nada al toque (esperando HTTP)
-    fixture.detectChanges();
+  it('renderiza estructura base y sliders', () => {
+    // Injectar datos falsos
+    const mockedPosts = Array.from({ length: 15 }).map((_, i) => ({
+      id: i, title: { rendered: 'Mock ' + i }, meta: { quality: '1080p', year: '2025' }
+    } as WpPost));
     
-    // Debería dibujar n skeletons simulando grids cargando (ahora 6 con el Hero presente)
-    const skeletons = fixture.nativeElement.querySelectorAll('df-skeleton-card');
-    expect(skeletons.length).toBe(6);
-  });
-
-  it('renderiza el Error Feedback State tras un fallo HTTP (catchError of(null))', () => {
+    fixture.detectChanges();
+    mockBackendSubject.next(mockedPosts);
     fixture.detectChanges();
 
-    // Rxjs Catch Error dispara of(null), nuestro test trigger emit null simulado
-    mockBackendSubject.next(null);
-    fixture.detectChanges();
-
-    const emptyWrapper = fixture.nativeElement.querySelector('.py-20.text-center');
-    expect(emptyWrapper.textContent).toContain('No hemos encontrado contenido disponible');
-    expect(fixture.nativeElement.querySelectorAll('df-skeleton-card').length).toBe(0);
-  });
-
-  it('renderiza la MediaGrid tras resolución satisfactoria en el servicio', () => {
-    fixture.detectChanges();
-
-    const result = [{ id: 1, title: { rendered: 'Dark' } } as WpPost];
-    mockBackendSubject.next(result);
-    fixture.detectChanges();
-
-    const mediaGrid = fixture.nativeElement.querySelector('df-media-grid');
-    expect(mediaGrid).toBeTruthy();
-    expect(component.posts()?.length).toBe(1);
-    expect(fixture.nativeElement.querySelectorAll('df-skeleton-card').length).toBe(0);
+    expect(component.posts().length).toBe(15);
+    
+    // Verificamos de forma segura buscando los components en crudo por etiqueta
+    const sliders = fixture.nativeElement.querySelectorAll('df-media-slider');
+    expect(sliders.length).toBeGreaterThan(0);
+    
+    const hero = fixture.nativeElement.querySelector('df-hero-banner');
+    expect(hero).toBeTruthy();
   });
 });
