@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { WpMediaService } from '../../core/services/wp-media';
 import { WpPost } from '../../core/models/wp-post.model';
 import { MediaGridComponent } from '../../shared/components/media-grid/media-grid';
+import { HeroBannerComponent } from '../../shared/components/hero-banner/hero-banner';
 
 describe('BrowseHomeComponent', () => {
   let component: BrowseHomeComponent;
@@ -26,7 +27,7 @@ describe('BrowseHomeComponent', () => {
       ]
     })
     .overrideComponent(BrowseHomeComponent, { 
-      remove: { imports: [MediaGridComponent] },
+      remove: { imports: [MediaGridComponent, HeroBannerComponent] },
       add: { schemas: [NO_ERRORS_SCHEMA] } 
     })
     .compileComponents();
@@ -43,9 +44,9 @@ describe('BrowseHomeComponent', () => {
     // La suscripción arranca, pero el Subject no emite nada al toque (esperando HTTP)
     fixture.detectChanges();
     
-    // Debería dibujar n skeletons simulando grids cargando
+    // Debería dibujar n skeletons simulando grids cargando (ahora 6 con el Hero presente)
     const skeletons = fixture.nativeElement.querySelectorAll('df-skeleton-card');
-    expect(skeletons.length).toBe(12);
+    expect(skeletons.length).toBe(6);
   });
 
   it('renderiza el Error Feedback State tras un fallo HTTP (catchError of(null))', () => {

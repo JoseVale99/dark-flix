@@ -5,38 +5,41 @@ import { of } from 'rxjs';
 import { WpMediaService } from '../../core/services/wp-media';
 import { MediaGridComponent } from '../../shared/components/media-grid/media-grid';
 import { SkeletonCardComponent } from '../../shared/components/skeleton-card/skeleton-card';
+import { HeroBannerComponent } from '../../shared/components/hero-banner/hero-banner';
 
 @Component({
   selector: 'df-browse-home',
   template: `
-    <div class="min-h-screen bg-df-background text-white pt-20">
-      <header class="px-4 md:px-8 mb-6">
-        <h1 class="text-3xl font-bold font-sans">DarkFlix Series y Películas</h1>
-        <p class="text-df-muted mt-2 text-sm">Catálogo dinámico servido desde WordPress Headless API</p>
-      </header>
+    <div class="bg-df-background text-white w-full">
+      <!-- Mega Hero Banner alimentado por el Post más reciente (índice 0) -->
+      @if (posts()?.length) {
+        <df-hero-banner [featuredPost]="posts()![0]" />
+      } @else if (posts() === undefined) {
+        <div class="w-full h-[75vh] md:h-[85vh] bg-df-card animate-shimmer"></div>
+      }
 
-      <main class="px-4 md:px-8">
+      <main class="px-4 md:px-12 -mt-16 md:-mt-20 relative z-30">
+        <h2 class="text-xl md:text-2xl font-bold mb-4 px-2">Trending Now</h2>
+        
         @if (posts() === undefined) {
-          <!-- Skeleton Loading visualizándose mientras el observable se resuelve -->
-           <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4 py-8">
-             @for (s of [1,2,3,4,5,6,7,8,9,10,11,12]; track s) {
+           <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4 mb-20">
+             @for (s of [1,2,3,4,5,6]; track s) {
                <df-skeleton-card />
              }
            </div>
         } @else if (posts()?.length) {
-          <!-- Success state: renderizar la grilla inteligente -->
-          <df-media-grid [mediaItems]="posts()!" />
+          <!-- Por defecto limitaremos el render de la grilla exceptuando el que ya fue destacada en Hero -->
+          <df-media-grid [mediaItems]="posts()!.slice(1)" />
         } @else {
-          <!-- Error o Empty State (posts resolvió a null o vacio) -->
           <div class="py-20 text-center">
             <h2 class="text-xl text-df-muted font-semibold">No hemos encontrado contenido disponible 🎬</h2>
-            <p class="text-sm text-df-muted mt-2">La conexión con el backend o WP REST API falló o el catálogo está vacío.</p>
+            <p class="text-sm text-df-muted mt-2">La conexión con el backend falló o el catálogo está vacío.</p>
           </div>
         }
       </main>
     </div>
   `,
-  imports: [MediaGridComponent, SkeletonCardComponent]
+  imports: [MediaGridComponent, SkeletonCardComponent, HeroBannerComponent]
 })
 export class BrowseHomeComponent {
   private mediaService = inject(WpMediaService);
