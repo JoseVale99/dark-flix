@@ -45,7 +45,7 @@ describe('WpMediaService', () => {
     });
 
     // Validar HTTP Request mock
-    const req = httpTesting.expectOne('/wp-json/wp/v2/posts?_embed');
+    const req = httpTesting.expectOne('https://hackstore.mx/wp-json/wp/v2/posts?_embed');
     expect(req.request.method).toEqual('GET');
 
     // Despachar mock data al pipeline que espera los resultados
