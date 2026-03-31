@@ -11,11 +11,12 @@ import { filter } from 'rxjs';
 
 import { ProgressBarComponent } from '@shared/components/progress-bar/progress-bar';
 import { ProgressBarService } from '@services/progress-bar';
+import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, ProgressBarComponent],
+  imports: [RouterOutlet, ProgressBarComponent, BottomNavComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
