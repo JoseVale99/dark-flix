@@ -1,4 +1,5 @@
 export const environment = {
-  production: true,
-  apiBaseUrl: '',
+  production: false,
+  // URL absoluta y pública para consumir la API Headless de WP con metadata incrustada (_embed)
+  apiUrl: '',
 };
