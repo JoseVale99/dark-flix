@@ -30,7 +30,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <p class="font-semibold text-xl">Archivo dañado o no encontrado</p>
-          <button (click)="goBack()" class="mt-6 text-df-accent hover:text-white transition-colors underline">
+          <button (click)="goBack()" class="mt-6 text-df-accent hover:text-white transition-colors underline cursor-pointer">
             Regresar al Inicio
           </button>
         </div>
@@ -63,7 +63,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
         </div>
 
         <!-- Botón Volver -->
-        <button (click)="goBack()" class="absolute top-6 left-4 md:left-12 z-50 text-white/80 hover:text-white bg-df-background/50 hover:bg-[#e50914] rounded-full p-3 backdrop-blur-md transition-all duration-300 focus:outline-none hover:scale-110 shadow-lg border border-white/5">
+        <button (click)="goBack()" class="absolute top-6 left-4 md:left-12 z-50 text-white/80 hover:text-white bg-df-background/50 hover:bg-[#e50914] rounded-full p-3 backdrop-blur-md transition-all duration-300 focus:outline-none hover:scale-110 shadow-lg border border-white/5 cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
@@ -137,7 +137,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
               <button (click)="activeTab.set('EPISODIOS')"
                       [class.text-white]="activeTab() === 'EPISODIOS'"
                       [class.border-white]="activeTab() === 'EPISODIOS'"
-                      class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
+                      class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                       [class.text-gray-400]="activeTab() !== 'EPISODIOS'"
                       [class.border-transparent]="activeTab() !== 'EPISODIOS'">
                 EPISODIOS
@@ -146,7 +146,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
             <button (click)="activeTab.set('REPRODUCIR')"
                     [class.text-white]="activeTab() === 'REPRODUCIR'"
                     [class.border-white]="activeTab() === 'REPRODUCIR'"
-                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
+                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                     [class.text-gray-400]="activeTab() !== 'REPRODUCIR'"
                     [class.border-transparent]="activeTab() !== 'REPRODUCIR'">
               {{ (movie()?.type === 'tvshows' || movie()?.type === 'animes') ? 'VER EPISODIO SELECCIONADO' : 'REPRODUCTOR EN LÍNEA' }}
@@ -154,7 +154,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
             <button (click)="activeTab.set('DESCARGAS')"
                     [class.text-white]="activeTab() === 'DESCARGAS'"
                     [class.border-white]="activeTab() === 'DESCARGAS'"
-                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
+                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                     [class.text-gray-400]="activeTab() !== 'DESCARGAS'"
                     [class.border-transparent]="activeTab() !== 'DESCARGAS'">
               DESCARGAS
@@ -162,7 +162,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
             <button (click)="activeTab.set('REPARTO')"
                     [class.text-white]="activeTab() === 'REPARTO'"
                     [class.border-white]="activeTab() === 'REPARTO'"
-                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
+                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                     [class.text-gray-400]="activeTab() !== 'REPARTO'"
                     [class.border-transparent]="activeTab() !== 'REPARTO'">
               REPARTO
@@ -170,7 +170,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
             <button (click)="activeTab.set('SIMILARES')"
                     [class.text-white]="activeTab() === 'SIMILARES'"
                     [class.border-white]="activeTab() === 'SIMILARES'"
-                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
+                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                     [class.text-gray-400]="activeTab() !== 'SIMILARES'"
                     [class.border-transparent]="activeTab() !== 'SIMILARES'">
               TÍTULOS SIMILARES
@@ -211,7 +211,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                     <div class="flex flex-col gap-3">
                       @for (ep of episodesResponse()!.posts; track ep._id) {
                         <button (click)="selectedEpisodeId.set(ep._id); activeTab.set('REPRODUCIR'); isTheaterMode.set(true)" 
-                                class="flex items-center gap-4 text-left p-4 md:p-5 bg-[#161616] hover:bg-white/10 border border-white/5 transition-colors rounded-xl group relative overflow-hidden"
+                                class="flex items-center gap-4 text-left p-4 md:p-5 bg-[#161616] hover:bg-white/10 border border-white/5 transition-colors rounded-xl group relative overflow-hidden cursor-pointer"
                                 [class.border-[#e50914]]="selectedEpisodeId() === ep._id">
                           
                           <!-- Número de capitulo gigante -->
@@ -255,7 +255,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                       }
                       
                       <!-- Overlay expand button (Only visible in Tab mode) -->
-                      <button (click)="isTheaterMode.set(true)" class="absolute bottom-4 right-4 bg-black/60 hover:bg-[#e50914] backdrop-blur text-white p-3 rounded opacity-0 group-hover:opacity-100 transition-all shadow-lg border border-white/20">
+                      <button (click)="isTheaterMode.set(true)" class="absolute bottom-4 right-4 bg-black/60 hover:bg-[#e50914] backdrop-blur text-white p-3 rounded opacity-0 group-hover:opacity-100 transition-all shadow-lg border border-white/20 cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14v-2m0 0h2m-2 0l4 4m10-4v-2m0 0h-2m2 0l-4 4m-6-8V4m0 0H6m2 0l-4 4m10 4V4m0 0h2m-2 0l4 4" />
                         </svg>
@@ -271,7 +271,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                                 [class.text-black]="selectedEmbedIndex() === $index"
                                 [class.bg-white/10]="selectedEmbedIndex() !== $index"
                                 [class.text-white]="selectedEmbedIndex() !== $index"
-                                class="px-4 py-2 rounded-md text-sm font-medium hover:bg-white/30 transition-colors border border-white/5">
+                                class="px-4 py-2 rounded-md text-sm font-medium hover:bg-white/30 transition-colors border border-white/5 cursor-pointer">
                           {{ embed.server || 'Server ' + ($index + 1) }} - {{ embed.lang }} ({{ embed.quality }})
                         </button>
                       }

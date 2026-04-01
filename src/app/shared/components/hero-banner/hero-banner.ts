@@ -54,11 +54,11 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           </p>
 
           <div class="flex flex-wrap justify-center md:justify-start gap-4 w-full">
-            <button [routerLink]="featuredPost() | mediaUrl" [state]="{ media: featuredPost() }" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-3 md:py-4 px-8 md:px-12 rounded flex items-center justify-center gap-3 transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(229,9,20,0.4)] text-lg">
+            <button [routerLink]="featuredPost() | mediaUrl" [state]="{ media: featuredPost() }" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-3 md:py-4 px-8 md:px-12 rounded flex items-center justify-center gap-3 transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(229,9,20,0.4)] text-lg cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path d="M5 3l14 9-14 9V3z"/></svg>
               REPRODUCIR
             </button>
-            <button [routerLink]="featuredPost() | mediaUrl" [state]="{ media: featuredPost() }" class="bg-gray-500/30 hover:bg-gray-500/50 backdrop-blur-md border border-white/10 text-white font-bold py-3 md:py-4 px-8 md:px-10 rounded transition-colors flex justify-center items-center text-lg gap-2">
+            <button [routerLink]="featuredPost() | mediaUrl" [state]="{ media: featuredPost() }" class="bg-gray-500/30 hover:bg-gray-500/50 backdrop-blur-md border border-white/10 text-white font-bold py-3 md:py-4 px-8 md:px-10 rounded transition-colors flex justify-center items-center text-lg gap-2 cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
               MÁS INFO
             </button>
