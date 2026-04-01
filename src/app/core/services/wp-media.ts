@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { ApiMedia, ApiMediaResponse } from '@models';
+import { ApiMedia, ApiMediaResponse, ApiPlayerResponse, ApiRelatedResponse, ApiCastResponse, ApiCast } from '@models';
 import { environment } from '@env';
 
 @Injectable({
@@ -41,4 +41,34 @@ export class WpMediaService {
          return match;
       }));
   }
+
+  // ---- NUEVOS ENDPOINTS ESTILO "NETFLIX EXPANDIDO" ----
+
+  getMoviePlayers(postId: string | number): Observable<ApiPlayerResponse['data']> {
+    return this.http.get<ApiPlayerResponse>(`${this.baseUrl}/player?postId=${postId}&demo=0`)
+      .pipe(map(res => res.data));
+  }
+
+  getMovieDownloads(postId: string | number): Observable<any[]> {
+    // El payload asume s=7 y d=1 por defecto según Hackstore API para retornar el array directo
+    return this.http.get<{error: boolean, data: any[]}>(`${this.baseUrl}/player?postId=${postId}&demo=0&s=7&d=1`)
+      .pipe(map(res => res.data));
+  }
+
+  getRelatedMedia(postId: string | number): Observable<ApiMedia[]> {
+    return this.http.get<ApiRelatedResponse>(`${this.baseUrl}/single/related?postId=${postId}&page=1&tab=connections&postsPerPage=6`)
+      .pipe(map(res => res.data.posts));
+  }
+
+  getMovieCast(postId: string | number, type: string = 'movies'): Observable<ApiCast[]> {
+    return this.http.get<ApiCastResponse>(`${this.baseUrl}/cast/${type}/${postId}`)
+      .pipe(map(res => res.data));
+  }
+
+  registerHit(postId: string | number, type: string = 'movies'): Observable<boolean> {
+    const nocache = new Date().getTime();
+    return this.http.get<{error: boolean, data: boolean}>(`${this.baseUrl}/hit?nocache=${nocache}&_id=${postId}&type=${type}`)
+      .pipe(map(res => res.data));
+  }
 }
+
