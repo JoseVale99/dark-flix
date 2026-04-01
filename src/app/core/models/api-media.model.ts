@@ -33,3 +33,62 @@ export interface ApiMediaResponse {
     }
   };
 }
+
+export interface ApiEmbed {
+  url: string;
+  server: string | null;
+  lang: string;
+  quality: string;
+  size: string | null;
+  subtitle: number;
+  format: string | null;
+  resolution: string | null;
+}
+
+export interface ApiDownload {
+  url: string;
+  server: string | null;
+  lang: string;
+  quality: string;
+  size: string | null;
+  subtitle: number;
+  format: string | null;
+  resolution: string | null;
+}
+
+export interface ApiPlayerResponse {
+  error: boolean;
+  message: string;
+  data: {
+    embeds: ApiEmbed[];
+    downloads: ApiDownload[]; // It could be empty if they require specific payload
+  };
+}
+
+export interface ApiRelatedResponse {
+  error: boolean;
+  message: string;
+  data: {
+    posts: ApiMedia[];
+  };
+}
+
+export interface ApiCast {
+  term_id: number;
+  term_name: string;
+  term_slug: string;
+  object_id: number;
+  meta?: {
+    popularity?: string;
+    profile_path?: string;
+    order?: number;
+    character?: string;
+  };
+  dep?: string; // e.g. director
+}
+
+export interface ApiCastResponse {
+  error: boolean;
+  message: string;
+  data: ApiCast[];
+}
