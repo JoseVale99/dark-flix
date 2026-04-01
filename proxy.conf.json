@@ -1,0 +1,7 @@
+{
+  "/wp-api": {
+    "target": "https://hackstore.mx",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
