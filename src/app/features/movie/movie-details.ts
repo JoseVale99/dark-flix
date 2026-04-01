@@ -133,7 +133,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           
           <!-- TABS NAVIGATION -->
           <div class="flex flex-wrap gap-4 md:gap-8 border-b border-white/10 mb-8 pt-8">
-            @if (movie()?.type === 'tvshows') {
+            @if (movie()?.type === 'tvshows' || movie()?.type === 'animes') {
               <button (click)="activeTab.set('EPISODIOS')"
                       [class.text-white]="activeTab() === 'EPISODIOS'"
                       [class.border-white]="activeTab() === 'EPISODIOS'"
@@ -149,7 +149,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                     class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
                     [class.text-gray-400]="activeTab() !== 'REPRODUCIR'"
                     [class.border-transparent]="activeTab() !== 'REPRODUCIR'">
-              {{ movie()?.type === 'tvshows' ? 'VER EPISODIO SELECCIONADO' : 'REPRODUCTOR EN LÍNEA' }}
+              {{ (movie()?.type === 'tvshows' || movie()?.type === 'animes') ? 'VER EPISODIO SELECCIONADO' : 'REPRODUCTOR EN LÍNEA' }}
             </button>
             <button (click)="activeTab.set('DESCARGAS')"
                     [class.text-white]="activeTab() === 'DESCARGAS'"
@@ -464,7 +464,7 @@ export class MovieDetailsComponent {
   private stateMedia = history.state.media as ApiMedia | undefined;
 
   activeTab = signal<'REPRODUCIR' | 'DESCARGAS' | 'REPARTO' | 'SIMILARES' | 'EPISODIOS'>(
-    this.stateMedia?.type === 'tvshows' ? 'EPISODIOS' : 'REPRODUCIR'
+    (this.stateMedia?.type === 'tvshows' || this.stateMedia?.type === 'animes') ? 'EPISODIOS' : 'REPRODUCIR'
   );
   selectedEmbedIndex = signal<number>(0);
   isTheaterMode = signal(false);
@@ -497,7 +497,8 @@ export class MovieDetailsComponent {
   activeMediaId = computed(() => {
     const rootId = this.movie()?._id;
     if (!rootId) return undefined;
-    return this.movie()?.type === 'tvshows' ? this.selectedEpisodeId() : rootId;
+    const isSeries = this.movie()?.type === 'tvshows' || this.movie()?.type === 'animes';
+    return isSeries ? this.selectedEpisodeId() : rootId;
   });
 
   playersState = toSignal(
@@ -520,7 +521,7 @@ export class MovieDetailsComponent {
 
   episodesResponse = toSignal(
     combineLatest([toObservable(this.movie), toObservable(this.selectedSeason)]).pipe(
-      filter(([m]) => m?.type === 'tvshows'),
+      filter(([m]) => m?.type === 'tvshows' || m?.type === 'animes'),
       switchMap(([currentMovie, season]) => this.wpService.getTvShowEpisodes(currentMovie!._id, season).pipe(
         catchError(() => of(undefined))
       ))
