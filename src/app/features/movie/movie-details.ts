@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { WpMediaService } from '@services/wp-media';
 import { ApiMedia } from '@models';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { catchError, map, of, switchMap, combineLatest, filter } from 'rxjs';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
 import { BadgeComponent } from '@shared/components/badge/badge';
 import { Location } from '@angular/common';
 import { SafePipe } from '@shared/pipes/safe';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'df-movie-details',
@@ -126,45 +127,117 @@ import { RouterModule } from '@angular/router';
           
         </div>
 
-        <!-- LOWER SECTION (TABS) -->
-        <div class="mt-8 w-full max-w-7xl mx-auto px-4 md:px-12 relative z-30 pb-20">
+        <!-- COMPONENTES EXTENDIDOS (TABS: REPRODUCTORES, DESCARGAS, REPARTO...) -->
+        <div class="max-w-7xl mx-auto px-6 pb-24 text-white relative z-30">
           
-          <!-- TABS MENU -->
-          <div class="flex gap-6 border-b border-white/10 pb-0 overflow-x-auto hide-scrollbar mb-8">
-            <button (click)="activeTab.set('REPRODUCIR')" 
-                    [class.text-white]="activeTab() === 'REPRODUCIR'" 
-                    [class.border-[#e50914]]="activeTab() === 'REPRODUCIR'" 
-                    [class.border-transparent]="activeTab() !== 'REPRODUCIR'"
-                    class="text-gray-400 hover:text-white font-bold tracking-wider pb-3 border-b-2 whitespace-nowrap transition-colors uppercase text-sm">
-              Reproductor en línea
+          <!-- TABS NAVIGATION -->
+          <div class="flex flex-wrap gap-4 md:gap-8 border-b border-white/10 mb-8 pt-8">
+            @if (movie()?.type === 'tvshows') {
+              <button (click)="activeTab.set('EPISODIOS')"
+                      [class.text-white]="activeTab() === 'EPISODIOS'"
+                      [class.border-white]="activeTab() === 'EPISODIOS'"
+                      class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
+                      [class.text-gray-400]="activeTab() !== 'EPISODIOS'"
+                      [class.border-transparent]="activeTab() !== 'EPISODIOS'">
+                EPISODIOS
+              </button>
+            }
+            <button (click)="activeTab.set('REPRODUCIR')"
+                    [class.text-white]="activeTab() === 'REPRODUCIR'"
+                    [class.border-white]="activeTab() === 'REPRODUCIR'"
+                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
+                    [class.text-gray-400]="activeTab() !== 'REPRODUCIR'"
+                    [class.border-transparent]="activeTab() !== 'REPRODUCIR'">
+              {{ movie()?.type === 'tvshows' ? 'VER EPISODIO SELECCIONADO' : 'REPRODUCTOR EN LÍNEA' }}
             </button>
-            <button (click)="activeTab.set('DESCARGAS')" 
-                    [class.text-white]="activeTab() === 'DESCARGAS'" 
-                    [class.border-[#e50914]]="activeTab() === 'DESCARGAS'" 
-                    [class.border-transparent]="activeTab() !== 'DESCARGAS'"
-                    class="text-gray-400 hover:text-white font-bold tracking-wider pb-3 border-b-2 whitespace-nowrap transition-colors uppercase text-sm">
-              Descargas
+            <button (click)="activeTab.set('DESCARGAS')"
+                    [class.text-white]="activeTab() === 'DESCARGAS'"
+                    [class.border-white]="activeTab() === 'DESCARGAS'"
+                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
+                    [class.text-gray-400]="activeTab() !== 'DESCARGAS'"
+                    [class.border-transparent]="activeTab() !== 'DESCARGAS'">
+              DESCARGAS
             </button>
-            <button (click)="activeTab.set('REPARTO')" 
-                    [class.text-white]="activeTab() === 'REPARTO'" 
-                    [class.border-[#e50914]]="activeTab() === 'REPARTO'" 
-                    [class.border-transparent]="activeTab() !== 'REPARTO'"
-                    class="text-gray-400 hover:text-white font-bold tracking-wider pb-3 border-b-2 whitespace-nowrap transition-colors uppercase text-sm">
-              Reparto
+            <button (click)="activeTab.set('REPARTO')"
+                    [class.text-white]="activeTab() === 'REPARTO'"
+                    [class.border-white]="activeTab() === 'REPARTO'"
+                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
+                    [class.text-gray-400]="activeTab() !== 'REPARTO'"
+                    [class.border-transparent]="activeTab() !== 'REPARTO'">
+              REPARTO
             </button>
-            <button (click)="activeTab.set('SIMILARES')" 
-                    [class.text-white]="activeTab() === 'SIMILARES'" 
-                    [class.border-[#e50914]]="activeTab() === 'SIMILARES'" 
-                    [class.border-transparent]="activeTab() !== 'SIMILARES'"
-                    class="text-gray-400 hover:text-white font-bold tracking-wider pb-3 border-b-2 whitespace-nowrap transition-colors uppercase text-sm">
-              Títulos Similares
+            <button (click)="activeTab.set('SIMILARES')"
+                    [class.text-white]="activeTab() === 'SIMILARES'"
+                    [class.border-white]="activeTab() === 'SIMILARES'"
+                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white"
+                    [class.text-gray-400]="activeTab() !== 'SIMILARES'"
+                    [class.border-transparent]="activeTab() !== 'SIMILARES'">
+              TÍTULOS SIMILARES
             </button>
           </div>
 
-          <!-- TAB CONTENT RENDERER -->
-          <div class="min-h-100">
+          <!-- TABS CONTENT -->
+          <div class="min-h-50">
             @switch (activeTab()) {
               
+              @case ('EPISODIOS') {
+                <div class="animate-fade-in max-w-5xl mx-auto flex flex-col gap-6">
+                  <!-- Control de Temporada -->
+                  <div class="flex justify-between items-center bg-[#161616] border border-white/5 py-3 px-6 rounded-xl">
+                    <h2 class="text-white font-bold text-lg md:text-xl">Selecciona un Episodio</h2>
+                    <div class="relative min-w-40">
+                      <select [ngModel]="selectedSeason()" (ngModelChange)="selectedSeason.set($event)"
+                              class="w-full bg-black border border-white/20 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:border-[#e50914] appearance-none cursor-pointer hover:bg-white/5 transition-colors">
+                        @if (episodesResponse()?.seasons) {
+                          @for (s of episodesResponse()!.seasons; track s) {
+                            <option [value]="s">Temporada {{ s }}</option>
+                          }
+                        } @else {
+                          <option value="1">Temporada 1</option>
+                        }
+                      </select>
+                      <!-- Custom caret icon -->
+                      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Lista de Episodios -->
+                  @if (!episodesResponse()?.posts) {
+                    <div class="text-center py-10 text-gray-500 font-bold animate-pulse">Cargando episodios...</div>
+                  } @else {
+                    <div class="flex flex-col gap-3">
+                      @for (ep of episodesResponse()!.posts; track ep._id) {
+                        <button (click)="selectedEpisodeId.set(ep._id); activeTab.set('REPRODUCIR'); isTheaterMode.set(true)" 
+                                class="flex items-center gap-4 text-left p-4 md:p-5 bg-[#161616] hover:bg-white/10 border border-white/5 transition-colors rounded-xl group relative overflow-hidden"
+                                [class.border-[#e50914]]="selectedEpisodeId() === ep._id">
+                          
+                          <!-- Número de capitulo gigante -->
+                          <div class="text-4xl md:text-5xl font-black text-white/5 group-hover:text-white/10 transition-colors mr-2 shrink-0">
+                            {{ ep.episode_number }}
+                          </div>
+                          
+                          <div class="flex flex-col flex-1 z-10">
+                            <h3 class="text-white font-bold text-base md:text-lg group-hover:text-[#e50914] transition-colors leading-tight">
+                              {{ ep.title.split(': ').pop() || ep.title }}
+                            </h3>
+                            <p class="text-gray-500 text-xs md:text-sm font-medium mt-1">Temporada {{ ep.season_number }} • Episodio {{ ep.episode_number }}</p>
+                          </div>
+                          
+                          <!-- Play icon on hover -->
+                          <div class="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center shrink-0 group-hover:bg-[#e50914] group-hover:border-[#e50914] transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
               @case ('REPRODUCIR') {
                 <div class="animate-fade-in flex flex-col gap-4">
                   @if (playersState().embeds.length === 0) {
@@ -378,60 +451,75 @@ import { RouterModule } from '@angular/router';
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, LazyImageDirective, WpImagePipe, BadgeComponent, SafePipe]
+  imports: [CommonModule, RouterModule, LazyImageDirective, WpImagePipe, BadgeComponent, SafePipe, FormsModule]
 })
 export class MovieDetailsComponent {
-  // Captured directly from the route param /movie/:id thanks to withComponentInputBinding()
   id = input.required<string>();
 
   private wpService = inject(WpMediaService);
   private location = inject(Location);
   
-  // Custom View States
-  activeTab = signal<'REPRODUCIR' | 'DESCARGAS' | 'REPARTO' | 'SIMILARES'>('REPRODUCIR');
+  private stateMedia = history.state.media as ApiMedia | undefined;
+
+  activeTab = signal<'REPRODUCIR' | 'DESCARGAS' | 'REPARTO' | 'SIMILARES' | 'EPISODIOS'>(
+    this.stateMedia?.type === 'tvshows' ? 'EPISODIOS' : 'REPRODUCIR'
+  );
   selectedEmbedIndex = signal<number>(0);
   isTheaterMode = signal(false);
 
-  // Router state
-  private stateMedia = history.state.media as ApiMedia | undefined;
+  selectedSeason = signal<string>('1');
+  selectedEpisodeId = signal<string | number | undefined>(undefined);
 
-  // Derive an observable from the input 'id' and fetch the details IF state was empty
-  private mediaState = toSignal(
+  mediaState = toSignal(
     toObservable(this.id).pipe(
       switchMap(currentId => {
-        // Register Hit Asynchronously
-        this.wpService.registerHit(currentId).pipe(catchError(() => of(false))).subscribe();
-
-        // Carga ultra rápida: si viene en el estado, úsalo!
-        if (this.stateMedia && String(this.stateMedia._id) === currentId) {
-            return of({ data: this.stateMedia, error: false });
+        if (this.stateMedia && this.stateMedia._id == currentId) {
+          return of({ data: this.stateMedia, error: false });
         }
-        // Fallback: Fetch (Hackstore might crash unless on page=1)
         return this.wpService.getMediaById(currentId).pipe(
-            map(post => ({ data: post, error: false })),
-            catchError(() => of({ data: null as ApiMedia | null, error: true }))
+          map(res => ({ data: res, error: false })),
+          catchError(() => of({ data: null, error: true }))
         );
       })
-    ),
-    { initialValue: this.stateMedia ? { data: this.stateMedia, error: false } : { data: null as ApiMedia | null, error: false } }
+    )
   );
+  
+  movie = computed(() => this.mediaState()?.data || null);
 
-  // Extended Data Signals (Non-blocking Parallel Fetching)
+  activeMediaId = computed(() => {
+    return this.movie()?.type === 'tvshows' ? this.selectedEpisodeId() : this.id();
+  });
+
   playersState = toSignal(
-    toObservable(this.id).pipe(
-      switchMap(currentId => this.wpService.getMoviePlayers(currentId).pipe(catchError(() => of({ embeds: [], downloads: [] }))))
+    toObservable(this.activeMediaId).pipe(
+      filter(id => !!id),
+      switchMap(currentId => this.wpService.getMoviePlayers(currentId!).pipe(
+        catchError(() => of({ embeds: [], downloads: [] }))
+      ))
     ), { initialValue: { embeds: [], downloads: [] } }
   );
 
   downloadsState = toSignal(
-    toObservable(this.id).pipe(
-      switchMap(currentId => this.wpService.getMovieDownloads(currentId).pipe(catchError(() => of([]))))
+    toObservable(this.activeMediaId).pipe(
+      filter(id => !!id),
+      switchMap(currentId => this.wpService.getMovieDownloads(currentId!).pipe(
+        catchError(() => of([]))
+      ))
     ), { initialValue: [] }
+  );
+
+  episodesResponse = toSignal(
+    combineLatest([toObservable(this.id), toObservable(this.selectedSeason)]).pipe(
+      filter(() => this.movie()?.type === 'tvshows'),
+      switchMap(([currentId, season]) => this.wpService.getTvShowEpisodes(currentId, season).pipe(
+        catchError(() => of(undefined))
+      ))
+    ), { initialValue: undefined }
   );
 
   castState = toSignal(
     toObservable(this.id).pipe(
-      switchMap(currentId => this.wpService.getMovieCast(currentId).pipe(catchError(() => of([]))))
+      switchMap(currentId => this.wpService.getMovieCast(currentId, this.movie()?.type || 'movies').pipe(catchError(() => of([]))))
     ), { initialValue: [] }
   );
 
@@ -445,7 +533,6 @@ export class MovieDetailsComponent {
     const downloads = this.downloadsState();
     if (!downloads) return [];
     
-    // Grouping by quality
     const groups = new Map<string, any>();
     for (const dl of downloads) {
       if (!groups.has(dl.quality)) {
@@ -462,27 +549,39 @@ export class MovieDetailsComponent {
     return Array.from(groups.values());
   });
 
-  movie = computed(() => this.mediaState()?.data || null);
   hasError = computed(() => this.mediaState()?.error === true);
   loadingOrPending = computed(() => this.mediaState() === undefined && !this.hasError());
-
+  
   currentEmbed = computed(() => {
     const embeds = this.playersState().embeds;
-    if (!embeds.length) return null;
+    if (!embeds || embeds.length === 0) return null;
     return embeds[this.selectedEmbedIndex()] || embeds[0];
   });
 
-  getQuality(): string | null {
-    return this.movie()?.quality?.length ? 'HD' : null;
-  }
+  getYear = computed(() => {
+    const mv = this.movie();
+    if (mv?.years && mv.years.length > 0) {
+      if (mv.release_date) {
+        return new Date(mv.release_date).getFullYear().toString();
+      }
+    }
+    return mv?.release_date ? parseInt(mv.release_date).toString() : null;
+  });
 
-  getYear(): string | null {
-    const rd = this.movie()?.release_date;
-    return rd ? rd.split('-')[0] : null;
+  getQuality = computed(() => {
+    return this.movie()?.quality?.length ? 'HD' : null;
+  });
+
+  constructor() {
+    effect(() => {
+      const currentMovie = this.movie();
+      if (currentMovie) {
+        this.wpService.registerHit(currentMovie._id, currentMovie.type).subscribe();
+      }
+    });
   }
 
   goBack() {
     this.location.back();
   }
 }
-

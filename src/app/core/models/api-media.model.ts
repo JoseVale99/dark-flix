@@ -96,3 +96,39 @@ export interface ApiCastResponse {
   message: string;
   data: ApiCast[];
 }
+
+// ---- TV SOWS & EPISODES ----
+
+export interface ApiEpisode {
+  _id: number | string;
+  title: string;
+  date: string;
+  slug: string;
+  type: string;
+  episode_type: string;
+  overview: string;
+  runtime: string;
+  show_id: string;
+  still_path: string;
+  vote_average: string;
+  vote_count: string;
+  season_number: number | string;
+  episode_number: number | string;
+}
+
+export interface ApiEpisodeResponse {
+  error: boolean;
+  message: string;
+  data: {
+    posts: ApiEpisode[];
+    seasons: string[];
+    pagination: {
+      current_page: number;
+      last_page: number;
+      per_page: number;
+      total: number;
+      next_page_url: string | null;
+      prev_page_url: string | null;
+    }
+  };
+}

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { ApiMedia, ApiMediaResponse, ApiPlayerResponse, ApiRelatedResponse, ApiCastResponse, ApiCast } from '@models';
+import { ApiMedia, ApiMediaResponse, ApiPlayerResponse, ApiRelatedResponse, ApiCastResponse, ApiCast, ApiEpisodeResponse } from '@models';
 import { environment } from '@env';
 
 @Injectable({
@@ -68,6 +68,12 @@ export class WpMediaService {
   registerHit(postId: string | number, type: string = 'movies'): Observable<boolean> {
     const nocache = new Date().getTime();
     return this.http.get<{error: boolean, data: boolean}>(`${this.baseUrl}/hit?nocache=${nocache}&_id=${postId}&type=${type}`)
+      .pipe(map(res => res.data));
+  }
+
+  // Obtenemos los episodios y las temporadas para una serie de TV
+  getTvShowEpisodes(showId: string | number, season: string | number = 1): Observable<ApiEpisodeResponse['data']> {
+    return this.http.get<ApiEpisodeResponse>(`${this.baseUrl}/single/episodes/list?_id=${showId}&season=${season}&page=1&postsPerPage=50`)
       .pipe(map(res => res.data));
   }
 }
