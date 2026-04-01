@@ -42,6 +42,16 @@ export class WpMediaService {
       }));
   }
 
+  getMediaBySlug(slug: string, postType: string): Observable<ApiMedia> {
+    return this.http.get<{error: boolean, message: string, data: ApiMedia}>(`${this.baseUrl}/single/${postType}?slug=${slug}&postType=${postType}`)
+      .pipe(map(res => {
+         if (res.error || !res.data) throw new Error('Media no encontrada por Slug');
+         // A veces el backend de hackstore no inserta type firmemente en el single
+         res.data.type = postType;
+         return res.data;
+      }));
+  }
+
   // ---- NUEVOS ENDPOINTS ESTILO "NETFLIX EXPANDIDO" ----
 
   getMoviePlayers(postId: string | number): Observable<ApiPlayerResponse['data']> {
