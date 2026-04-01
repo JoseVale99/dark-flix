@@ -8,7 +8,7 @@ export const routes: Routes = [
     title: 'DarkFlix | Inicio'
   },
   {
-    path: 'movie/:id',
+    path: ':typeSlug/:slug',
     loadComponent: () => import('./features/movie/movie-details').then(m => m.MovieDetailsComponent),
     title: 'DarkFlix | Detalles'
   },
