@@ -25,6 +25,6 @@ describe('SkeletonCardComponent', () => {
     const div = fixture.debugElement.query(By.css('div')).nativeElement;
     expect(div.className).toContain('animate-shimmer');
     expect(div.className).toContain('aspect-poster');
-    expect(div.className).toContain('bg-gradient-to-r');
+    expect(div.className).toContain('bg-linear-to-r');
   });
 });

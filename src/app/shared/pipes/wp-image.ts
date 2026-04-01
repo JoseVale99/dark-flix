@@ -1,22 +1,25 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import type { WpPost } from '@models';
+import { ApiMedia } from '@models';
 
-@Pipe({ name: 'wpImage', pure: true })
+@Pipe({
+  name: 'wpImage',
+  standalone: true
+})
 export class WpImagePipe implements PipeTransform {
-  transform(
-    post: WpPost | null | undefined,
-    size: 'full' | 'medium' | 'thumbnail' = 'medium'
-  ): string | null {
-    if (!post) return null;
+  transform(post: ApiMedia | null | undefined, size: 'poster' | 'backdrop' | 'logo' = 'poster'): string {
+    if (!post || !post.images) {
+      return '';
+    }
 
-    const media = post._embedded?.['wp:featuredmedia']?.[0];
-    if (!media) return null;
-
-    // Intentar obtener el tamaño solicitado
-    const sizeUrl = media.media_details?.sizes?.[size]?.source_url;
-    if (sizeUrl) return sizeUrl;
-
-    // Fallback a source_url si el tamaño no existe
-    return media.source_url ?? null;
+    const host = 'https://hackstore.mx';
+    
+    // Devolver la imagen solicitada asumiendo fallback cruzado si algo falta
+    switch(size) {
+       case 'backdrop': return host + (post.images.backdrop || post.images.poster || '');
+       case 'logo': return host + (post.images.logo || '');
+       case 'poster':
+       default: 
+           return host + (post.images.poster || post.images.backdrop || '');
+    }
   }
 }

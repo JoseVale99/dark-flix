@@ -32,7 +32,7 @@ import { Location } from '@angular/common';
       } @else if (movie()) {
         <!-- Backdrop Hero -->
         <div class="relative w-full h-[60vh] md:h-[75vh]">
-          <img dfLazyImage [lazySrc]="movie()! | wpImage:'full'" class="w-full h-full object-cover" alt="Backdrop">
+          <img dfLazyImage [lazySrc]="movie()! | wpImage:'backdrop'" class="w-full h-full object-cover" alt="Backdrop">
           <div class="absolute inset-0 bg-linear-to-b from-transparent via-df-background/60 to-df-background"></div>
           <div class="absolute inset-0 bg-linear-to-r from-df-background/90 via-df-background/40 to-transparent hidden md:block"></div>
           
@@ -49,7 +49,7 @@ import { Location } from '@angular/common';
           <!-- Left Column: Poster -->
           <div class="hidden md:block w-1/4 shrink-0">
             <div class="aspect-poster rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] overflow-hidden border border-white/10">
-              <img dfLazyImage [lazySrc]="movie()! | wpImage:'medium'" class="w-full h-full object-cover" alt="Poster">
+              <img dfLazyImage [lazySrc]="movie()! | wpImage:'poster'" class="w-full h-full object-cover" alt="Poster">
             </div>
           </div>
 
@@ -66,15 +66,15 @@ import { Location } from '@angular/common';
             </div>
 
             <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none mb-6 text-balance drop-shadow-lg"
-                [innerHTML]="movie()!.title.rendered">
+                [innerHTML]="movie()!.title">
             </h1>
 
             <div class="prose prose-invert prose-lg text-gray-300 mb-8 max-w-3xl leading-relaxed"
-                 [innerHTML]="movie()!.content.rendered">
+                 [innerHTML]="movie()!.overview">
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4">
-              <a [href]="movie()!.link" target="_blank" class="bg-df-accent hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(229,9,20,0.5)] active:scale-95 text-center">
+              <a [href]="'https://hackstore.mx/peliculas/' + movie()!.slug" target="_blank" class="bg-df-accent hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(229,9,20,0.5)] active:scale-95 text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                 </svg>
@@ -113,13 +113,12 @@ export class MovieDetailsComponent {
   loadingOrPending = computed(() => this.mediaState() === undefined && !this.hasError());
 
   getQuality(): string | null {
-    const quality = this.movie()?.meta?.['quality'];
-    return typeof quality === 'string' ? quality : null;
+    return this.movie()?.quality?.length ? 'HD' : null;
   }
 
   getYear(): string | null {
-    const year = this.movie()?.meta?.['year'];
-    return typeof year === 'string' ? year : null;
+    const rd = this.movie()?.release_date;
+    return rd ? rd.split('-')[0] : null;
   }
 
   goBack() {

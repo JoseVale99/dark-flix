@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { WpPost } from '@models/wp-post.model';
+import { ApiMedia } from '@models';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
 import { BadgeComponent } from '@shared/components/badge/badge';
@@ -16,7 +16,7 @@ import { BadgeComponent } from '@shared/components/badge/badge';
       @if (featuredPost()) {
         <img 
           dfLazyImage 
-          [lazySrc]="featuredPost() | wpImage:'full'" 
+          [lazySrc]="featuredPost() | wpImage:'backdrop'" 
           class="absolute inset-0 w-full h-full object-cover z-0"
           alt="Featured Show Poster">
       }
@@ -35,21 +35,21 @@ import { BadgeComponent } from '@shared/components/badge/badge';
         </div>
 
         <h1 class="text-5xl md:text-7xl font-black text-white uppercase tracking-tighter leading-none mb-4 drop-shadow-lg"
-            [innerHTML]="featuredPost()?.title?.rendered || 'NEON ECLIPSE'">
+            [innerHTML]="featuredPost()?.title || 'NEON ECLIPSE'">
         </h1>
 
         <p class="text-gray-300 text-sm md:text-base md:max-w-xl mb-6 line-clamp-3 drop-shadow-sm font-light">
-          In a decaying metropolis governed by neural-networks, one rogue technician discovers a frequency that could reboot humanity.
+          {{ featuredPost()?.overview || 'In a decaying metropolis governed by neural-networks, one rogue technician discovers a frequency that could reboot humanity.' }}
         </p>
 
         <!-- CTAs Base - "Watch Now" y "More Info" -->
         <div class="flex flex-col sm:flex-row gap-3">
-          <button [routerLink]="['/movie', featuredPost()?.id]" class="bg-df-accent hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(229,9,20,0.5)]">
-            <svg xmlns="http://www.w3.org/O/svg/2000" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M5 3l14 9-14 9V3z"/></svg>
+          <button [routerLink]="['/movie', featuredPost()?._id]" class="bg-df-accent hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(229,9,20,0.5)]">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M5 3l14 9-14 9V3z"/></svg>
             PLAY NOW
           </button>
           
-          <button [routerLink]="['/movie', featuredPost()?.id]" class="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold py-3 px-8 rounded transition-colors flex justify-center items-center">
+          <button [routerLink]="['/movie', featuredPost()?._id]" class="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold py-3 px-8 rounded transition-colors flex justify-center items-center">
             MORE INFO
           </button>
         </div>
@@ -58,5 +58,5 @@ import { BadgeComponent } from '@shared/components/badge/badge';
   `
 })
 export class HeroBannerComponent {
-  featuredPost = input<WpPost | undefined>();
+  featuredPost = input<ApiMedia | undefined>();
 }

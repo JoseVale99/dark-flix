@@ -1,41 +1,41 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MediaCardComponent } from './media-card';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import fc from 'fast-check';
-import { signal, WritableSignal, NO_ERRORS_SCHEMA } from '@angular/core';
-import { WpPost } from '@models/wp-post.model';
+import * as fc from 'fast-check';
+import { ApiMedia } from '@models';
+import { ComponentRef } from '@angular/core';
 
 describe('MediaCardComponent', () => {
   let component: MediaCardComponent;
   let fixture: ComponentFixture<MediaCardComponent>;
-  let mediaSignal: WritableSignal<WpPost>;
+  let componentRef: ComponentRef<MediaCardComponent>;
+
+  // Variables simuladas para las props (Signals)
+  let mediaSignal: any;
+  let selectedSpy: any;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MediaCardComponent]
-    })
-    // Forzamos ignorar los errores del JIT Compiler sobre los inputs de los componentes internos (LazyImageDirective, etc.)
-    .overrideComponent(MediaCardComponent, { set: { schemas: [NO_ERRORS_SCHEMA] } })
-    .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(MediaCardComponent);
     component = fixture.componentInstance;
-
-    // Manejo de mock signal para bypassear fallos en el ambiente JS DOM con JIT
-    mediaSignal = signal({
-      id: 1,
-      slug: 'test',
-      title: { rendered: 'Test Post' },
-      excerpt: { rendered: '' },
-      content: { rendered: '' },
-      featured_media: 0,
-      meta: {}
-    } as WpPost);
-
-    Object.defineProperty(component, 'media', { get: () => mediaSignal });
+    componentRef = fixture.componentRef;
     
-    // Setear mock espía para el output
-    component.selected.emit = vi.fn();
+    // Configurar Inputs iniciales (Simulando lo que pasaría desde el padre)
+    mediaSignal = componentRef.setInput('media', { 
+      _id: 1, 
+      title: 'Prueba', 
+      slug: 'prueba', 
+      overview: '',
+      images: { poster: '', backdrop: '', logo: '' } 
+    } as unknown as ApiMedia);
+
+    // Mockear el output para escucharlo
+    selectedSpy = vi.spyOn(component.selected, 'emit');
+    
+    fixture.detectChanges();
   });
 
   afterEach(() => {
@@ -43,54 +43,53 @@ describe('MediaCardComponent', () => {
   });
 
   // Property Tests (PBT)
-  it('Propiedad 1: output selected emite el mismo WpPost recibido al hacer click', () => {
+  it('Propiedad 1: output selected emite el mismo ApiMedia recibido al hacer click', () => {
     fc.assert(
       fc.property(fc.record({
-        id: fc.integer({ min: 1 }),
+        _id: fc.integer({ min: 1 }),
+        title: fc.string(),
         slug: fc.string(),
-        title: fc.record({ rendered: fc.string() }),
-        excerpt: fc.record({ rendered: fc.string() }),
-        content: fc.record({ rendered: fc.string() }),
-        featured_media: fc.integer({ min: 0 }),
-        meta: fc.dictionary(fc.string(), fc.anything())
-      }), (arbitraryPost) => {
-        // Enlazar datos aleatorios generados
-        const postMock = arbitraryPost as unknown as WpPost;
-        mediaSignal.set(postMock);
+        overview: fc.string()
+      }), (randomMedia) => {
+        // Ejecutar escenario
+        componentRef.setInput('media', randomMedia as unknown as ApiMedia);
         fixture.detectChanges();
 
-        // Extraer elemento trigger
-        const cardDiv = fixture.nativeElement.querySelector('.group');
-        cardDiv.click();
+        const cardElement = fixture.nativeElement.querySelector('.group');
+        cardElement.click();
+
+        // Verificamos propiedad
+        expect(selectedSpy).toHaveBeenCalledWith(randomMedia);
         
-        // Comprobar que el espía emitió este objeto exactamente (identidad referencial por input)
-        expect(component.selected.emit).toHaveBeenCalledWith(postMock);
-      }),
-      { numRuns: 100 }
+        // Limpiar para siguiente prueba
+        selectedSpy.mockClear();
+      })
     );
   });
 
   it('Propiedad 2: título mostrado coincide con el input', () => {
     fc.assert(
       fc.property(fc.string(), (randomTitle) => {
-        mediaSignal.set({
-          id: 1, slug: '', title: { rendered: randomTitle }, excerpt: { rendered: '' }, content: { rendered: '' }, featured_media: 0, meta: {}
-        } as WpPost);
-        
+        componentRef.setInput('media', {
+          _id: 1, 
+          title: randomTitle, 
+          slug: 'random', 
+          overview: '',
+          images: { poster: '', backdrop: '', logo: '' } 
+        } as unknown as ApiMedia);
         fixture.detectChanges();
-        
-        const titleEl = fixture.nativeElement.querySelector('p');
-        expect(titleEl.textContent).toBe(randomTitle);
-      }),
-      { numRuns: 100 }
+
+        const titleElement = fixture.nativeElement.querySelector('.truncate');
+        expect(titleElement.textContent).toBe(randomTitle);
+      })
     );
   });
 
-  // Unit Tests
+  // Example-based test (Los clásicos)
   it('skeleton visible cuando imageLoaded es false', () => {
     component.imageLoaded.set(false);
     fixture.detectChanges();
-    
+
     const skeleton = fixture.nativeElement.querySelector('df-skeleton-card');
     expect(skeleton).toBeTruthy();
   });
@@ -98,16 +97,13 @@ describe('MediaCardComponent', () => {
   it('skeleton oculto cuando imageLoaded es true', () => {
     component.imageLoaded.set(true);
     fixture.detectChanges();
-    
+
     const skeleton = fixture.nativeElement.querySelector('df-skeleton-card');
     expect(skeleton).toBeNull();
   });
 
   it('el elemento img tiene el atributo dfLazyImage', () => {
-    fixture.detectChanges();
     const img = fixture.nativeElement.querySelector('img');
-    
-    expect(img).toBeTruthy();
     expect(img.hasAttribute('dfLazyImage')).toBe(true);
   });
 });

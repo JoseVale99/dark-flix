@@ -3,20 +3,23 @@ import { BrowseHomeComponent } from './browse-home';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { Subject } from 'rxjs';
 import { WpMediaService } from '@services/wp-media';
-import { WpPost } from '@models/wp-post.model';
+import { ApiMedia } from '@models';
 import { provideRouter } from '@angular/router';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('BrowseHomeComponent', () => {
   let component: BrowseHomeComponent;
   let fixture: ComponentFixture<BrowseHomeComponent>;
-  let mockBackendSubject: Subject<WpPost[] | null>;
+  let mockHeroSubject: Subject<ApiMedia[] | null>;
+  let mockCatalogSubject: Subject<ApiMedia[] | null>;
 
   beforeEach(async () => {
-    mockBackendSubject = new Subject<WpPost[] | null>();
+    mockHeroSubject = new Subject<ApiMedia[] | null>();
+    mockCatalogSubject = new Subject<ApiMedia[] | null>();
 
     const mockWpMediaService = {
-      getMediaCatalog: vi.fn().mockReturnValue(mockBackendSubject.asObservable())
+      getMediaSliders: vi.fn().mockReturnValue(mockHeroSubject.asObservable()),
+      getMediaCatalog: vi.fn().mockReturnValue(mockCatalogSubject.asObservable())
     };
 
     await TestBed.configureTestingModule({
@@ -42,11 +45,12 @@ describe('BrowseHomeComponent', () => {
   it('renderiza estructura base y sliders', () => {
     // Injectar datos falsos
     const mockedPosts = Array.from({ length: 15 }).map((_, i) => ({
-      id: i, title: { rendered: 'Mock ' + i }, meta: { quality: '1080p', year: '2025' }
-    } as unknown as WpPost));
+      _id: i, title: 'Mock ' + i, quality: [544], release_date: '2025-01-01'
+    } as unknown as ApiMedia));
     
     fixture.detectChanges();
-    mockBackendSubject.next(mockedPosts);
+    mockHeroSubject.next([mockedPosts[0]]);
+    mockCatalogSubject.next(mockedPosts);
     fixture.detectChanges();
 
     expect(component.posts().length).toBe(15);

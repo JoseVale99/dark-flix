@@ -2,8 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { WpMediaService } from './wp-media';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { WpPost } from '@models/wp-post.model';
+import { ApiMedia, ApiMediaResponse } from '@models';
 import { environment } from '@env';
 
 describe('WpMediaService', () => {
@@ -13,9 +12,9 @@ describe('WpMediaService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
+        WpMediaService,
         provideHttpClient(),
-        provideHttpClientTesting(), // El emulador/mock de llamadas asíncronas
-        WpMediaService
+        provideHttpClientTesting()
       ]
     });
 
@@ -32,24 +31,29 @@ describe('WpMediaService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('getMediaCatalog() hace petici\u00f3n GET a /wp-json/wp/v2/posts?_embed y emite posts', () => {
-    const mockPosts: WpPost[] = [
-      { id: 101, title: { rendered: 'Dark' } } as WpPost,
-      { id: 202, title: { rendered: 'Stranger Things' } } as WpPost
+  it('getMediaCatalog() hace petición GET a listado y emite posts descapsulados', () => {
+    const mockPosts: ApiMedia[] = [
+      { _id: 1, title: 'Breaking Bad' } as ApiMedia,
+      { _id: 2, title: 'Stranger Things' } as ApiMedia
     ];
 
-    // Subscribirse al cold observable
-    service.getMediaCatalog().subscribe((posts) => {
+    const mockResponse: ApiMediaResponse = {
+       error: false,
+       message: '',
+       data: { posts: mockPosts }
+    };
+
+    service.getMediaCatalog().subscribe(posts => {
       expect(posts.length).toBe(2);
-      expect(posts[0].id).toBe(101);
-      expect(posts[1].title.rendered).toBe('Stranger Things');
+      expect(posts[0].title).toBe('Breaking Bad');
+      expect(posts[1].title).toBe('Stranger Things');
     });
 
     // Validar HTTP Request mock
-    const req = httpTesting.expectOne(`${environment.apiBaseUrl}/posts?_embed`);
+    const req = httpTesting.expectOne(`https://hackstore.mx/wp-api/v1/listing/movies?page=1&orderBy=latest&order=desc&postType=movies&postsPerPage=12`);
     expect(req.request.method).toEqual('GET');
 
-    // Despachar mock data al pipeline que espera los resultados
-    req.flush(mockPosts);
+    // Emitir mock
+    req.flush(mockResponse);
   });
 });

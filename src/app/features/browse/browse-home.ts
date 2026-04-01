@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of } from 'rxjs';
@@ -6,50 +6,36 @@ import { Router } from '@angular/router';
 import { WpMediaService } from '@services/wp-media';
 import { HeroBannerComponent } from '@shared/components/hero-banner/hero-banner';
 import { MediaSliderComponent } from '@shared/components/media-slider/media-slider';
-import { WpPost } from '@models/wp-post.model';
-
+import { ApiMedia } from '@models';
 
 @Component({
   selector: 'df-browse-home',
   template: `
-    <div class="h-full w-full pb-20 overflow-x-hidden">
-      <!-- 1. El Estado de Error si todo truena a nivel HTTP -->
-      @if (hasError()) {
-        <div class="flex items-center justify-center h-64 text-red-500 bg-df-card/50 mx-4 my-8 rounded">
-          <p class="font-semibold px-4 text-center">
-            Error de conexión a la Base Madre.
-            <br/><span class="text-sm font-normal text-df-muted">La red parece comprometida.</span>
-          </p>
-        </div>
-      }
-
-      <!-- 2. Hero Banner principal -->
-      <!-- Ocupa un espacio central majestuoso. Si posts() está vacío/nulo, inyecta 'undefined' y renderiza el layout placeholder -->
+    <div class="min-h-screen w-full bg-df-background pb-20 overflow-x-hidden">
+      <!-- Hero Principal (Toma el primer post destacado de Sliders) -->
       <df-hero-banner [featuredPost]="heroPost()" />
 
-      <!-- 3. Carruseles / Filas de Contenido -->
-      <!-- Las empujamos sutilmente hacia arriba con un -mt para sobreponerlas en el gradiente del Hero -->
-      <div class="relative z-10 -mt-10 md:-mt-24 space-y-6">
-        <df-media-slider
-          title="Tendencias"
-          [isLoading]="loadingOrPending()"
-          [mediaItems]="trendingPosts()"
-          (mediaSelected)="onMediaSelected($event)"
-        />
+      <!-- Carruseles de Categorías -->
+      <div class="relative z-20 -mt-8 md:-mt-16 space-y-8 md:space-y-12">
+        
+        <df-media-slider 
+          title="Nuevos Lanzamientos" 
+          [mediaItems]="newReleases() || []" 
+          [loading]="loading()"
+          (mediaSelected)="onMediaSelected($event)" />
 
-        <df-media-slider
-          title="Nuevos Lanzamientos"
-          [isLoading]="loadingOrPending()"
-          [mediaItems]="newReleasesPosts()"
-          (mediaSelected)="onMediaSelected($event)"
-        />
+        <df-media-slider 
+          title="Tendencias" 
+          [mediaItems]="trendingPosts() || []" 
+          [loading]="loading()"
+          (mediaSelected)="onMediaSelected($event)" />
 
-        <df-media-slider
-          title="Nuestra Selección"
-          [isLoading]="loadingOrPending()"
-          [mediaItems]="curatedPosts()"
-          (mediaSelected)="onMediaSelected($event)"
-        />
+        <df-media-slider 
+          title="Selección Exclusiva" 
+          [mediaItems]="curatedPosts() || []" 
+          [loading]="loading()"
+          (mediaSelected)="onMediaSelected($event)" />
+          
       </div>
     </div>
   `,
@@ -60,37 +46,39 @@ export class BrowseHomeComponent {
   private wpService = inject(WpMediaService);
   private router = inject(Router);
 
-  // Derivamos un stream capturando status desde el Request original simulando una PWA
-  // toSignal lo empalma al árbol de reactividad Signal a nivel Root
-  private postsState = toSignal(
+  // Hero y Slider response
+  private heroResponse = toSignal(
+    this.wpService.getMediaSliders().pipe(
+      map(posts => ({ data: posts, error: false })),
+      catchError(() => of({ data: null, error: true }))
+    ),
+    { initialValue: { data: null, error: false } }
+  );
+
+  // Movies Catalog response
+  private catalogResponse = toSignal(
     this.wpService.getMediaCatalog().pipe(
       map(posts => ({ data: posts, error: false })),
       catchError(() => of({ data: null, error: true }))
     ),
-    { initialValue: undefined } // undefined = pending request network state
+    { initialValue: { data: null, error: false } }
   );
 
-  // Señal calculada de conveniencia que extrae estrictamente los posts o vacío
-  posts = computed(() => this.postsState()?.data || []);
+  // Estado Computado
+  loading = computed(() => this.catalogResponse().data === null && !this.catalogResponse().error);
+  hasError = computed(() => this.catalogResponse().error === true || this.heroResponse().error === true);
+  
+  // Derivadas para los sliders
+  heroPost = computed(() => this.heroResponse().data?.[0]);
+  
+  // El listado general que devuelve 12 items, se corta para simular categorías
+  posts = computed(() => this.catalogResponse().data || []);
+  
+  newReleases = computed(() => this.posts().slice(0, 4));
+  trendingPosts = computed(() => this.posts().slice(4, 9));
+  curatedPosts = computed(() => this.posts().slice(9, 12));
 
-  /**
-   * Extraemos falsas rebanadas de array para simular "categorías"
-   * ya que Hackstore escupe posts lineales desde el RestAPI base sin filtro.
-   */
-  heroPost = computed(() => this.posts()[0]); // Slot 0
-  trendingPosts = computed(() => this.posts().slice(1, 4)); // Slot 1 al 3
-  newReleasesPosts = computed(() => this.posts().slice(4, 7)); // Slot 4 al 6
-  curatedPosts = computed(() => this.posts().slice(7, 10)); // Restantes
-
-  // Signals reactivos puros para la UI (Skeletization y Feedback)
-  hasError = computed(() => this.postsState()?.error === true);
-  // Pendiente/cargando es verdadero SOLO cuando la Signal principal ni siquiera emitió un `{}` (su InitialValue)
-  loadingOrPending = computed(() => this.postsState() === undefined && !this.hasError());
-
-  /**
-   * Navegación imperativa visual al detalle
-   */
-  onMediaSelected(post: WpPost) {
-    this.router.navigate(['/movie', post.id]);
+  onMediaSelected(media: ApiMedia) {
+    void this.router.navigate(['/movie', media._id]);
   }
 }

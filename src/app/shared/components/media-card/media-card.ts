@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
-import { WpPost } from '@models/wp-post.model';
+import { ApiMedia } from '@models';
 import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton-card';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
@@ -16,8 +16,8 @@ import { BadgeComponent } from '@shared/components/badge/badge';
       }
 
       <img dfLazyImage
-           [lazySrc]="media() | wpImage : 'medium'"
-           [alt]="media().title.rendered"
+           [lazySrc]="media() | wpImage : 'poster'"
+           [alt]="media().title"
            (load)="imageLoaded.set(true)"
            class="w-full h-full object-cover transition-opacity duration-300"
            [class.opacity-0]="!imageLoaded()" />
@@ -42,7 +42,7 @@ import { BadgeComponent } from '@shared/components/badge/badge';
 
       <!-- Title Gradient -->
       <div class="absolute bottom-0 left-0 right-0 p-2 bg-linear-to-t from-black/90 to-transparent z-20">
-        <p class="text-white text-xs font-semibold truncate">{{ media().title.rendered }}</p>
+        <p class="text-white text-xs font-semibold truncate">{{ media().title }}</p>
       </div>
     </div>
   `,
@@ -50,19 +50,17 @@ import { BadgeComponent } from '@shared/components/badge/badge';
   imports: [SkeletonCardComponent, LazyImageDirective, WpImagePipe, BadgeComponent]
 })
 export class MediaCardComponent {
-  media = input.required<WpPost>();
-  selected = output<WpPost>();
+  media = input.required<ApiMedia>();
+  selected = output<ApiMedia>();
 
   imageLoaded = signal(false);
 
-  // Helper getters to safely extract metadata if present
   getQuality(): string | null {
-    const quality = this.media().meta?.['quality'];
-    return typeof quality === 'string' ? quality : null;
+    return this.media().quality?.length ? 'HD' : null;
   }
 
   getYear(): string | null {
-    const year = this.media().meta?.['year'];
-    return typeof year === 'string' ? year : null;
+    const rd = this.media().release_date;
+    return rd ? rd.split('-')[0] : null;
   }
 }
