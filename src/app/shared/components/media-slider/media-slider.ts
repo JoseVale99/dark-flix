@@ -15,25 +15,25 @@ import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton
       <!-- Zona del Carrusel con padding Vertical para que el scale-110 de las tarjetas no se recite -->
       <div class="relative w-full">
         <!-- Botón Anterior (Estilo Circular Seguro para Hover) -->
-        <button 
+        <button
           (click)="scrollLeft()"
           [class.hidden]="!canScrollLeft()"
           [class.md:flex]="canScrollLeft()"
-          class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-[#141414]/90 hover:bg-[#202020] border border-gray-500/40 rounded-full items-center justify-center z-[70] text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer shadow-lg backdrop-blur-sm hidden">
+          class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-[#141414]/90 hover:bg-[#202020] border border-gray-500/40 rounded-full items-center justify-center z-70 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer shadow-lg backdrop-blur-sm hidden">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 md:w-6 md:h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
         </button>
 
         <!-- Botón Siguiente (Estilo Circular Seguro para Hover) -->
-        <button 
+        <button
           (click)="scrollRight()"
           [class.hidden]="!canScrollRight()"
           [class.md:flex]="canScrollRight()"
-          class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-[#141414]/90 hover:bg-[#202020] border border-gray-500/40 rounded-full items-center justify-center z-[70] text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer shadow-lg backdrop-blur-sm hidden">
+          class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 bg-[#141414]/90 hover:bg-[#202020] border border-gray-500/40 rounded-full items-center justify-center z-70 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 cursor-pointer shadow-lg backdrop-blur-sm hidden">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 md:w-6 md:h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
         </button>
 
         <!-- Contenedor con scroll padding ancho -->
-        <div 
+        <div
           #sliderRef
           (scroll)="checkScroll()"
           class="flex gap-2 md:gap-3 overflow-x-auto overflow-y-visible snap-x snap-mandatory px-14 md:px-20 py-6 scroll-smooth scrollbar-hide"
@@ -77,7 +77,7 @@ export class MediaSliderComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     setTimeout(() => this.checkScroll(), 100);
-    
+
     if (typeof window !== 'undefined' && this.sliderRef) {
       this.observer = new ResizeObserver(() => this.checkScroll());
       this.observer.observe(this.sliderRef.nativeElement);
@@ -91,7 +91,7 @@ export class MediaSliderComponent implements AfterViewInit, OnDestroy {
   checkScroll() {
     if (!this.sliderRef) return;
     const el = this.sliderRef.nativeElement;
-    
+
     // Actualizar márgenes de scrolleo con tolerancia de 2px
     this.canScrollLeft.set(el.scrollLeft > 2);
     this.canScrollRight.set(Math.ceil(el.scrollLeft + el.clientWidth) < el.scrollWidth - 2);
