@@ -85,6 +85,10 @@ export class BrowseHomeComponent {
   heroPost = computed(() => this.heroResponse().data);
 
   onMediaSelected(media: ApiMedia) {
-    void this.router.navigate(['/movie', media._id], { state: { media } });
+    let prefix = 'peliculas';
+    if (media.type === 'tvshows') prefix = 'series';
+    else if (media.type === 'animes') prefix = 'animes';
+
+    void this.router.navigate(['/' + prefix, media.slug], { state: { media } });
   }
 }
