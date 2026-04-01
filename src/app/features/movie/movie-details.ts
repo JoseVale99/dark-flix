@@ -114,9 +114,8 @@ import { RouterModule } from '@angular/router';
                  [innerHTML]="movie()!.overview">
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-4">
-              <!-- Reemplazado por el nuevo componente inferior -->
-              <button (click)="activeTab.set('REPRODUCIR')" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(229,9,20,0.5)] active:scale-95 text-center text-lg w-fit">
+            <div class="flex flex-col sm:flex-row gap-4 mt-6">
+              <button (click)="isTheaterMode.set(true)" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(229,9,20,0.5)] active:scale-95 text-center text-lg w-fit cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
                 </svg>
@@ -174,10 +173,19 @@ import { RouterModule } from '@angular/router';
                     </div>
                   } @else {
                     <!-- Iframe Container -->
-                    <div class="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl relative border border-white/10">
-                      @if (currentEmbed()) {
+                    <div class="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl relative border border-white/10 flex items-center justify-center group">
+                      @if (!isTheaterMode() && currentEmbed()) {
                         <iframe [src]="currentEmbed()!.url | safe:'resourceUrl'" class="absolute inset-0 w-full h-full" allowfullscreen></iframe>
+                      } @else if (isTheaterMode()) {
+                        <div class="text-df-accent font-bold animate-pulse">Reproduciendo en Modo Cine...</div>
                       }
+                      
+                      <!-- Overlay expand button (Only visible in Tab mode) -->
+                      <button (click)="isTheaterMode.set(true)" class="absolute bottom-4 right-4 bg-black/60 hover:bg-[#e50914] backdrop-blur text-white p-3 rounded opacity-0 group-hover:opacity-100 transition-all shadow-lg border border-white/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14v-2m0 0h2m-2 0l4 4m10-4v-2m0 0h-2m2 0l-4 4m-6-8V4m0 0H6m2 0l-4 4m10 4V4m0 0h2m-2 0l4 4" />
+                        </svg>
+                      </button>
                     </div>
                     
                     <!-- Server Selector -->
@@ -270,6 +278,51 @@ import { RouterModule } from '@angular/router';
         </div>
 
       }
+
+      <!-- THEATER MODE MODAL (OVERLAY DE PANTALLA COMPLETA) -->
+      @if (isTheaterMode()) {
+        <div class="fixed inset-0 z-100 bg-black flex flex-col animate-fade-in">
+          
+          <!-- Top Controls Bar -->
+          <div class="absolute top-0 inset-x-0 h-24 bg-linear-to-b from-black to-transparent flex items-start justify-between px-6 pt-6 z-50 pointer-events-none">
+            <h2 class="text-white font-bold tracking-widest text-sm md:text-lg opacity-80 uppercase drop-shadow-md pointer-events-auto">
+              {{ movie()?.title }} <span class="mx-2 text-[#e50914]">•</span> <span class="font-normal">{{ currentEmbed()?.server || 'Servidor en Línea' }}</span>
+            </h2>
+            <button (click)="isTheaterMode.set(false)" class="text-white/70 hover:text-white bg-black/40 hover:bg-[#e50914] border border-white/10 rounded-full p-2 transition-all pointer-events-auto backdrop-blur cursor-pointer shadow-2xl">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Video Player Iframe -->
+          <div class="flex-1 w-full h-full relative flex flex-col justify-center bg-black">
+             @if (currentEmbed()) {
+               <!-- max-h-screen para evitar scrolls indeseados -->
+               <iframe [src]="currentEmbed()!.url | safe:'resourceUrl'" class="w-full h-[90vh] md:h-screen border-none" allowfullscreen></iframe>
+             }
+          </div>
+
+          <!-- Bottom Floating Server Selector -->
+          <div class="absolute bottom-6 inset-x-0 flex justify-center z-50 pointer-events-none">
+             <div class="flex flex-wrap justify-center gap-2 bg-black/50 backdrop-blur-md p-2 md:p-3 rounded-2xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] pointer-events-auto max-w-4xl max-h-[25vh] overflow-y-auto hide-scrollbar">
+                @for (embed of playersState().embeds; track $index) {
+                  <button (click)="selectedEmbedIndex.set($index)"
+                          [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
+                          [class.text-white]="selectedEmbedIndex() === $index"
+                          [class.border-[#e50914]]="selectedEmbedIndex() === $index"
+                          [class.bg-black/40]="selectedEmbedIndex() !== $index"
+                          [class.text-gray-300]="selectedEmbedIndex() !== $index"
+                          [class.border-white/10]="selectedEmbedIndex() !== $index"
+                          [class.hover:bg-white/20]="selectedEmbedIndex() !== $index"
+                          class="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all border">
+                    {{ embed.server || 'Server ' + ($index + 1) }} - {{ embed.lang }}
+                  </button>
+                }
+             </div>
+          </div>
+        </div>
+      }
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -285,6 +338,7 @@ export class MovieDetailsComponent {
   // Custom View States
   activeTab = signal<'REPRODUCIR' | 'DESCARGAS' | 'REPARTO' | 'SIMILARES'>('REPRODUCIR');
   selectedEmbedIndex = signal<number>(0);
+  isTheaterMode = signal(false);
 
   // Router state
   private stateMedia = history.state.media as ApiMedia | undefined;
