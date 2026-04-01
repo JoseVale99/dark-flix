@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
-import type { CatalogFilters, WpPaginatedResponse, WpPost } from '@models';
+import type { CatalogFilters, WpPaginatedResponse, ApiMedia } from '@models';
 import { WpApiService } from '@api/wp-api';
 import { buildFilterParams } from '@api/wp-api.utils';
 
@@ -12,9 +12,9 @@ export class MoviesService {
   getMovies(
     filters: CatalogFilters = {},
     page = 1
-  ): Observable<WpPaginatedResponse<WpPost>> {
+  ): Observable<WpPaginatedResponse<ApiMedia>> {
     return this.api
-      .get<WpPost[]>('pelicula', {
+      .get<ApiMedia[]>('pelicula', {
         page,
         per_page: 20,
         _embed: true,
@@ -29,15 +29,15 @@ export class MoviesService {
       );
   }
 
-  getMovieBySlug(slug: string): Observable<WpPost | undefined> {
+  getMovieBySlug(slug: string): Observable<ApiMedia | undefined> {
     return this.api
-      .get<WpPost[]>('pelicula', { slug, _embed: true })
+      .get<ApiMedia[]>('pelicula', { slug, _embed: true })
       .pipe(map((res) => res.body?.[0]));
   }
 
-  getMovieById(id: number): Observable<WpPost> {
+  getMovieById(id: number): Observable<ApiMedia> {
     return this.api
-      .get<WpPost>(`pelicula/${id}`, { _embed: true })
+      .get<ApiMedia>(`pelicula/${id}`, { _embed: true })
       .pipe(map((res) => res.body!));
   }
 }

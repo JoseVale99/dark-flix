@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
-import type { CatalogFilters, WpPaginatedResponse, WpPost } from '@models';
+import type { CatalogFilters, WpPaginatedResponse, ApiMedia } from '@models';
 import { WpApiService } from '@api/wp-api';
 import { buildFilterParams } from '@api/wp-api.utils';
 
@@ -12,9 +12,9 @@ export class SeriesService {
   getSeries(
     filters: CatalogFilters = {},
     page = 1
-  ): Observable<WpPaginatedResponse<WpPost>> {
+  ): Observable<WpPaginatedResponse<ApiMedia>> {
     return this.api
-      .get<WpPost[]>('serie', {
+      .get<ApiMedia[]>('serie', {
         page,
         per_page: 20,
         _embed: true,
@@ -29,15 +29,15 @@ export class SeriesService {
       );
   }
 
-  getSerieBySlug(slug: string): Observable<WpPost | undefined> {
+  getSerieBySlug(slug: string): Observable<ApiMedia | undefined> {
     return this.api
-      .get<WpPost[]>('serie', { slug, _embed: true })
+      .get<ApiMedia[]>('serie', { slug, _embed: true })
       .pipe(map((res) => res.body?.[0]));
   }
 
-  getSerieById(id: number): Observable<WpPost> {
+  getSerieById(id: number): Observable<ApiMedia> {
     return this.api
-      .get<WpPost>(`serie/${id}`, { _embed: true })
+      .get<ApiMedia>(`serie/${id}`, { _embed: true })
       .pipe(map((res) => res.body!));
   }
 }
