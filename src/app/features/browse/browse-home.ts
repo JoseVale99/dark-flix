@@ -48,10 +48,14 @@ export class BrowseHomeComponent {
 
   private heroResponse = toSignal(
     this.wpService.getMediaSliders().pipe(
-      map(posts => ({ data: posts, error: false })),
-      catchError(() => of({ data: null, error: true }))
+      map(posts => {
+        if (!posts || posts.length === 0) return { data: undefined, error: false };
+        const randomFeatured = posts[Math.floor(Math.random() * posts.length)];
+        return { data: randomFeatured, error: false };
+      }),
+      catchError(() => of({ data: undefined as ApiMedia | undefined, error: true }))
     ),
-    { initialValue: { data: null, error: false } }
+    { initialValue: { data: undefined as ApiMedia | undefined, error: false } }
   );
 
   moviesResponse = toSignal(
@@ -78,7 +82,7 @@ export class BrowseHomeComponent {
     { initialValue: { data: [], error: false, loading: true } }
   );
 
-  heroPost = computed(() => this.heroResponse().data?.[0]);
+  heroPost = computed(() => this.heroResponse().data);
 
   onMediaSelected(media: ApiMedia) {
     void this.router.navigate(['/movie', media._id]);
