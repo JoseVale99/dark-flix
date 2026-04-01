@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WpMediaService } from '@services/wp-media';
+import { ApiMedia } from '@models';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
@@ -96,16 +97,26 @@ export class MovieDetailsComponent {
 
   private wpService = inject(WpMediaService);
   private location = inject(Location);
+  
+  // Router state
+  private stateMedia = history.state.media as ApiMedia | undefined;
 
-  // Derive an observable from the input 'id' and fetch the details
+  // Derive an observable from the input 'id' and fetch the details IF state was empty
   private mediaState = toSignal(
     toObservable(this.id).pipe(
-      switchMap(currentId => this.wpService.getMediaById(currentId).pipe(
-        map(post => ({ data: post, error: false })),
-        catchError(() => of({ data: null, error: true }))
-      ))
+      switchMap(currentId => {
+        // Carga ultra rápida: si viene en el estado, úsalo!
+        if (this.stateMedia && String(this.stateMedia._id) === currentId) {
+            return of({ data: this.stateMedia, error: false });
+        }
+        // Fallback: Fetch (Hackstore might crash unless on page=1)
+        return this.wpService.getMediaById(currentId).pipe(
+            map(post => ({ data: post, error: false })),
+            catchError(() => of({ data: null as ApiMedia | null, error: true }))
+        );
+      })
     ),
-    { initialValue: undefined }
+    { initialValue: this.stateMedia ? { data: this.stateMedia, error: false } : { data: null as ApiMedia | null, error: false } }
   );
 
   movie = computed(() => this.mediaState()?.data || null);
