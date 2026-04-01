@@ -11,6 +11,7 @@ import { Location } from '@angular/common';
 import { SafePipe } from '@shared/pipes/safe';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 
 @Component({
   selector: 'df-movie-details',
@@ -387,7 +388,7 @@ import { FormsModule } from '@angular/forms';
                   } @else {
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                       @for (rel of relatedState(); track rel._id) {
-                        <a [routerLink]="['/movie', rel._id]" class="block relative aspect-2/3 rounded-lg overflow-hidden group border border-white/5 bg-df-card">
+                        <a [routerLink]="rel | mediaUrl" class="block relative aspect-2/3 rounded-lg overflow-hidden group border border-white/5 bg-df-card">
                           <img [src]="rel | wpImage:'poster'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                           <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
                             <p class="text-white text-center font-bold text-sm leading-tight border-b-2 border-[#e50914] pb-1">{{ rel.title }}</p>
@@ -451,10 +452,11 @@ import { FormsModule } from '@angular/forms';
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, LazyImageDirective, WpImagePipe, BadgeComponent, SafePipe, FormsModule]
+  imports: [CommonModule, RouterModule, LazyImageDirective, WpImagePipe, BadgeComponent, SafePipe, FormsModule, MediaUrlPipe]
 })
 export class MovieDetailsComponent {
-  id = input.required<string>();
+  typeSlug = input.required<string>();
+  slug = input.required<string>();
 
   private wpService = inject(WpMediaService);
   private location = inject(Location);
@@ -471,15 +473,21 @@ export class MovieDetailsComponent {
   selectedEpisodeId = signal<string | number | undefined>(undefined);
 
   mediaState = toSignal(
-    toObservable(this.id).pipe(
-      switchMap(currentId => {
-        if (this.stateMedia && this.stateMedia._id == currentId) {
-          return of({ data: this.stateMedia, error: false });
-        }
-        return this.wpService.getMediaById(currentId).pipe(
-          map(res => ({ data: res, error: false })),
-          catchError(() => of({ data: null, error: true }))
-        );
+    combineLatest([toObservable(this.typeSlug), toObservable(this.slug)]).pipe(
+      switchMap(([currentTypeSlug, currentSlug]) => {
+         let postType = 'movies';
+         if (currentTypeSlug === 'series') postType = 'tvshows';
+         else if (currentTypeSlug === 'animes') postType = 'animes';
+
+         // Carga ultra rápida si la tarjeta trae el media en state, checando equivalencia
+         if (this.stateMedia && this.stateMedia.slug === currentSlug) {
+           return of({ data: this.stateMedia, error: false });
+         }
+         
+         return this.wpService.getMediaBySlug(currentSlug, postType).pipe(
+           map(res => ({ data: res, error: false })),
+           catchError(() => of({ data: null, error: true }))
+         );
       })
     )
   );
@@ -487,12 +495,14 @@ export class MovieDetailsComponent {
   movie = computed(() => this.mediaState()?.data || null);
 
   activeMediaId = computed(() => {
-    return this.movie()?.type === 'tvshows' ? this.selectedEpisodeId() : this.id();
+    const rootId = this.movie()?._id;
+    if (!rootId) return undefined;
+    return this.movie()?.type === 'tvshows' ? this.selectedEpisodeId() : rootId;
   });
 
   playersState = toSignal(
     toObservable(this.activeMediaId).pipe(
-      filter(id => !!id),
+      filter(activeId => !!activeId),
       switchMap(currentId => this.wpService.getMoviePlayers(currentId!).pipe(
         catchError(() => of({ embeds: [], downloads: [] }))
       ))
@@ -501,7 +511,7 @@ export class MovieDetailsComponent {
 
   downloadsState = toSignal(
     toObservable(this.activeMediaId).pipe(
-      filter(id => !!id),
+      filter(activeId => !!activeId),
       switchMap(currentId => this.wpService.getMovieDownloads(currentId!).pipe(
         catchError(() => of([]))
       ))
@@ -509,23 +519,25 @@ export class MovieDetailsComponent {
   );
 
   episodesResponse = toSignal(
-    combineLatest([toObservable(this.id), toObservable(this.selectedSeason)]).pipe(
-      filter(() => this.movie()?.type === 'tvshows'),
-      switchMap(([currentId, season]) => this.wpService.getTvShowEpisodes(currentId, season).pipe(
+    combineLatest([toObservable(this.movie), toObservable(this.selectedSeason)]).pipe(
+      filter(([m]) => m?.type === 'tvshows'),
+      switchMap(([currentMovie, season]) => this.wpService.getTvShowEpisodes(currentMovie!._id, season).pipe(
         catchError(() => of(undefined))
       ))
     ), { initialValue: undefined }
   );
 
   castState = toSignal(
-    toObservable(this.id).pipe(
-      switchMap(currentId => this.wpService.getMovieCast(currentId, this.movie()?.type || 'movies').pipe(catchError(() => of([]))))
+    toObservable(this.movie).pipe(
+      filter(m => !!m),
+      switchMap(currentMovie => this.wpService.getMovieCast(currentMovie!._id, currentMovie!.type || 'movies').pipe(catchError(() => of([]))))
     ), { initialValue: [] }
   );
 
   relatedState = toSignal(
-    toObservable(this.id).pipe(
-      switchMap(currentId => this.wpService.getRelatedMedia(currentId).pipe(catchError(() => of([]))))
+    toObservable(this.movie).pipe(
+      filter(m => !!m),
+      switchMap(currentMovie => this.wpService.getRelatedMedia(currentMovie!._id).pipe(catchError(() => of([]))))
     ), { initialValue: [] }
   );
 
