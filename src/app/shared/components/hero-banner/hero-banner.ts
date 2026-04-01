@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { WpPost } from '../../../core/models/wp-post.model';
-import { LazyImageDirective } from '../../directives/lazy-image';
-import { WpImagePipe } from '../../pipes/wp-image';
-import { BadgeComponent } from '../badge/badge';
+import { WpPost } from '@models/wp-post.model';
+import { LazyImageDirective } from '@shared/directives/lazy-image';
+import { WpImagePipe } from '@shared/pipes/wp-image';
+import { BadgeComponent } from '@shared/components/badge/badge';
 
 @Component({
   selector: 'df-hero-banner',

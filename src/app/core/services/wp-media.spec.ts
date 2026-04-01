@@ -3,8 +3,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { WpMediaService } from './wp-media';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { WpPost } from '../models/wp-post.model';
-import { environment } from '../../../environments/environment';
+import { WpPost } from '@models/wp-post.model';
+import { environment } from '@env';
 
 describe('WpMediaService', () => {
   let service: WpMediaService;

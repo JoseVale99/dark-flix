@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { WpPost } from '../models/wp-post.model';
+import { WpPost } from '@models/wp-post.model';
 import { environment } from '@env';
 
 @Injectable({
@@ -18,5 +18,12 @@ export class WpMediaService {
    */
   getMediaCatalog(): Observable<WpPost[]> {
     return this.http.get<WpPost[]>(`${this.baseUrl}/posts?_embed`);
+  }
+
+  /**
+   * Extrae la metadata completa de un solo post mediante ID
+   */
+  getMediaById(id: string | number): Observable<WpPost> {
+    return this.http.get<WpPost>(`${this.baseUrl}/posts/${id}?_embed`);
   }
 }

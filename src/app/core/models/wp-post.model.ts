@@ -4,6 +4,7 @@ import type { WpTerm } from './wp-term.model';
 export interface WpPost {
   id: number;
   slug: string;
+  link: string;
   title: { rendered: string };
   excerpt: { rendered: string };
   content: { rendered: string };

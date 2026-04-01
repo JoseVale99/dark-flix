@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of } from 'rxjs';
 import { Router } from '@angular/router';
-import { WpMediaService } from '@core/services/wp-media';
+import { WpMediaService } from '@services/wp-media';
 import { HeroBannerComponent } from '@shared/components/hero-banner/hero-banner';
 import { MediaSliderComponent } from '@shared/components/media-slider/media-slider';
-import { WpPost } from '@core/models/wp-post.model';
+import { WpPost } from '@models/wp-post.model';
 
 
 @Component({

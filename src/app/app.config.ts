@@ -8,6 +8,7 @@ import {
   withPreloading,
   PreloadAllModules,
   withViewTransitions,
+  withComponentInputBinding
 } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 
@@ -19,7 +20,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes, withPreloading(PreloadAllModules), withViewTransitions()),
+    provideRouter(routes, withPreloading(PreloadAllModules), withViewTransitions(), withComponentInputBinding()),
     provideHttpClient(
       withFetch(),
       // cacheInterceptor primero: respuestas cacheadas no activan la barra de progreso

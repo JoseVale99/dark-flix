@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowseHomeComponent } from './browse-home';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { Subject } from 'rxjs';
-import { WpMediaService } from '../../core/services/wp-media';
-import { WpPost } from '../../core/models/wp-post.model';
+import { WpMediaService } from '@services/wp-media';
+import { WpPost } from '@models/wp-post.model';
 import { provideRouter } from '@angular/router';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
@@ -43,7 +43,7 @@ describe('BrowseHomeComponent', () => {
     // Injectar datos falsos
     const mockedPosts = Array.from({ length: 15 }).map((_, i) => ({
       id: i, title: { rendered: 'Mock ' + i }, meta: { quality: '1080p', year: '2025' }
-    } as WpPost));
+    } as unknown as WpPost));
     
     fixture.detectChanges();
     mockBackendSubject.next(mockedPosts);
