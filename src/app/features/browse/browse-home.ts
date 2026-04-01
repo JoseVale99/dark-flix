@@ -85,6 +85,6 @@ export class BrowseHomeComponent {
   heroPost = computed(() => this.heroResponse().data);
 
   onMediaSelected(media: ApiMedia) {
-    void this.router.navigate(['/movie', media._id]);
+    void this.router.navigate(['/movie', media._id], { state: { media } });
   }
 }
