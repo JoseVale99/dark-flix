@@ -31,31 +31,52 @@ import { Location } from '@angular/common';
           </button>
         </div>
       } @else if (movie()) {
-        <!-- Backdrop Hero -->
-        <div class="relative w-full h-[60vh] md:h-[75vh]">
-          <img dfLazyImage [lazySrc]="movie()! | wpImage:'backdrop'" class="w-full h-full object-cover" alt="Backdrop">
-          <div class="absolute inset-0 bg-linear-to-b from-transparent via-df-background/60 to-df-background"></div>
-          <div class="absolute inset-0 bg-linear-to-r from-df-background/90 via-df-background/40 to-transparent hidden md:block"></div>
+        <!-- CAPA DE FONDO: Backdrop Absoluto Cinemático -->
+        <div class="absolute top-0 left-0 w-full h-screen overflow-hidden pointer-events-none">
           
-          <button (click)="goBack()" class="absolute top-6 left-4 md:left-12 z-50 text-white/80 hover:text-white bg-black/40 hover:bg-black/80 rounded-full p-2 backdrop-blur-sm transition-all focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-          </button>
+          <!-- Capa 1: Fondo escenográfico súper borroso (Proyección de luz) -->
+          <img dfLazyImage [lazySrc]="movie()! | wpImage:'backdrop'" class="absolute inset-0 w-full h-[150%] object-cover z-0 blur-[90px] opacity-40 mix-blend-screen" alt="Atmosphere">
+          
+          <!-- Capa 2: Backdrop estirado con máscara Tailwind v4 nativa -->
+          <div class="absolute top-0 right-0 w-full md:w-[80%] h-[85vh] z-10 flex justify-end opacity-60 md:mask-[linear-gradient(to_right,transparent,black_20%)] mask-[linear-gradient(to_bottom,black_10%,transparent_90%)]">
+            <img dfLazyImage [lazySrc]="movie()! | wpImage:'backdrop'" class="w-full h-full object-cover md:object-right object-top" alt="Backdrop">
+          </div>
+
+          <!-- Capa 3: "Humo" (Smoke Fades) usando densidad paralela -->
+          <div class="absolute inset-0 bg-black/10 z-10"></div> <!-- Oscurecedor unificador ligero -->
+          
+          <!-- Base sólida inferior para evitar cualquier corte -->
+          <div class="absolute inset-x-0 bottom-0 h-[20vh] bg-df-background z-20"></div>
+          
+          <!-- Humo denso ascendente -->
+          <div class="absolute inset-x-0 bottom-[10vh] h-[70vh] bg-linear-to-t from-df-background from-20% via-df-background/80 to-transparent z-20"></div>
+          
+          <!-- Sombra profunda interior adicional -->
+          <div class="absolute inset-0 bg-linear-to-t from-df-background via-transparent to-transparent z-20 opacity-80"></div>
+
+          <!-- Gradiente horizontal (para oscurecer la zona de texto) -->
+          <div class="absolute inset-y-0 left-0 w-full md:w-3/5 bg-linear-to-r from-df-background from-15% via-df-background/80 to-transparent z-20"></div>
         </div>
 
-        <!-- Content -->
-        <div class="relative z-10 -mt-20 md:-mt-40 px-4 md:px-12 max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
+        <!-- Botón Volver -->
+        <button (click)="goBack()" class="absolute top-6 left-4 md:left-12 z-50 text-white/80 hover:text-white bg-df-background/50 hover:bg-[#e50914] rounded-full p-3 backdrop-blur-md transition-all duration-300 focus:outline-none hover:scale-110 shadow-lg border border-white/5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+        </button>
+
+        <!-- CONTENIDO PRINCIPAL FLOTANTE -->
+        <div class="relative z-30 pt-[35vh] md:pt-[40vh] px-4 md:px-12 max-w-7xl mx-auto flex flex-col md:flex-row gap-8 pb-12">
           
           <!-- Left Column: Poster -->
           <div class="hidden md:block w-1/4 shrink-0">
-            <div class="aspect-poster rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] overflow-hidden border border-white/10">
-              <img dfLazyImage [lazySrc]="movie()! | wpImage:'poster'" class="w-full h-full object-cover" alt="Poster">
+            <div class="aspect-poster rounded-lg shadow-[0_0_40px_rgba(0,0,0,0.9)] overflow-hidden border border-white/5 ring-1 ring-white/10 group">
+              <img dfLazyImage [lazySrc]="movie()! | wpImage:'poster'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Poster">
             </div>
           </div>
 
           <!-- Right Column: Info -->
-          <div class="flex-1 text-white pt-4">
+          <div class="flex-1 pt-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             <div class="flex flex-wrap gap-2 mb-4">
               @if (getQuality()) {
                 <df-badge [text]="getQuality()!" variant="accent" />
@@ -66,20 +87,20 @@ import { Location } from '@angular/common';
               <df-badge text="Cinematic" variant="default" />
             </div>
 
-            <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none mb-6 text-balance drop-shadow-lg"
+            <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-tight mb-6 text-balance text-white"
                 [innerHTML]="movie()!.title">
             </h1>
 
-            <div class="prose prose-invert prose-lg text-gray-300 mb-8 max-w-3xl leading-relaxed"
+            <div class="prose prose-invert prose-lg text-gray-300 mb-8 max-w-3xl leading-relaxed drop-shadow-md"
                  [innerHTML]="movie()!.overview">
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4">
-              <a [href]="'https://hackstore.mx/peliculas/' + movie()!.slug" target="_blank" class="bg-df-accent hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(229,9,20,0.5)] active:scale-95 text-center">
+              <a [href]="'https://hackstore.mx/peliculas/' + movie()!.slug" target="_blank" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(229,9,20,0.5)] active:scale-95 text-center text-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
                 </svg>
-                DESCARGAR DE ORIGEN
+                REPRODUCIR
               </a>
             </div>
           </div>
