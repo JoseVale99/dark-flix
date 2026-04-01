@@ -11,15 +11,21 @@ describe('BrowseHomeComponent', () => {
   let component: BrowseHomeComponent;
   let fixture: ComponentFixture<BrowseHomeComponent>;
   let mockHeroSubject: Subject<ApiMedia[] | null>;
-  let mockCatalogSubject: Subject<ApiMedia[] | null>;
+  let mockMoviesSubject: Subject<ApiMedia[] | null>;
+  let mockTvShowsSubject: Subject<ApiMedia[] | null>;
+  let mockAnimesSubject: Subject<ApiMedia[] | null>;
 
   beforeEach(async () => {
     mockHeroSubject = new Subject<ApiMedia[] | null>();
-    mockCatalogSubject = new Subject<ApiMedia[] | null>();
+    mockMoviesSubject = new Subject<ApiMedia[] | null>();
+    mockTvShowsSubject = new Subject<ApiMedia[] | null>();
+    mockAnimesSubject = new Subject<ApiMedia[] | null>();
 
     const mockWpMediaService = {
       getMediaSliders: vi.fn().mockReturnValue(mockHeroSubject.asObservable()),
-      getMediaCatalog: vi.fn().mockReturnValue(mockCatalogSubject.asObservable())
+      getMoviesList: vi.fn().mockReturnValue(mockMoviesSubject.asObservable()),
+      getTvShowsList: vi.fn().mockReturnValue(mockTvShowsSubject.asObservable()),
+      getAnimesList: vi.fn().mockReturnValue(mockAnimesSubject.asObservable())
     };
 
     await TestBed.configureTestingModule({
@@ -50,11 +56,11 @@ describe('BrowseHomeComponent', () => {
     
     fixture.detectChanges();
     mockHeroSubject.next([mockedPosts[0]]);
-    mockCatalogSubject.next(mockedPosts);
+    mockMoviesSubject.next(mockedPosts);
+    mockTvShowsSubject.next(mockedPosts);
+    mockAnimesSubject.next(mockedPosts);
     fixture.detectChanges();
 
-    expect(component.posts().length).toBe(15);
-    
     // Verificamos de forma segura buscando los components en crudo por etiqueta
     const sliders = fixture.nativeElement.querySelectorAll('df-media-slider');
     expect(sliders.length).toBeGreaterThan(0);

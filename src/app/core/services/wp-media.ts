@@ -10,31 +10,30 @@ import { environment } from '@env';
 export class WpMediaService {
   private http = inject(HttpClient);
 
-  // Nueva Base URL custom
-  private readonly baseUrl = 'https://hackstore.mx/wp-api/v1';
+  // Redirigir la base URL por el proxy local para matar el CORS
+  private readonly baseUrl = environment.production ? 'https://hackstore.mx/wp-api/v1' : '/wp-api/v1';
 
-  /**
-   * Obtiene la data estelar para los Hero Banners
-   */
   getMediaSliders(): Observable<ApiMedia[]> {
     return this.http.get<ApiMediaResponse>(`${this.baseUrl}/sliders?page=1&postType=any&postsPerPage=9`)
       .pipe(map(res => res.data.posts));
   }
 
-  /**
-   * Obtiene la primera página del catálogo principal de peliculas
-   */
-  getMediaCatalog(): Observable<ApiMedia[]> {
+  getMoviesList(): Observable<ApiMedia[]> {
     return this.http.get<ApiMediaResponse>(`${this.baseUrl}/listing/movies?page=1&orderBy=latest&order=desc&postType=movies&postsPerPage=12`)
       .pipe(map(res => res.data.posts));
   }
 
-  /**
-   * Extrae un post mediante ID
-   */
+  getTvShowsList(): Observable<ApiMedia[]> {
+    return this.http.get<ApiMediaResponse>(`${this.baseUrl}/listing/tvshows?page=1&orderBy=latest&order=desc&postType=tvshows&postsPerPage=12`)
+      .pipe(map(res => res.data.posts));
+  }
+
+  getAnimesList(): Observable<ApiMedia[]> {
+    return this.http.get<ApiMediaResponse>(`${this.baseUrl}/listing/animes?page=1&orderBy=latest&order=desc&postType=animes&postsPerPage=12`)
+      .pipe(map(res => res.data.posts));
+  }
+
   getMediaById(id: string | number): Observable<ApiMedia> {
-    // Al no tener confirmación de endpoint unitario, pediremos listado total y filtraremos temporalmente 
-    // O si en la doc real es /posts/, esto podria fallar (sujeto a revision)
     return this.http.get<ApiMediaResponse>(`${this.baseUrl}/listing/movies?page=1`)
       .pipe(map(res => {
          const match = res.data?.posts?.find(p => p._id == id);

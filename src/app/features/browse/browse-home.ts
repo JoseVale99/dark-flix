@@ -12,28 +12,28 @@ import { ApiMedia } from '@models';
   selector: 'df-browse-home',
   template: `
     <div class="min-h-screen w-full bg-df-background pb-20 overflow-x-hidden">
-      <!-- Hero Principal (Toma el primer post destacado de Sliders) -->
+      <!-- Hero Principal -->
       <df-hero-banner [featuredPost]="heroPost()" />
 
-      <!-- Carruseles de Categorías -->
+      <!-- Carruseles Verdaderos Segmentados -->
       <div class="relative z-20 -mt-8 md:-mt-16 space-y-8 md:space-y-12">
         
         <df-media-slider 
-          title="Nuevos Lanzamientos" 
-          [mediaItems]="newReleases() || []" 
-          [loading]="loading()"
+          title="Películas Recientes" 
+          [mediaItems]="moviesResponse().data || []" 
+          [loading]="moviesResponse().loading"
           (mediaSelected)="onMediaSelected($event)" />
 
         <df-media-slider 
-          title="Tendencias" 
-          [mediaItems]="trendingPosts() || []" 
-          [loading]="loading()"
+          title="Series Destacadas" 
+          [mediaItems]="tvShowsResponse().data || []" 
+          [loading]="tvShowsResponse().loading"
           (mediaSelected)="onMediaSelected($event)" />
 
         <df-media-slider 
-          title="Selección Exclusiva" 
-          [mediaItems]="curatedPosts() || []" 
-          [loading]="loading()"
+          title="Animes Populares" 
+          [mediaItems]="animesResponse().data || []" 
+          [loading]="animesResponse().loading"
           (mediaSelected)="onMediaSelected($event)" />
           
       </div>
@@ -46,7 +46,6 @@ export class BrowseHomeComponent {
   private wpService = inject(WpMediaService);
   private router = inject(Router);
 
-  // Hero y Slider response
   private heroResponse = toSignal(
     this.wpService.getMediaSliders().pipe(
       map(posts => ({ data: posts, error: false })),
@@ -55,28 +54,31 @@ export class BrowseHomeComponent {
     { initialValue: { data: null, error: false } }
   );
 
-  // Movies Catalog response
-  private catalogResponse = toSignal(
-    this.wpService.getMediaCatalog().pipe(
-      map(posts => ({ data: posts, error: false })),
-      catchError(() => of({ data: null, error: true }))
+  moviesResponse = toSignal(
+    this.wpService.getMoviesList().pipe(
+        map(posts => ({ data: posts, error: false, loading: false })),
+        catchError(() => of({ data: null, error: true, loading: false }))
     ),
-    { initialValue: { data: null, error: false } }
+    { initialValue: { data: [], error: false, loading: true } }
   );
 
-  // Estado Computado
-  loading = computed(() => this.catalogResponse().data === null && !this.catalogResponse().error);
-  hasError = computed(() => this.catalogResponse().error === true || this.heroResponse().error === true);
-  
-  // Derivadas para los sliders
+  tvShowsResponse = toSignal(
+    this.wpService.getTvShowsList().pipe(
+        map(posts => ({ data: posts, error: false, loading: false })),
+        catchError(() => of({ data: null, error: true, loading: false }))
+    ),
+    { initialValue: { data: [], error: false, loading: true } }
+  );
+
+  animesResponse = toSignal(
+    this.wpService.getAnimesList().pipe(
+        map(posts => ({ data: posts, error: false, loading: false })),
+        catchError(() => of({ data: null, error: true, loading: false }))
+    ),
+    { initialValue: { data: [], error: false, loading: true } }
+  );
+
   heroPost = computed(() => this.heroResponse().data?.[0]);
-  
-  // El listado general que devuelve 12 items, se corta para simular categorías
-  posts = computed(() => this.catalogResponse().data || []);
-  
-  newReleases = computed(() => this.posts().slice(0, 4));
-  trendingPosts = computed(() => this.posts().slice(4, 9));
-  curatedPosts = computed(() => this.posts().slice(9, 12));
 
   onMediaSelected(media: ApiMedia) {
     void this.router.navigate(['/movie', media._id]);

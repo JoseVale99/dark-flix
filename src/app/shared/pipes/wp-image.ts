@@ -11,7 +11,7 @@ export class WpImagePipe implements PipeTransform {
       return '';
     }
 
-    const host = 'https://hackstore.mx';
+    const host = 'https://hackstore.mx/wp-content/uploads';
     
     // Devolver la imagen solicitada asumiendo fallback cruzado si algo falta
     switch(size) {
