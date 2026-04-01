@@ -14,11 +14,15 @@ export interface ApiMedia {
   images: ApiImages;
   trailer?: string;
   rating?: string;
+  community_rating?: string;
+  vote_count?: string | number;
   type: 'movies' | 'series' | 'anime' | string;
   release_date: string;
   runtime?: string;
   quality?: number[];
   years?: number[];
+  original_title?: string;
+  tagline?: string;
 }
 
 export interface ApiMediaResponse {

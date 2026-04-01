@@ -80,18 +80,35 @@ import { RouterModule } from '@angular/router';
           <!-- Right Column: Info -->
           <div class="flex-1 pt-4 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             <div class="flex flex-wrap gap-2 mb-4">
-              @if (getQuality()) {
-                <df-badge [text]="getQuality()!" variant="accent" />
-              }
-              @if (getYear()) {
-                <df-badge [text]="getYear()!" variant="default" />
-              }
+              @if (getQuality()) { <df-badge [text]="getQuality()!" variant="accent" /> }
+              @if (getYear()) { <df-badge [text]="getYear()!" variant="default" /> }
               <df-badge text="Cinematic" variant="default" />
+              @if (movie()?.runtime && movie()?.runtime !== '0.0') {
+                <df-badge [text]="movie()!.runtime + ' min'" variant="default" />
+              }
+              @if (movie()?.rating && movie()?.rating !== '0.0') {
+                <div class="flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded text-sm font-bold text-yellow-400 border border-white/5 backdrop-blur-sm shadow">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  {{ movie()!.rating }}
+                </div>
+              }
             </div>
 
-            <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-tight mb-6 text-balance text-white"
+            <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-tight mb-2 text-balance text-white"
                 [innerHTML]="movie()!.title">
             </h1>
+            
+            @if (movie()?.original_title && movie()!.original_title !== movie()!.title) {
+              <p class="text-gray-400 font-medium mb-4 italic" [innerHTML]="movie()!.original_title"></p>
+            }
+
+            @if (movie()?.tagline) {
+              <p class="text-df-accent font-bold uppercase tracking-widest text-sm mb-6">{{ movie()!.tagline }}</p>
+            } @else {
+              <div class="mb-6"></div>
+            }
 
             <div class="prose prose-invert prose-lg text-gray-300 mb-8 max-w-3xl leading-relaxed drop-shadow-md"
                  [innerHTML]="movie()!.overview">
