@@ -3,7 +3,7 @@ import { MediaCardComponent } from './media-card';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import fc from 'fast-check';
 import { signal, WritableSignal, NO_ERRORS_SCHEMA } from '@angular/core';
-import { WpPost } from '../../../core/models/wp-post.model';
+import { WpPost } from '@models/wp-post.model';
 
 describe('MediaCardComponent', () => {
   let component: MediaCardComponent;

@@ -1,9 +1,9 @@
 import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
-import { WpPost } from '../../../core/models/wp-post.model';
-import { SkeletonCardComponent } from '../skeleton-card/skeleton-card';
-import { LazyImageDirective } from '../../directives/lazy-image';
-import { WpImagePipe } from '../../pipes/wp-image';
-import { BadgeComponent } from '../badge/badge';
+import { WpPost } from '@models/wp-post.model';
+import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton-card';
+import { LazyImageDirective } from '@shared/directives/lazy-image';
+import { WpImagePipe } from '@shared/pipes/wp-image';
+import { BadgeComponent } from '@shared/components/badge/badge';
 
 @Component({
   selector: 'df-media-card',

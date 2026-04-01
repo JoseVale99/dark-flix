@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { WpPost } from '../../../core/models/wp-post.model';
-import { MediaCardComponent } from '../media-card/media-card';
-import { SkeletonCardComponent } from '../skeleton-card/skeleton-card';
+import { WpPost } from '@models/wp-post.model';
+import { MediaCardComponent } from '@shared/components/media-card/media-card';
+import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton-card';
 
 @Component({
   selector: 'df-media-slider',
