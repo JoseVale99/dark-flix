@@ -17,13 +17,13 @@ import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton
         @if (loading()) {
             <!-- Skeletons placeholders -->
             @for (item of [1,2,3,4,5,6]; track item) {
-                <div class="snap-start shrink-0 w-140 md:w-220">
+                <div class="snap-start shrink-0 w-35 md:w-55">
                     <df-skeleton-card />
                 </div>
             }
         } @else {
             @for (media of mediaItems(); track media._id) {
-                <div class="snap-start shrink-0 w-140 md:w-220">
+                <div class="snap-start shrink-0 w-35 md:w-55">
                     <df-media-card [media]="media" (selected)="mediaSelected.emit($event)" />
                 </div>
             } @empty {

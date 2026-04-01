@@ -22,23 +22,32 @@ import { BadgeComponent } from '@shared/components/badge/badge';
       }
 
       <!-- Gradientes (Fade to DarkFlix Background) -->
-      <div class="absolute inset-0 bg-linear-to-b from-transparent via-df-background/40 to-df-background z-10"></div>
+      <div class="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-df-background via-df-background/80 to-transparent z-10"></div>
       
       <!-- Viñeta Lateral para desktop -->
-      <div class="absolute inset-0 bg-linear-to-r from-df-background/80 via-transparent to-transparent z-10 hidden md:block"></div>
+      <div class="absolute inset-y-0 left-0 w-3/4 bg-gradient-to-r from-df-background via-df-background/60 to-transparent z-10 hidden md:block"></div>
 
       <!-- Contenido Destacado Texto y Título Frontal -->
       <div class="relative z-20 max-w-2xl">
         <div class="flex items-center gap-2 mb-3">
           <df-badge variant="accent" text="ORIGINAL SERIES" />
-          <span class="text-xs tracking-widest text-[#FFB000] font-semibold drop-shadow-md">PREMIUM EXCLUSIVE</span>
+          <span class="text-xs md:text-sm tracking-widest text-amber-500 font-bold drop-shadow-md">PREMIUM EXCLUSIVE</span>
         </div>
 
-        <h1 class="text-5xl md:text-7xl font-black text-white uppercase tracking-tighter leading-none mb-4 drop-shadow-lg"
-            [innerHTML]="featuredPost()?.title || 'NEON ECLIPSE'">
-        </h1>
+        @if (featuredPost()?.images?.logo) {
+          <img 
+            [src]="featuredPost() | wpImage:'logo'" 
+            [alt]="featuredPost()?.title"
+            class="w-full max-w-[250px] md:max-w-md h-auto mb-6 object-contain drop-shadow-2xl"
+            loading="eager"
+          />
+        } @else {
+          <h1 class="text-5xl md:text-7xl font-black text-white uppercase tracking-tight leading-none mb-6 drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]"
+              [innerHTML]="featuredPost()?.title || 'NEON ECLIPSE'">
+          </h1>
+        }
 
-        <p class="text-gray-300 text-sm md:text-base md:max-w-xl mb-6 line-clamp-3 drop-shadow-sm font-light">
+        <p class="text-gray-200 text-sm md:text-lg lg:text-xl font-medium md:max-w-xl mb-8 line-clamp-3 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] leading-relaxed">
           {{ featuredPost()?.overview || 'In a decaying metropolis governed by neural-networks, one rogue technician discovers a frequency that could reboot humanity.' }}
         </p>
 
