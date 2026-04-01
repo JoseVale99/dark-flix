@@ -207,25 +207,77 @@ import { RouterModule } from '@angular/router';
               }
 
               @case ('DESCARGAS') {
-                <div class="animate-fade-in">
-                  @if (downloadsState().length === 0) {
-                    <div class="text-gray-400">Verificando descargas disponibles...</div>
-                  } @else {
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      @for (dl of downloadsState(); track $index) {
-                        <a [href]="dl.url" target="_blank" class="flex flex-col bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-5 transition-colors group">
-                          <div class="flex justify-between items-start mb-4">
-                            <span class="text-lg font-bold text-white group-hover:text-[#e50914] transition-colors line-clamp-1 break-all">{{ dl.url.split('/')[2] }}</span>
-                            <df-badge [text]="dl.quality" variant="accent" />
-                          </div>
-                          <div class="space-y-2 mt-auto text-sm text-gray-300">
-                            <div class="flex justify-between"><span>Audio:</span> <span class="text-white">{{ dl.lang }}</span></div>
-                            @if (dl.size) { <div class="flex justify-between"><span>Peso:</span> <span class="text-white">{{ dl.size }}</span></div> }
-                            @if (dl.format) { <div class="flex justify-between"><span>Formato:</span> <span class="text-white">{{ dl.format }}</span></div> }
-                          </div>
-                        </a>
-                      }
+                <div class="animate-fade-in max-w-5xl mx-auto flex flex-col gap-3">
+                  @if (groupedDownloads().length === 0) {
+                    <div class="text-gray-400 min-h-30 flex items-center justify-center bg-white/5 rounded-xl border border-white/5">
+                      Verificando descargas disponibles...
                     </div>
+                  } @else {
+                    @for (group of groupedDownloads(); track group.quality) {
+                      <details class="group bg-[#161616] border border-white/5 rounded-xl overflow-hidden transition-all duration-300">
+                        <summary class="flex flex-col md:flex-row items-center cursor-pointer p-4 md:p-6 list-none hover:bg-white/5 transition-colors gap-4 relative">
+                          
+                          <!-- Ocultar el marcador nativo de "details" -->
+                          <style>details > summary::-webkit-details-marker { display: none; }</style>
+
+                          <!-- Izquierda: Icono y Título (Calidad) -->
+                          <div class="flex items-center gap-4 w-full md:w-auto">
+                            <!-- Icono Estilo Llama Azul (Referencia de la imagen) -->
+                            <div class="text-blue-500 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.5 10c0 4.142-3.358 7.5-7.5 7.5s-7.5-3.358-7.5-7.5c0-1.745.59-3.35 1.583-4.633.344-.446.996-.401 1.28.093.59.99 1.63 1.624 2.802 1.583l.116-.008c.51-.059.957-.428 1.1-.926l.86-2.905c.16-.54.84-.716 1.26-.33.328.3.626.638.887 1.002.324.453.948.514 1.346.126 1.134-1.104 1.956-2.58 2.215-4.249.096-.61.85-.758 1.18-.235C16.892 4)94 17.5 7.24 17.5 10z"/>
+                                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zM12 20c-4.418 20-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z" opacity=".1"/>
+                              </svg>
+                            </div>
+                            <h3 class="text-lg md:text-xl font-bold text-white tracking-wide shrink-0 min-w-50">{{ group.quality }}</h3>
+                          </div>
+
+                          <!-- Centro: Datos Técnicos -->
+                          <div class="flex items-center gap-3 md:gap-8 flex-1 w-full md:w-auto overflow-x-auto hide-scrollbar text-center">
+                             <!-- Formato -->
+                             <div class="bg-black/30 rounded-lg py-2 px-4 border border-white/5 min-w-25">
+                                <p class="text-white font-medium text-sm">{{ group.format }}</p>
+                                <p class="text-gray-500 text-xs">Formato</p>
+                             </div>
+                             <!-- Tamaño -->
+                             <div class="bg-black/30 rounded-lg py-2 px-4 border border-white/5 min-w-25">
+                                <p class="text-white font-medium text-sm">{{ group.size }}</p>
+                                <p class="text-gray-500 text-xs">Tamaño</p>
+                             </div>
+                             <!-- Resolución -->
+                             <div class="bg-black/30 rounded-lg py-2 px-4 border border-white/5 min-w-35">
+                                <p class="text-white font-medium text-sm">{{ group.resolution }}</p>
+                                <p class="text-gray-500 text-xs">Resolución</p>
+                             </div>
+                          </div>
+
+                          <!-- Derecha: Botón Dropdown (Rojo estilo DarkFlix) -->
+                          <div class="w-full md:w-auto mt-4 md:mt-0 flex justify-end">
+                            <div class="bg-[#ba0811] hover:bg-[#e50914] text-white px-6 py-3 rounded text-sm md:text-base font-bold flex items-center justify-between min-w-45 transition-colors gap-4">
+                              <span>Descargar</span>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-open:rotate-180 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </div>
+                          </div>
+                        </summary>
+
+                        <!-- Contenido Desplegable: Lista de Enlaces -->
+                        <div class="p-6 bg-black/40 border-t border-white/5 flex flex-col gap-3">
+                          @for (dl of group.links; track dl.url) {
+                            <a [href]="dl.url" target="_blank" class="flex justify-between items-center p-4 bg-white/5 hover:bg-white/10 rounded-lg border border-white/5 transition-all text-sm md:text-base group/link">
+                               <div class="flex items-center gap-3">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 group-hover/link:text-df-accent transition-colors hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                  </svg>
+                                  <span class="font-bold text-gray-300 group-hover/link:text-white transition-colors">{{ dl.server || dl.url.split('/')[2] }}</span>
+                               </div>
+                               <span class="text-gray-400 font-medium tracking-wide">Audio: {{ dl.lang }}</span>
+                            </a>
+                          }
+                        </div>
+                      </details>
+                    }
                   }
                 </div>
               }
@@ -235,19 +287,19 @@ import { RouterModule } from '@angular/router';
                   @if (castState().length === 0) {
                     <div class="text-gray-400">Cargando reparto...</div>
                   } @else {
-                    <div class="flex overflow-x-auto gap-4 md:gap-6 pb-6 hide-scrollbar snap-x">
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-x-4 gap-y-8 pb-6 justify-items-center">
                       @for (actor of castState(); track actor.term_id) {
-                        <div class="flex flex-col items-center shrink-0 w-30 md:w-37.5 snap-center">
-                          <div class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden mb-3 border-2 border-white/10 bg-df-card relative">
+                        <div class="flex flex-col items-center w-full max-w-30">
+                          <div class="w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden mb-3 border-2 border-white/10 bg-df-card relative">
                             <!-- Si la API provee path local, usualmente es de la base TMDB -->
                             @if (actor.meta?.profile_path; as path) {
-                               <img [src]="'https://image.tmdb.org/t/p/w276_and_h350_face' + path" class="w-full h-full object-cover">
+                               <img [src]="'https://image.tmdb.org/t/p/w276_and_h350_face' + path" class="w-full h-full object-cover shadow-inner hover:scale-110 transition-transform duration-500">
                             } @else {
                                <div class="w-full h-full flex items-center justify-center text-3xl font-bold text-white/20">{{ actor.term_name.charAt(0) }}</div>
                             }
                           </div>
-                          <p class="text-white text-center font-semibold text-sm leading-tight mb-1">{{ actor.term_name }}</p>
-                          <p class="text-gray-400 text-center text-xs leading-tight line-clamp-2">{{ actor.meta?.character || actor.dep }}</p>
+                          <p class="text-white text-center font-bold text-xs md:text-sm leading-tight mb-1 line-clamp-2 px-1">{{ actor.term_name }}</p>
+                          <p class="text-gray-400 text-center text-[10px] md:text-xs leading-tight line-clamp-2 px-1">{{ actor.meta?.character || actor.dep }}</p>
                         </div>
                       }
                     </div>
@@ -388,6 +440,27 @@ export class MovieDetailsComponent {
       switchMap(currentId => this.wpService.getRelatedMedia(currentId).pipe(catchError(() => of([]))))
     ), { initialValue: [] }
   );
+
+  groupedDownloads = computed(() => {
+    const downloads = this.downloadsState();
+    if (!downloads) return [];
+    
+    // Grouping by quality
+    const groups = new Map<string, any>();
+    for (const dl of downloads) {
+      if (!groups.has(dl.quality)) {
+        groups.set(dl.quality, {
+          quality: dl.quality,
+          format: dl.format || 'MKV',
+          size: dl.size || '--',
+          resolution: dl.resolution || '--',
+          links: []
+        });
+      }
+      groups.get(dl.quality)!.links.push(dl);
+    }
+    return Array.from(groups.values());
+  });
 
   movie = computed(() => this.mediaState()?.data || null);
   hasError = computed(() => this.mediaState()?.error === true);
