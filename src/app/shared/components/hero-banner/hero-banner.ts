@@ -11,21 +11,21 @@ import { BadgeComponent } from '@shared/components/badge/badge';
   imports: [RouterLink, LazyImageDirective, WpImagePipe, BadgeComponent],
   template: `
     <div class="relative w-full h-[75vh] md:h-[85vh] flex flex-col justify-end pb-24 md:pb-32 px-4 md:px-12 object-cover">
-      
+
       <!-- Fondo Hero Image (Parallax/Cover) -->
       @if (featuredPost()) {
-        <img 
-          dfLazyImage 
-          [lazySrc]="featuredPost() | wpImage:'backdrop'" 
+        <img
+          dfLazyImage
+          [lazySrc]="featuredPost() | wpImage:'backdrop'"
           class="absolute inset-0 w-full h-full object-cover z-0"
           alt="Featured Show Poster">
       }
 
       <!-- Gradientes (Fade to DarkFlix Background) -->
-      <div class="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-df-background via-df-background/80 to-transparent z-10"></div>
-      
+      <div class="absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-t from-df-background via-df-background/80 to-transparent z-10"></div>
+
       <!-- Viñeta Lateral para desktop -->
-      <div class="absolute inset-y-0 left-0 w-3/4 bg-gradient-to-r from-df-background via-df-background/60 to-transparent z-10 hidden md:block"></div>
+      <div class="absolute inset-y-0 left-0 w-3/4 bg-linear-to-r from-df-background via-df-background/60 to-transparent z-10 hidden md:block"></div>
 
       <!-- Contenido Destacado Texto y Título Frontal -->
       <div class="relative z-20 max-w-2xl">
@@ -35,10 +35,10 @@ import { BadgeComponent } from '@shared/components/badge/badge';
         </div>
 
         @if (featuredPost()?.images?.logo) {
-          <img 
-            [src]="featuredPost() | wpImage:'logo'" 
+          <img
+            [src]="featuredPost() | wpImage:'logo'"
             [alt]="featuredPost()?.title"
-            class="w-full max-w-[250px] md:max-w-md h-auto mb-6 object-contain drop-shadow-2xl"
+            class="w-full max-w-250 md:max-w-md h-auto mb-6 object-contain drop-shadow-2xl"
             loading="eager"
           />
         } @else {
@@ -57,7 +57,7 @@ import { BadgeComponent } from '@shared/components/badge/badge';
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M5 3l14 9-14 9V3z"/></svg>
             PLAY NOW
           </button>
-          
+
           <button [routerLink]="['/movie', featuredPost()?._id]" class="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold py-3 px-8 rounded transition-colors flex justify-center items-center">
             MORE INFO
           </button>
