@@ -1,53 +1,45 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { WpPost } from '@models/wp-post.model';
+import { ApiMedia } from '@models';
 import { MediaCardComponent } from '@shared/components/media-card/media-card';
 import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton-card';
 
 @Component({
   selector: 'df-media-slider',
   template: `
-    <section class="mb-8">
-      <!-- Header de la Fila -->
-      <div class="px-4 mb-3 flex items-center justify-between">
-        <h2 class="text-white text-xl md:text-2xl font-bold tracking-tight">{{ title() }}</h2>
-        <!-- Optional "Explore All" link could go here -->
-      </div>
+    <div class="w-full mb-8 relative group">
+      <h2 class="text-xl md:text-2xl font-bold text-white mb-4 px-4 md:px-12">{{ title() }}</h2>
 
-      <!-- Carrusel -->
-      <!-- Usamos hide-scrollbar, snap-x snap-mandatory y flex-nowrap para la experiencia de deslizamiento -->
-      <div class="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 hide-scrollbar">
-        @if (isLoading()) {
-          <!-- Skeletons en fila -->
-          @for (s of [1,2,3,4,5,6]; track s) {
-            <div class="shrink-0 w-36 md:w-52 snap-start">
-              <df-skeleton-card class="block w-full h-full aspect-poster" />
-            </div>
-          }
+      <!-- Contenedor con scroll nativo oculto pero funcional (Hide scrollbar) -->
+      <div
+        class="flex gap-2 md:gap-4 overflow-x-auto snap-x snap-mandatory px-4 md:px-12 pb-4 scrollbar-hide"
+        style="-ms-overflow-style: none; scrollbar-width: none;">
+
+        @if (loading()) {
+            <!-- Skeletons placeholders -->
+            @for (item of [1,2,3,4,5,6]; track item) {
+                <div class="snap-start shrink-0 w-140 md:w-220">
+                    <df-skeleton-card />
+                </div>
+            }
         } @else {
-          <!-- Items reales -->
-          @for (post of mediaItems(); track post.id) {
-            <div class="shrink-0 w-36 md:w-52 snap-start hover:z-10 relative">
-              <df-media-card
-                [media]="post"
-                (selected)="mediaSelected.emit($event)"
-                class="block w-full h-full" />
-            </div>
-          } @empty {
-            <div class="w-full text-center text-df-muted py-6 bg-df-card rounded">
-              No hay contenido disponible para esta categoría.
-            </div>
-          }
+            @for (media of mediaItems(); track media._id) {
+                <div class="snap-start shrink-0 w-140 md:w-220">
+                    <df-media-card [media]="media" (selected)="mediaSelected.emit($event)" />
+                </div>
+            } @empty {
+                <p class="text-gray-500">No hay contenido disponible.</p>
+            }
         }
       </div>
-    </section>
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MediaCardComponent, SkeletonCardComponent]
 })
 export class MediaSliderComponent {
-  title = input<string>('Explorar');
-  mediaItems = input<WpPost[]>([]);
-  isLoading = input<boolean>(false);
-  
-  mediaSelected = output<WpPost>();
+  title = input.required<string>();
+  mediaItems = input.required<ApiMedia[]>();
+  loading = input<boolean>(false);
+
+  mediaSelected = output<ApiMedia>();
 }
