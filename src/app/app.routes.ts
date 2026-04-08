@@ -8,6 +8,11 @@ export const routes: Routes = [
     title: 'DarkFlix | Inicio'
   },
   {
+    path: 'search',
+    loadComponent: () => import('./features/search/search-view').then(m => m.SearchViewComponent),
+    title: 'DarkFlix | Búsqueda'
+  },
+  {
     path: ':typeSlug/:slug',
     loadComponent: () => import('./features/movie/movie-details').then(m => m.MovieDetailsComponent),
     title: 'DarkFlix | Detalles'
