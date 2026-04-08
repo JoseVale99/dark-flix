@@ -86,5 +86,11 @@ export class WpMediaService {
     return this.http.get<ApiEpisodeResponse>(`${this.baseUrl}/single/episodes/list?_id=${showId}&season=${season}&page=1&postsPerPage=50`)
       .pipe(map(res => res.data));
   }
+
+  // Buscador Universal
+  searchMedia(query: string): Observable<ApiMedia[]> {
+    return this.http.get<{error: boolean, data: {posts: ApiMedia[]}}>(`${this.baseUrl}/search?q=${query}`)
+      .pipe(map(res => res.data.posts || []));
+  }
 }
 
