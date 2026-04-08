@@ -92,5 +92,22 @@ export class WpMediaService {
     return this.http.get<{error: boolean, data: {posts: ApiMedia[]}}>(`${this.baseUrl}/search?q=${query}`)
       .pipe(map(res => res.data.posts || []));
   }
+
+  // Obtenemos listado por Tipo y Pagina
+  getPagedCatalog(type: string, page: number = 1): Observable<{ posts: ApiMedia[], hasMore: boolean }> {
+    let internalEndpoint = 'movies';
+    if (type === 'series') internalEndpoint = 'tvshows';
+    if (type === 'animes') internalEndpoint = 'animes';
+
+    return this.http.get<any>(`${this.baseUrl}/listing/${internalEndpoint}?page=${page}&orderBy=latest&order=desc&postType=${internalEndpoint}&postsPerPage=24`)
+      .pipe(map(res => {
+         const pagination = res.data?.pagination;
+         const hasMore = pagination ? pagination.current_page < pagination.last_page : false;
+         return {
+            posts: res.data?.posts || [],
+            hasMore: hasMore
+         };
+      }));
+  }
 }
 
