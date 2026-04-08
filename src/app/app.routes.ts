@@ -13,6 +13,11 @@ export const routes: Routes = [
     title: 'DarkFlix | Búsqueda'
   },
   {
+    path: 'mi-lista',
+    loadComponent: () => import('./features/my-list/my-list-view').then(m => m.MyListViewComponent),
+    title: 'DarkFlix | Mi Lista'
+  },
+  {
     path: ':catalogType',
     loadComponent: () => import('./features/catalog/catalog-view').then(m => m.CatalogViewComponent),
     title: 'DarkFlix | Catálogo'

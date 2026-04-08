@@ -39,17 +39,16 @@ import { filter } from 'rxjs/operators';
         <!-- Right Side: Search & Profile -->
         <div class="flex items-center gap-4 md:gap-6 ml-auto">
           
-          <!-- Lupa Animada y Buscador -->
-          <div class="relative flex items-center justify-end"
+          <!-- Lupa Animada y Buscador Netflix Style -->
+          <div class="relative flex items-center justify-end transition-all duration-300 ease-in-out"
                [class.w-10]="!isSearchActive()"
                [class.w-full]="isSearchActive()"
-               [class.sm:w-64]="isSearchActive()"
-               class="transition-all duration-300 ease-in-out">
+               [class.sm:w-80]="isSearchActive()">
                
                <svg xmlns="http://www.w3.org/2000/svg" 
                     (click)="toggleSearch()"
                     fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" 
-                    class="w-6 h-6 text-white cursor-pointer absolute right-2 z-10 hover:text-df-accent transition-colors">
+                    class="w-6 h-6 text-white cursor-pointer absolute right-2 z-10 hover:text-gray-300 transition-colors">
                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                </svg>
 
@@ -61,13 +60,12 @@ import { filter } from 'rxjs/operators';
                       [class.opacity-0]="!isSearchActive()"
                       [class.pointer-events-none]="!isSearchActive()"
                       [class.opacity-100]="isSearchActive()"
-                      placeholder="Títulos, personas, géneros"
-                      class="pl-4 pr-10 py-1.5 bg-black/60 border border-white/30 text-white rounded focus:outline-none focus:border-white focus:bg-black w-full text-sm placeholder-gray-400 transition-all duration-300">
-          </div>
-          
-          <!-- Avatar (Desktop Only) -->
-          <div class="hidden sm:block cursor-pointer hover:opacity-80 transition-opacity">
-            <div class="w-8 h-8 bg-linear-to-tr from-purple-500 to-df-accent rounded-sm"></div>
+                      placeholder="Películas, Series, Animes..."
+                      class="pl-4 pr-12 py-2 border text-white outline-none w-full text-sm placeholder-gray-400 transition-all duration-300 shadow-xl"
+                      [class.bg-transparent]="!isSearchActive()"
+                      [class.border-transparent]="!isSearchActive()"
+                      [class.bg-black]="isSearchActive()"
+                      [class.border-white]="isSearchActive()">
           </div>
         </div>
 
