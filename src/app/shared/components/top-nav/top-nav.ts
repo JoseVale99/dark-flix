@@ -33,7 +33,7 @@ import { filter } from 'rxjs/operators';
           <a routerLink="/series" class="hover:text-white transition-colors cursor-pointer">Series</a>
           <a routerLink="/movies" class="hover:text-white transition-colors cursor-pointer">Películas</a>
           <a routerLink="/animes" class="hover:text-white transition-colors cursor-pointer">Animes</a>
-          <a routerLink="/categories" class="hover:text-white transition-colors cursor-pointer">Mi Lista</a>
+          <a routerLink="/mi-lista" class="hover:text-white transition-colors cursor-pointer">Mi Lista</a>
         </div>
 
         <!-- Right Side: Search & Profile -->

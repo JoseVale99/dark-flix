@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, input, computed, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WpMediaService } from '@services/wp-media';
+import { MyListService } from '@services/my-list';
 import { ApiMedia } from '@models';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap, combineLatest, filter } from 'rxjs';
@@ -122,6 +123,21 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
                 </svg>
                 VER AHORA
+              </button>
+
+              <button (click)="myListService.toggleList(movie()!)"
+                      class="bg-black/40 hover:bg-black/60 border border-white/20 text-white font-bold py-3 px-6 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-xl text-center text-lg w-fit cursor-pointer">
+                @if (myListService.isInList(movie()!._id)) {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#e50914]" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                  En Mi Lista
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Mi Lista
+                }
               </button>
             </div>
           </div>
@@ -460,6 +476,7 @@ export class MovieDetailsComponent {
 
   private wpService = inject(WpMediaService);
   private location = inject(Location);
+  public myListService = inject(MyListService);
   
   private stateMedia = history.state.media as ApiMedia | undefined;
 
