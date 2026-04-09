@@ -9,7 +9,7 @@ import { MyListService } from '@services/my-list';
 @Component({
   selector: 'df-media-card',
   template: `
-    <div class="group relative aspect-poster bg-df-card rounded overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.12] hover:z-50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] hover:ring-2 hover:ring-white/20"
+    <div class="group relative aspect-poster bg-df-card rounded overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:z-50 hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)] hover:ring-1 hover:ring-white/10"
          (click)="selected.emit(media())">
 
       @if (!imageLoaded()) {
