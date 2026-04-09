@@ -3,7 +3,7 @@ import { toObservable, toSignal, takeUntilDestroyed } from '@angular/core/rxjs-i
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { filter, debounceTime, distinctUntilChanged, switchMap, catchError, map, tap } from 'rxjs/operators';
+import { filter, debounceTime, distinctUntilChanged, switchMap, catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { WpMediaService } from '@services/wp-media';
 import { ApiMedia } from '@models';
@@ -23,9 +23,9 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
          [class.bg-gradient-to-b]="!isScrolled() && !isSearchActive()"
          [class.from-black]="!isScrolled() && !isSearchActive()"
          [class.to-transparent]="!isScrolled() && !isSearchActive()">
-         
+
       <div class="max-w-400 mx-auto px-4 md:px-8 flex items-center justify-between">
-        
+
         <!-- Logo -->
         <a routerLink="/" class="flex flex-col select-none cursor-pointer group">
           <h1 class="text-2xl md:text-3xl font-black tracking-tighter" style="font-family: 'Outfit', sans-serif;">
@@ -44,22 +44,22 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 
         <!-- Right Side: Search & Profile -->
         <div class="flex items-center gap-4 md:gap-6 ml-auto relative">
-          
+
           <!-- Lupa Animada y Buscador Netflix Style -->
           <div class="relative flex items-center justify-end transition-all duration-300 ease-in-out"
                [class.w-10]="!isSearchActive()"
                [class.w-full]="isSearchActive()"
                [class.sm:w-[350px]]="isSearchActive()">
-               
-               <svg xmlns="http://www.w3.org/2000/svg" 
+
+               <svg xmlns="http://www.w3.org/2000/svg"
                     (click)="toggleSearch()"
-                    fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" 
+                    fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"
                     class="w-6 h-6 text-white cursor-pointer absolute right-2 z-10 hover:text-gray-300 transition-colors">
                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                </svg>
 
                <input #searchInput
-                      type="text" 
+                      type="text"
                       [(ngModel)]="searchQuery"
                       (ngModelChange)="onSearchInput($event)"
                       (blur)="onSearchBlur()"
@@ -76,8 +76,8 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 
           <!-- Dropdown Popover Resultados -->
           @if (isSearchActive() && (searchResults().length > 0 || isSearching())) {
-            <div class="absolute top-12 right-0 w-[350px] bg-[#141414] border border-white/10 rounded-b shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden z-50">
-              
+            <div class="absolute top-12 right-0 w-87.5 bg-[#141414] border border-white/10 rounded-b shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden z-50">
+
               @if (isSearching()) {
                 <div class="py-6 flex justify-center">
                    <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[#e50914]"></div>
@@ -87,7 +87,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
                   <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-3 h-3 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                   Resultados ({{searchTotal()}})
                 </h3>
-                
+
                 <div class="max-h-[60vh] overflow-y-auto">
                   @for (res of searchResults(); track res._id) {
                     <a [routerLink]="res | mediaUrl" (click)="forceHideSearch()" class="flex items-center gap-3 p-3 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/5 group">
@@ -99,7 +99,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
                     </a>
                   }
                 </div>
-                
+
                 <!-- Botón de ir a ver todos en la cuadrícula de búsqueda base -->
                 <a routerLink="/search" [queryParams]="{q: searchQuery()}" (click)="forceHideSearch()" class="block w-full py-3 text-center text-sm font-bold text-white bg-[#e50914] hover:bg-red-700 transition-colors cursor-pointer">
                   Ver todos los resultados
@@ -116,7 +116,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 export class TopNavComponent {
   private router = inject(Router);
   private wpService = inject(WpMediaService);
-  
+
   isScrolled = signal(false);
   isSearchActive = signal(false);
   searchQuery = signal('');
