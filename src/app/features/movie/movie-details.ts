@@ -159,22 +159,24 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                 EPISODIOS
               </button>
             }
-            <button (click)="activeTab.set('REPRODUCIR')"
-                    [class.text-white]="activeTab() === 'REPRODUCIR'"
-                    [class.border-white]="activeTab() === 'REPRODUCIR'"
-                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
-                    [class.text-gray-400]="activeTab() !== 'REPRODUCIR'"
-                    [class.border-transparent]="activeTab() !== 'REPRODUCIR'">
-              {{ (movie()?.type === 'tvshows' || movie()?.type === 'animes') ? 'VER EPISODIO SELECCIONADO' : 'REPRODUCTOR EN LÍNEA' }}
-            </button>
-            <button (click)="activeTab.set('DESCARGAS')"
-                    [class.text-white]="activeTab() === 'DESCARGAS'"
-                    [class.border-white]="activeTab() === 'DESCARGAS'"
-                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
-                    [class.text-gray-400]="activeTab() !== 'DESCARGAS'"
-                    [class.border-transparent]="activeTab() !== 'DESCARGAS'">
-              DESCARGAS
-            </button>
+            @if (movie()?.type === 'movies' || selectedEpisodeId()) {
+              <button (click)="activeTab.set('REPRODUCIR')"
+                      [class.text-white]="activeTab() === 'REPRODUCIR'"
+                      [class.border-white]="activeTab() === 'REPRODUCIR'"
+                      class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
+                      [class.text-gray-400]="activeTab() !== 'REPRODUCIR'"
+                      [class.border-transparent]="activeTab() !== 'REPRODUCIR'">
+                {{ (movie()?.type === 'tvshows' || movie()?.type === 'animes') ? 'VER EPISODIO SELECCIONADO' : 'REPRODUCTOR EN LÍNEA' }}
+              </button>
+              <button (click)="activeTab.set('DESCARGAS')"
+                      [class.text-white]="activeTab() === 'DESCARGAS'"
+                      [class.border-white]="activeTab() === 'DESCARGAS'"
+                      class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
+                      [class.text-gray-400]="activeTab() !== 'DESCARGAS'"
+                      [class.border-transparent]="activeTab() !== 'DESCARGAS'">
+                DESCARGAS
+              </button>
+            }
             <button (click)="activeTab.set('REPARTO')"
                     [class.text-white]="activeTab() === 'REPARTO'"
                     [class.border-white]="activeTab() === 'REPARTO'"
@@ -606,9 +608,21 @@ export class MovieDetailsComponent {
     effect(() => {
       const currentMovie = this.movie();
       if (currentMovie) {
+        // Registrar visita
         this.wpService.registerHit(currentMovie._id, currentMovie.type).subscribe();
+        
+        // Reset state on movie change (como cuando se navega desde Similares)
+        setTimeout(() => {
+          this.activeTab.set((currentMovie.type === 'tvshows' || currentMovie.type === 'animes') ? 'EPISODIOS' : 'REPRODUCIR');
+          this.selectedEpisodeId.set(undefined);
+          this.selectedSeason.set('1');
+          this.isTheaterMode.set(false);
+          if (typeof window !== 'undefined') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }, 0);
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   goBack() {
