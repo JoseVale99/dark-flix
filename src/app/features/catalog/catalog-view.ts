@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, inject, signal, effect, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, effect, computed, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { WpMediaService } from '@services/wp-media';
 import { MediaGridComponent } from '@shared/components/media-grid/media-grid';
 import { ApiMedia } from '@models';
@@ -56,6 +57,7 @@ export class CatalogViewComponent {
   private router = inject(Router);
   private wpService = inject(WpMediaService);
   private mediaUrlPipe = inject(MediaUrlPipe);
+  private destroyRef = inject(DestroyRef); // Inyector nativo para auto-limpieza
 
   // States
   currentType = signal<string>('peliculas');
@@ -73,8 +75,8 @@ export class CatalogViewComponent {
   });
 
   constructor() {
-    // Escuchar activamente los cambios en la ruta y no solo el primer pantallazo
-    this.route.paramMap.subscribe(params => {
+    // Escuchar activamente los cambios usando RxJS nativo auto-destructible
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const paramSlug = params.get('catalogType');
       if (paramSlug) {
         this.currentType.set(paramSlug);

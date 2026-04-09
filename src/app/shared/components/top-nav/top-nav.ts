@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, signal, inject, ElementRef, ViewChild, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, inject, ElementRef, ViewChild, computed } from '@angular/core';
+import { toObservable, toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { filter, debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
-import { Subject, of, Subscription } from 'rxjs';
+import { filter, debounceTime, distinctUntilChanged, switchMap, catchError, map, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { WpMediaService } from '@services/wp-media';
 import { ApiMedia } from '@models';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
@@ -112,23 +113,43 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
     </nav>
   `
 })
-export class TopNavComponent implements OnDestroy {
+export class TopNavComponent {
   private router = inject(Router);
   private wpService = inject(WpMediaService);
   
   isScrolled = signal(false);
   isSearchActive = signal(false);
   searchQuery = signal('');
-
-  // Dropdown States
   isSearching = signal(false);
-  searchResults = signal<ApiMedia[]>([]);
-  searchTotal = signal<number>(0);
-
-  private searchSubject = new Subject<string>();
-  private sub?: Subscription;
 
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+
+  // Flujo Reactivo Puro (Zoneless Best Practice) usando Signals interoperables
+  private searchState = toSignal(
+    toObservable(this.searchQuery).pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      tap(() => this.isSearching.set(true)),
+      switchMap(query => {
+        if (!query.trim()) {
+           this.isSearching.set(false);
+           return of({posts: [], total: 0});
+        }
+        return this.wpService.searchMedia(query, 3).pipe(
+          tap(() => this.isSearching.set(false)),
+          catchError(() => {
+            this.isSearching.set(false);
+            return of({posts: [], total: 0});
+          })
+        );
+      })
+    ),
+    { initialValue: {posts: [], total: 0} }
+  );
+
+  // Computed signals derivados
+  searchResults = computed(() => this.searchState().posts);
+  searchTotal = computed(() => this.searchState().total);
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -137,32 +158,11 @@ export class TopNavComponent implements OnDestroy {
       });
     }
 
-    this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
-        this.forceHideSearch();
-    });
-
-    // Reactive Search Debouncing (Netflix style)
-    this.sub = this.searchSubject.pipe(
-      debounceTime(400),
-      distinctUntilChanged(),
-      switchMap(query => {
-        if (!query.trim()) {
-           this.searchResults.set([]);
-           this.searchTotal.set(0);
-           this.isSearching.set(false);
-           return of({posts: [], total: 0});
-        }
-        this.isSearching.set(true);
-        // API Call Hackstore universal (3 results max)
-        return this.wpService.searchMedia(query, 3).pipe(
-          catchError(() => of({posts: [], total: 0}))
-        );
-      })
-    ).subscribe(result => {
-       this.searchResults.set(result.posts); 
-       this.searchTotal.set(result.total);
-       this.isSearching.set(false);
-    });
+    // Usamos takeUntilDestroyed para auto-limpiar la memoria del Router sin usar OnDestroy
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntilDestroyed()
+    ).subscribe(() => this.forceHideSearch());
   }
 
   toggleSearch() {
@@ -176,26 +176,19 @@ export class TopNavComponent implements OnDestroy {
 
   onSearchInput(query: string) {
     this.searchQuery.set(query);
-    this.searchSubject.next(query);
   }
 
   forceHideSearch() {
     this.isSearchActive.set(false);
     this.searchQuery.set('');
-    this.searchResults.set([]);
     this.isSearching.set(false);
   }
 
   onSearchBlur() {
-    // Retrasar blur para permitir que intercepten clics en el dropdown
     setTimeout(() => {
       if (this.searchQuery().trim() === '') {
         this.forceHideSearch();
       }
     }, 200);
-  }
-
-  ngOnDestroy() {
-    this.sub?.unsubscribe();
   }
 }
