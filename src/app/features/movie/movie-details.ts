@@ -357,14 +357,60 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                         <!-- Contenido Desplegable: Lista de Enlaces -->
                         <div class="p-6 bg-black/40 border-t border-white/5 flex flex-col gap-3">
                           @for (dl of group.links; track dl.url) {
-                            <a [href]="dl.url" target="_blank" class="flex justify-between items-center p-4 bg-white/5 hover:bg-white/10 rounded-lg border border-white/5 transition-all text-sm md:text-base group/link">
-                               <div class="flex items-center gap-3">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 group-hover/link:text-df-accent transition-colors hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                  </svg>
-                                  <span class="font-bold text-gray-300 group-hover/link:text-white transition-colors">{{ dl.server || dl.url.split('/')[2] }}</span>
+                            <a [href]="hackstorePostUrl()" target="_blank" class="flex justify-between items-center p-3 md:p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all text-sm md:text-base group/link overflow-hidden relative cursor-pointer shadow-lg hover:border-white/20">
+                               <!-- Shine effect -->
+                               <div class="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/link:translate-x-full transition-transform duration-1000 z-0 pointer-events-none"></div>
+                               
+                               <!-- Info Container -->
+                               <div class="flex items-center gap-4 z-10">
+                                  <!-- Server Icons Customization -->
+                                  @if (dl.url.includes('mega.nz')) {
+                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-600/40 to-black flex items-center justify-center shrink-0 border border-red-500/50 shadow-[0_0_15px_rgba(220,38,38,0.3)]">
+                                        <span class="font-black text-white text-lg tracking-tighter shadow-black drop-shadow-md">M</span>
+                                     </div>
+                                  } @else if (dl.url.includes('mediafire')) {
+                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600/40 to-black flex items-center justify-center shrink-0 border border-blue-500/50 shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                                        <span class="font-black text-white px-2">mf</span>
+                                     </div>
+                                  } @else if (dl.url.includes('1fichier')) {
+                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-600/40 to-black flex items-center justify-center shrink-0 border border-orange-500/50 shadow-[0_0_15px_rgba(234,88,12,0.3)]">
+                                        <span class="font-black text-white text-xs">1F</span>
+                                     </div>
+                                  } @else if (dl.url.includes('utorrent')) {
+                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-600/40 to-black flex items-center justify-center shrink-0 border border-green-500/50 shadow-[0_0_15px_rgba(22,163,74,0.3)]">
+                                        <span class="font-black text-white text-xs">µT</span>
+                                     </div>
+                                  } @else {
+                                     <div class="w-10 h-10 rounded-full bg-gray-500/20 flex items-center justify-center shrink-0 border border-gray-500/50 text-gray-400">
+                                       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                       </svg>
+                                     </div>
+                                  }
+                                  
+                                  <div class="flex flex-col">
+                                    <span class="font-bold text-gray-200 group-hover/link:text-white transition-colors capitalize md:text-lg">
+                                       {{ dl.server || dl.url.split('/')[2].replace('www.', '').split('.')[0] }}
+                                    </span>
+                                    <span class="text-[10px] md:text-xs text-gray-500 flex items-center gap-1 group-hover/link:text-gray-400 transition-colors">
+                                       <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-yellow-600/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                      </svg>
+                                      Enlace Acortado Protegido
+                                    </span>
+                                  </div>
                                </div>
-                               <span class="text-gray-400 font-medium tracking-wide">Audio: {{ dl.lang }}</span>
+                               
+                               <!-- Right Accents -->
+                               <div class="flex items-center gap-3 md:gap-6 z-10">
+                                 <span class="text-gray-400 font-medium tracking-wide text-[10px] md:text-xs bg-black/40 px-3 py-1.5 rounded-lg hidden sm:inline-block border border-white/5 uppercase shadow-inner">{{ dl.lang }}</span>
+                                 <div class="text-[#e50914] group-hover/link:scale-110 transition-transform bg-[#e50914]/10 p-2 md:p-3 rounded-full border border-[#e50914]/20 flex items-center gap-1">
+                                   <!-- External link icon instead of download to indicate redirect -->
+                                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5">
+                                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                   </svg>
+                                 </div>
+                               </div>
                             </a>
                           }
                         </div>
@@ -602,6 +648,15 @@ export class MovieDetailsComponent {
 
   getQuality = computed(() => {
     return this.movie()?.quality?.length ? 'HD' : null;
+  });
+
+  hackstorePostUrl = computed(() => {
+     const mv = this.movie();
+     if (!mv) return 'https://hackstore.mx/';
+     let cat = 'peliculas';
+     if (mv.type === 'tvshows' || mv.type === 'series') cat = 'series';
+     else if (mv.type === 'animes') cat = 'animes';
+     return `https://hackstore.mx/${cat}/${mv.slug}`;
   });
 
   constructor() {
