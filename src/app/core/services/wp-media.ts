@@ -97,12 +97,25 @@ export class WpMediaService {
   }
 
   // Obtenemos listado por Tipo y Pagina
-  getPagedCatalog(type: string, page: number = 1): Observable<{ posts: ApiMedia[], hasMore: boolean }> {
+  getPagedCatalog(type: string, page: number = 1, filters?: { genres?: (number|string)[], years?: (number|string)[], countries?: (number|string)[] }): Observable<{ posts: ApiMedia[], hasMore: boolean }> {
     let internalEndpoint = 'movies';
     if (type === 'series') internalEndpoint = 'tvshows';
     if (type === 'animes') internalEndpoint = 'animes';
 
-    return this.http.get<any>(`${this.baseUrl}/listing/${internalEndpoint}?page=${page}&orderBy=latest&order=desc&postType=${internalEndpoint}&postsPerPage=24`)
+    let url = `${this.baseUrl}/listing/${internalEndpoint}?page=${page}&orderBy=latest&order=desc&postType=${internalEndpoint}&postsPerPage=24`;
+
+    if (filters) {
+       const cleanFilters: any = {};
+       if (filters.genres && filters.genres.length > 0) cleanFilters.genres = filters.genres;
+       if (filters.years && filters.years.length > 0) cleanFilters.years = filters.years;
+       if (filters.countries && filters.countries.length > 0) cleanFilters.countries = filters.countries;
+
+       if (Object.keys(cleanFilters).length > 0) {
+          url += `&filter=${encodeURIComponent(JSON.stringify(cleanFilters))}`;
+       }
+    }
+
+    return this.http.get<any>(url)
       .pipe(map(res => {
          const pagination = res.data?.pagination;
          const hasMore = pagination ? pagination.current_page < pagination.last_page : false;
