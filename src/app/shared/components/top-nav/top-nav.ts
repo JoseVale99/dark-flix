@@ -1,13 +1,18 @@
-import { ChangeDetectionStrategy, Component, signal, inject, effect, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, inject, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { filter } from 'rxjs/operators';
+import { filter, debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
+import { Subject, of, Subscription } from 'rxjs';
+import { WpMediaService } from '@services/wp-media';
+import { ApiMedia } from '@models';
+import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
+import { WpImagePipe } from '@shared/pipes/wp-image';
 
 @Component({
   selector: 'df-top-nav',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, MediaUrlPipe, WpImagePipe],
   template: `
     <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
          [class.bg-[#141414]]="isScrolled() || isSearchActive()"
@@ -27,9 +32,9 @@ import { filter } from 'rxjs/operators';
           </h1>
         </a>
 
-        <!-- Desktop Global Navigation (Optional, can hide on mobile) -->
+        <!-- Desktop Global Navigation -->
         <div class="hidden lg:flex items-center gap-6 ml-10 flex-1 text-sm font-semibold text-gray-300">
-          <a routerLink="/" class="hover:text-white transition-colors cursor-pointer">Inicio</a>
+           <a routerLink="/" class="hover:text-white transition-colors cursor-pointer">Inicio</a>
           <a routerLink="/series" class="hover:text-white transition-colors cursor-pointer">Series</a>
           <a routerLink="/movies" class="hover:text-white transition-colors cursor-pointer">Películas</a>
           <a routerLink="/animes" class="hover:text-white transition-colors cursor-pointer">Animes</a>
@@ -37,13 +42,13 @@ import { filter } from 'rxjs/operators';
         </div>
 
         <!-- Right Side: Search & Profile -->
-        <div class="flex items-center gap-4 md:gap-6 ml-auto">
+        <div class="flex items-center gap-4 md:gap-6 ml-auto relative">
           
           <!-- Lupa Animada y Buscador Netflix Style -->
           <div class="relative flex items-center justify-end transition-all duration-300 ease-in-out"
                [class.w-10]="!isSearchActive()"
                [class.w-full]="isSearchActive()"
-               [class.sm:w-80]="isSearchActive()">
+               [class.sm:w-[350px]]="isSearchActive()">
                
                <svg xmlns="http://www.w3.org/2000/svg" 
                     (click)="toggleSearch()"
@@ -67,39 +72,96 @@ import { filter } from 'rxjs/operators';
                       [class.bg-black]="isSearchActive()"
                       [class.border-white]="isSearchActive()">
           </div>
+
+          <!-- Dropdown Popover Resultados -->
+          @if (isSearchActive() && (searchResults().length > 0 || isSearching())) {
+            <div class="absolute top-12 right-0 w-[350px] bg-[#141414] border border-white/10 rounded-b shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden z-50">
+              
+              @if (isSearching()) {
+                <div class="py-6 flex justify-center">
+                   <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[#e50914]"></div>
+                </div>
+              } @else {
+                <h3 class="text-[11px] text-[#4ea0ea] font-bold px-4 pt-4 pb-2 border-b border-white/5 uppercase tracking-wider">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="inline-block w-3 h-3 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                  Resultados ({{searchTotal()}})
+                </h3>
+                
+                <div class="max-h-[60vh] overflow-y-auto">
+                  @for (res of searchResults(); track res._id) {
+                    <a [routerLink]="res | mediaUrl" (click)="forceHideSearch()" class="flex items-center gap-3 p-3 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/5 group">
+                       <img [src]="res | wpImage:'poster'" class="w-12 h-16 object-cover rounded opacity-90 group-hover:opacity-100">
+                       <div class="flex-1 min-w-0">
+                         <h4 class="text-white font-bold text-sm truncate">{{res.title}}</h4>
+                         <span class="text-xs text-gray-400 capitalize">{{res.type === 'tvshows' ? 'Serie' : res.type === 'movies' ? 'Película' : 'Anime'}}</span>
+                       </div>
+                    </a>
+                  }
+                </div>
+                
+                <!-- Botón de ir a ver todos en la cuadrícula de búsqueda base -->
+                <a routerLink="/search" [queryParams]="{q: searchQuery()}" (click)="forceHideSearch()" class="block w-full py-3 text-center text-sm font-bold text-white bg-[#e50914] hover:bg-red-700 transition-colors cursor-pointer">
+                  Ver todos los resultados
+                </a>
+              }
+            </div>
+          }
         </div>
 
       </div>
     </nav>
   `
 })
-export class TopNavComponent {
+export class TopNavComponent implements OnDestroy {
   private router = inject(Router);
+  private wpService = inject(WpMediaService);
   
   isScrolled = signal(false);
   isSearchActive = signal(false);
   searchQuery = signal('');
 
+  // Dropdown States
+  isSearching = signal(false);
+  searchResults = signal<ApiMedia[]>([]);
+  searchTotal = signal<number>(0);
+
+  private searchSubject = new Subject<string>();
+  private sub?: Subscription;
+
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
   constructor() {
-    // Listen to scroll events to alter navbar styling (Netflix-like)
     if (typeof window !== 'undefined') {
       window.addEventListener('scroll', () => {
         this.isScrolled.set(window.scrollY > 0);
       });
     }
 
-    // Reset properties on navigation to home
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      if (event.url === '/' || !event.url.includes('/search')) {
-         // Auto-close if we navigate out of search without text
-         if (this.searchQuery() === '') {
-           this.isSearchActive.set(false);
-         }
-      }
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
+        this.forceHideSearch();
+    });
+
+    // Reactive Search Debouncing (Netflix style)
+    this.sub = this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(query => {
+        if (!query.trim()) {
+           this.searchResults.set([]);
+           this.searchTotal.set(0);
+           this.isSearching.set(false);
+           return of({posts: [], total: 0});
+        }
+        this.isSearching.set(true);
+        // API Call Hackstore universal (3 results max)
+        return this.wpService.searchMedia(query, 3).pipe(
+          catchError(() => of({posts: [], total: 0}))
+        );
+      })
+    ).subscribe(result => {
+       this.searchResults.set(result.posts); 
+       this.searchTotal.set(result.total);
+       this.isSearching.set(false);
     });
   }
 
@@ -108,27 +170,32 @@ export class TopNavComponent {
     if (this.isSearchActive()) {
       setTimeout(() => this.searchInput.nativeElement.focus(), 100);
     } else {
-      if (this.searchQuery() !== '') {
-        this.searchQuery.set('');
-        this.router.navigate(['/']); // optional: retreat to home if clearing all
-      }
+      this.forceHideSearch();
     }
   }
 
   onSearchInput(query: string) {
     this.searchQuery.set(query);
-    if (query.trim().length > 0) {
-      // Navigate to /search and push the query as a parameter
-      this.router.navigate(['/search'], { queryParams: { q: query } });
-    } else {
-      this.router.navigate(['/']);
-    }
+    this.searchSubject.next(query);
+  }
+
+  forceHideSearch() {
+    this.isSearchActive.set(false);
+    this.searchQuery.set('');
+    this.searchResults.set([]);
+    this.isSearching.set(false);
   }
 
   onSearchBlur() {
-    // Hide search bar if it's empty and we clicked outside
-    if (this.searchQuery().trim() === '') {
-      this.isSearchActive.set(false);
-    }
+    // Retrasar blur para permitir que intercepten clics en el dropdown
+    setTimeout(() => {
+      if (this.searchQuery().trim() === '') {
+        this.forceHideSearch();
+      }
+    }, 200);
+  }
+
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
   }
 }

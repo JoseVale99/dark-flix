@@ -88,9 +88,12 @@ export class WpMediaService {
   }
 
   // Buscador Universal
-  searchMedia(query: string): Observable<ApiMedia[]> {
-    return this.http.get<{error: boolean, data: {posts: ApiMedia[]}}>(`${this.baseUrl}/search?q=${query}`)
-      .pipe(map(res => res.data.posts || []));
+  searchMedia(query: string, limit: number = 24): Observable<{posts: ApiMedia[], total: number}> {
+    return this.http.get<{error: boolean, data: {posts: ApiMedia[], pagination?: any}}>(`${this.baseUrl}/search?postType=any&q=${query}&postsPerPage=${limit}`)
+      .pipe(map(res => ({
+        posts: res.data.posts || [],
+        total: res.data.pagination?.total || 0
+      })));
   }
 
   // Obtenemos listado por Tipo y Pagina

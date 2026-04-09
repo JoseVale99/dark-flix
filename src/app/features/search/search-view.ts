@@ -76,8 +76,9 @@ export class SearchViewComponent {
           this.loading.set(false);
           return of([]);
         }
-        return this.wpService.searchMedia(query).pipe(
+        return this.wpService.searchMedia(query, 30).pipe(
           tap(() => this.loading.set(false)),
+          map(res => res.posts),
           catchError(() => {
             this.loading.set(false);
             return of([]);

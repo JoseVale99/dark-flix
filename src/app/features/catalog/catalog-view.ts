@@ -73,18 +73,15 @@ export class CatalogViewComponent {
   });
 
   constructor() {
-    effect(() => {
-      // Whenever route param changes, we reset pagination and fetch.
-      const paramSlug = this.route.snapshot.paramMap.get('catalogType');
+    // Escuchar activamente los cambios en la ruta y no solo el primer pantallazo
+    this.route.paramMap.subscribe(params => {
+      const paramSlug = params.get('catalogType');
       if (paramSlug) {
-        // Run logic out-of-band to prevent signal collision
-        setTimeout(() => {
-          this.currentType.set(paramSlug);
-          this.currentPage.set(1);
-          this.items.set([]);
-          this.hasMoreItems.set(true);
-          this.fetchCatalog();
-        }, 0);
+        this.currentType.set(paramSlug);
+        this.currentPage.set(1);
+        this.items.set([]);
+        this.hasMoreItems.set(true);
+        this.fetchCatalog();
       }
     });
   }
