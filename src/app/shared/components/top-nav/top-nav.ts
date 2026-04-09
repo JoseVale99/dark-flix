@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal, inject, ElementRef, ViewChild, computed } from '@angular/core';
 import { toObservable, toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router, NavigationEnd } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { filter, debounceTime, distinctUntilChanged, switchMap, catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -13,7 +13,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 @Component({
   selector: 'df-top-nav',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, FormsModule, MediaUrlPipe, WpImagePipe],
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, MediaUrlPipe, WpImagePipe],
   template: `
     <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
          [class.bg-[#141414]]="isScrolled() || isSearchActive()"
@@ -34,12 +34,12 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
         </a>
 
         <!-- Desktop Global Navigation -->
-        <div class="hidden lg:flex items-center gap-6 ml-10 flex-1 text-sm font-semibold text-gray-300">
-           <a routerLink="/" class="hover:text-white transition-colors cursor-pointer">Inicio</a>
-          <a routerLink="/series" class="hover:text-white transition-colors cursor-pointer">Series</a>
-          <a routerLink="/movies" class="hover:text-white transition-colors cursor-pointer">Películas</a>
-          <a routerLink="/animes" class="hover:text-white transition-colors cursor-pointer">Animes</a>
-          <a routerLink="/mi-lista" class="hover:text-white transition-colors cursor-pointer">Mi Lista</a>
+        <div class="hidden lg:flex items-center gap-6 ml-10 flex-1 text-sm font-medium text-gray-400">
+           <a routerLink="/" routerLinkActive="font-bold text-white drop-shadow-md" [routerLinkActiveOptions]="{exact: true}" class="hover:text-white transition-all cursor-pointer">Inicio</a>
+          <a routerLink="/series" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">Series</a>
+          <a routerLink="/movies" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">Películas</a>
+          <a routerLink="/animes" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">Animes</a>
+          <a routerLink="/mi-lista" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">Mi Lista</a>
         </div>
 
         <!-- Right Side: Search & Profile -->
