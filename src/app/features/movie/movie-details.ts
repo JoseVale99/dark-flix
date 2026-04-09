@@ -168,14 +168,14 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                       [class.border-transparent]="activeTab() !== 'REPRODUCIR'">
                 {{ (movie()?.type === 'tvshows' || movie()?.type === 'animes') ? 'VER EPISODIO SELECCIONADO' : 'REPRODUCTOR EN LÍNEA' }}
               </button>
-              <button (click)="activeTab.set('DESCARGAS')"
+              <!-- <button (click)="activeTab.set('DESCARGAS')"
                       [class.text-white]="activeTab() === 'DESCARGAS'"
                       [class.border-white]="activeTab() === 'DESCARGAS'"
                       class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                       [class.text-gray-400]="activeTab() !== 'DESCARGAS'"
                       [class.border-transparent]="activeTab() !== 'DESCARGAS'">
                 DESCARGAS
-              </button>
+              </button> -->
             }
             <button (click)="activeTab.set('REPARTO')"
                     [class.text-white]="activeTab() === 'REPARTO'"
