@@ -22,9 +22,18 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           alt="Atmosphere">
       }
 
+      <!-- Capa 2: Imagen real de fondo nítida -->
+      @if (featuredPost()) {
+        <img
+          dfLazyImage
+          [lazySrc]="featuredPost() | wpImage:'backdrop'"
+          class="absolute inset-0 w-full h-full object-cover object-top z-[1] opacity-60"
+          alt="Backdrop">
+      }
+
       <!-- Dimmer general y Gradiente base -->
-      <div class="absolute inset-0 bg-black/60 z-0"></div>
-      <div class="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-df-background via-df-background/80 to-transparent z-0"></div>
+      <div class="absolute inset-0 bg-black/40 z-[2]"></div>
+      <div class="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-df-background via-df-background/70 to-transparent z-[2]"></div>
 
       <!-- Contenedor Principal (Grid/Flex) -->
       <div class="relative z-20 flex flex-col md:flex-row items-center justify-between w-full max-w-7xl mx-auto pt-10 md:pt-20 gap-8 md:gap-4">
