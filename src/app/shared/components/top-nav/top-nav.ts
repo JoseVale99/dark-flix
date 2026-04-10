@@ -13,7 +13,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, RouterLinkActive, FormsModule, MediaUrlPipe, WpImagePipe],
   template: `
-    <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    <nav class="fixed top-0 left-0 right-0 z-100 transition-all duration-300"
          [class.bg-[#141414]]="isScrolled() || isSearchActive()"
          [class.shadow-lg]="isScrolled() || isSearchActive()"
          [class.py-4]="!isScrolled() && !isSearchActive()"
