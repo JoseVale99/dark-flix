@@ -146,13 +146,13 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
         <!-- COMPONENTES EXTENDIDOS (TABS: REPRODUCTORES, DESCARGAS, REPARTO...) -->
         <div class="max-w-7xl mx-auto px-6 pb-24 text-white relative z-30">
 
-          <!-- TABS NAVIGATION -->
-          <div class="flex flex-wrap gap-4 md:gap-8 border-b border-white/10 mb-8 pt-8">
+          <!-- TABS NAVIGATION SCROLLABLE ON MOBILE -->
+          <div class="flex gap-6 md:gap-8 border-b border-white/10 mb-8 pt-8 overflow-x-auto hide-scrollbar snap-x w-full">
             @if (movie()?.type === 'tvshows' || movie()?.type === 'animes') {
               <button (click)="activeTab.set('EPISODIOS')"
                       [class.text-white]="activeTab() === 'EPISODIOS'"
                       [class.border-white]="activeTab() === 'EPISODIOS'"
-                      class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
+                      class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                       [class.text-gray-400]="activeTab() !== 'EPISODIOS'"
                       [class.border-transparent]="activeTab() !== 'EPISODIOS'">
                 EPISODIOS
@@ -162,24 +162,16 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
               <button (click)="activeTab.set('REPRODUCIR')"
                       [class.text-white]="activeTab() === 'REPRODUCIR'"
                       [class.border-white]="activeTab() === 'REPRODUCIR'"
-                      class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
+                      class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                       [class.text-gray-400]="activeTab() !== 'REPRODUCIR'"
                       [class.border-transparent]="activeTab() !== 'REPRODUCIR'">
-                {{ (movie()?.type === 'tvshows' || movie()?.type === 'animes') ? 'VER EPISODIO SELECCIONADO' : 'REPRODUCTOR EN LÍNEA' }}
+                {{ (movie()?.type === 'tvshows' || movie()?.type === 'animes') ? 'VER EPISODIO' : 'REPRODUCTOR' }}
               </button>
-              <!-- <button (click)="activeTab.set('DESCARGAS')"
-                      [class.text-white]="activeTab() === 'DESCARGAS'"
-                      [class.border-white]="activeTab() === 'DESCARGAS'"
-                      class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
-                      [class.text-gray-400]="activeTab() !== 'DESCARGAS'"
-                      [class.border-transparent]="activeTab() !== 'DESCARGAS'">
-                DESCARGAS
-              </button> -->
             }
             <button (click)="activeTab.set('REPARTO')"
                     [class.text-white]="activeTab() === 'REPARTO'"
                     [class.border-white]="activeTab() === 'REPARTO'"
-                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
+                    class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                     [class.text-gray-400]="activeTab() !== 'REPARTO'"
                     [class.border-transparent]="activeTab() !== 'REPARTO'">
               REPARTO
@@ -187,10 +179,10 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
             <button (click)="activeTab.set('SIMILARES')"
                     [class.text-white]="activeTab() === 'SIMILARES'"
                     [class.border-white]="activeTab() === 'SIMILARES'"
-                    class="pb-2 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
+                    class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                     [class.text-gray-400]="activeTab() !== 'SIMILARES'"
                     [class.border-transparent]="activeTab() !== 'SIMILARES'">
-              TÍTULOS SIMILARES
+              SIMILARES
             </button>
           </div>
 
@@ -272,26 +264,31 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                       }
 
                       <!-- Overlay expand button (Only visible in Tab mode) -->
-                      <button (click)="isTheaterMode.set(true)" class="absolute bottom-4 right-4 bg-black/60 hover:bg-[#e50914] backdrop-blur text-white p-3 rounded opacity-0 group-hover:opacity-100 transition-all shadow-lg border border-white/20 cursor-pointer">
+                      <button (click)="isTheaterMode.set(true)" class="absolute bottom-4 right-4 bg-black/60 hover:bg-[#e50914] backdrop-blur text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-lg border border-white/20 cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14v-2m0 0h2m-2 0l4 4m10-4v-2m0 0h-2m2 0l-4 4m-6-8V4m0 0H6m2 0l-4 4m10 4V4m0 0h2m-2 0l4 4" />
                         </svg>
                       </button>
                     </div>
 
-                    <!-- Server Selector -->
-                    <div class="flex flex-wrap gap-2 mt-4 items-center">
-                      <span class="text-sm font-semibold text-gray-400 uppercase tracking-widest mr-2">Servidor:</span>
-                      @for (embed of playersState().embeds; track $index) {
-                        <button (click)="selectedEmbedIndex.set($index)"
-                                [class.bg-white]="selectedEmbedIndex() === $index"
-                                [class.text-black]="selectedEmbedIndex() === $index"
-                                [class.bg-white/10]="selectedEmbedIndex() !== $index"
-                                [class.text-white]="selectedEmbedIndex() !== $index"
-                                class="px-4 py-2 rounded-md text-sm font-medium hover:bg-white/30 transition-colors border border-white/5 cursor-pointer">
-                          {{ embed.server || 'Server ' + ($index + 1) }} - {{ embed.lang }} ({{ embed.quality }})
-                        </button>
-                      }
+                    <!-- Server Selector Responsive -->
+                    <div class="flex flex-col md:flex-row gap-3 mt-4 md:items-center">
+                      <span class="text-xs md:text-sm font-black text-gray-500 uppercase tracking-widest shrink-0 ml-1">Servidor Activo:</span>
+                      
+                      <!-- Scroll horizontal suave para los botones -->
+                      <div class="flex overflow-x-auto hide-scrollbar snap-x gap-2 pb-2 -mb-2 w-full px-1">
+                        @for (embed of playersState().embeds; track $index) {
+                          <button (click)="selectedEmbedIndex.set($index)"
+                                  [class.bg-white]="selectedEmbedIndex() === $index"
+                                  [class.text-black]="selectedEmbedIndex() === $index"
+                                  [class.shadow-[0_0_15px_rgba(255,255,255,0.4)]]="selectedEmbedIndex() === $index"
+                                  [class.bg-[#1a1a1a]]="selectedEmbedIndex() !== $index"
+                                  [class.text-gray-300]="selectedEmbedIndex() !== $index"
+                                  class="shrink-0 snap-start whitespace-nowrap px-5 py-2.5 rounded-full text-xs font-bold hover:bg-white/20 transition-all border border-white/10 cursor-pointer">
+                            {{ embed.server || 'Server ' + ($index + 1) }} • {{ embed.lang }}
+                          </button>
+                        }
+                      </div>
                     </div>
                   }
                 </div>
