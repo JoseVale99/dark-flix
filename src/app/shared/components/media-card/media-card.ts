@@ -16,21 +16,18 @@ import { MyListService } from '@services/my-list';
         <df-skeleton-card class="absolute inset-0 z-0" />
       }
 
-      <!-- Imagen: blur en hover desktop / sutil en móvil -->
+      <!-- Imagen del poster -->
       <img dfLazyImage
            [lazySrc]="media() | wpImage : 'poster'"
            [alt]="media().title"
            (load)="imageLoaded.set(true)"
-           class="w-full h-full object-cover transition-all duration-500
-                  group-hover:scale-110 group-hover:blur-[2px] group-hover:brightness-50
-                  [@media(hover:none)]:scale-[1.03] [@media(hover:none)]:brightness-60 [@media(hover:none)]:blur-[1px]"
+           class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-50"
            [class.opacity-0]="!imageLoaded()" />
 
-      <!-- Overlay: gradiente oscuro siempre desde abajo, negro total en hover -->
-      <div class="absolute inset-0 z-10 transition-all duration-500
-                  bg-gradient-to-t from-black/90 via-black/20 to-transparent
-                  group-hover:from-black/95 group-hover:via-black/70 group-hover:to-black/30
-                  [@media(hover:none)]:from-black/85 [@media(hover:none)]:via-black/50 [@media(hover:none)]:to-black/10">
+      <!-- Gradiente base siempre visible desde abajo (título legible) -->
+      <div class="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/20 to-transparent
+                  group-hover:from-black/95 group-hover:via-black/60 group-hover:to-black/20
+                  transition-all duration-500">
       </div>
 
       <!-- Metadata Badges -->
@@ -59,20 +56,13 @@ import { MyListService } from '@services/my-list';
         }
       </button>
 
-      <!-- Contenido inferior: título + botón (siempre en móvil, hover en desktop) -->
-      <div class="absolute bottom-0 left-0 right-0 z-20 p-3 flex flex-col gap-2
-                  translate-y-2 group-hover:translate-y-0 transition-transform duration-300
-                  [@media(hover:none)]:translate-y-0">
-
-        <!-- Título -->
+      <!-- Título + Botón Ver Ahora (siempre visible) -->
+      <div class="absolute bottom-0 left-0 right-0 z-20 p-3 flex flex-col gap-2">
         <p class="text-white font-black text-sm leading-tight line-clamp-2 drop-shadow-lg">
           {{ media().title }}
         </p>
-
-        <!-- Botón Ver ahora -->
-        <button class="w-full flex items-center justify-center gap-2 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-2 px-3 rounded-lg transition-all shadow-lg
-                       opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300
-                       [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0">
+        <button class="w-full flex items-center justify-center gap-1.5 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-2 rounded-lg transition-all shadow-lg
+                       md:opacity-0 md:group-hover:opacity-100 md:translate-y-1 md:group-hover:translate-y-0 transition-all duration-300">
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0">
             <path d="M8 5v14l11-7z"/>
           </svg>
