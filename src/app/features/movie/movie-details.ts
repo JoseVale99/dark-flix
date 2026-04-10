@@ -117,7 +117,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 mt-6">
-              <button (click)="isTheaterMode.set(true)" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(229,9,20,0.5)] active:scale-95 text-center text-lg w-fit cursor-pointer">
+              <button (click)="playMedia()" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(229,9,20,0.5)] active:scale-95 text-center text-lg w-fit cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
                 </svg>
@@ -557,6 +557,16 @@ export class MovieDetailsComponent {
   );
 
   movie = computed(() => this.mediaState()?.data || null);
+
+  playMedia() {
+    if (this.movie()?.type === 'tvshows' || this.movie()?.type === 'animes') {
+      this.activeTab.set('EPISODIOS');
+      // Asegurarse de que el scroll baje hacia la sección de episodios de forma fluida
+      window.scrollTo({ top: window.innerHeight * 0.65, behavior: 'smooth' });
+    } else {
+      this.isTheaterMode.set(true);
+    }
+  }
 
   activeMediaId = computed(() => {
     const rootId = this.movie()?._id;
