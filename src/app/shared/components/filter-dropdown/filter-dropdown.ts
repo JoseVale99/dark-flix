@@ -1,20 +1,19 @@
 import { Component, ChangeDetectionStrategy, input, model, computed, signal, ElementRef, inject, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FilterOption } from '../../../core/constants/filter-config';
 
 @Component({
   selector: 'df-filter-dropdown',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="relative min-w-40 w-full group">
       <!-- Dropdown Toggle Button -->
-      <button type="button" 
+      <button type="button"
               (click)="toggle()"
               class="w-full flex items-center justify-between bg-[#191919] border border-white/10 text-gray-300 font-medium text-sm rounded px-4 py-2 hover:bg-white/5 hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-white/20">
         <span>
-          {{ title() }} 
+          {{ title() }}
           @if (selected().length > 0) {
              <span class="text-xs ml-1 opacity-70 bg-white/20 px-1.5 py-0.5 rounded-full">{{selected().length}}</span>
           }
@@ -27,7 +26,7 @@ import { FilterOption } from '../../../core/constants/filter-config';
       <!-- Dropdown Menu -->
       @if (isOpen()) {
         <div class="absolute z-50 left-0 top-full mt-2 w-64 bg-[#1e1e1e] border border-white/10 rounded-lg shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          
+
           <!-- Search Box -->
           <div class="p-3 border-b border-white/5">
             <div class="relative">
@@ -66,14 +65,14 @@ import { FilterOption } from '../../../core/constants/filter-config';
                 </span>
               </label>
             }
-            
+
             @if (filteredOptions().length === 0) {
               <div class="px-3 py-4 text-center text-sm text-gray-500">
                 No hay resultados
               </div>
             }
           </div>
-          
+
         </div>
       }
     </div>
@@ -126,13 +125,13 @@ export class FilterDropdownComponent {
     event.stopPropagation();
     const current = [...this.selected()];
     const index = current.findIndex(s => String(s) === String(id));
-    
+
     if (index === -1) {
       current.push(id);
     } else {
       current.splice(index, 1);
     }
-    
+
     this.selected.set(current);
   }
 
