@@ -1,0 +1,21 @@
+{
+  "rewrites": [
+    {
+      "source": "/wp-api/:path*",
+      "destination": "https://hackstore.mx/wp-api/:path*"
+    },
+    {
+      "source": "/((?!wp-api).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/wp-api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS" }
+      ]
+    }
+  ]
+}
