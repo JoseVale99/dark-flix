@@ -274,7 +274,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                     <!-- Server Selector Responsive -->
                     <div class="flex flex-col md:flex-row gap-3 mt-4 md:items-center">
                       <span class="text-xs md:text-sm font-black text-gray-500 uppercase tracking-widest shrink-0 ml-1">Servidor Activo:</span>
-                      
+
                       <!-- Scroll horizontal suave para los botones -->
                       <div class="flex overflow-x-auto hide-scrollbar snap-x gap-2 pb-2 -mb-2 w-full px-1">
                         @for (embed of playersState().embeds; track $index) {
@@ -683,7 +683,7 @@ export class MovieDetailsComponent {
           }
         }, 0);
       }
-    }, { allowSignalWrites: true });
+    });
   }
 
   goBack() {
