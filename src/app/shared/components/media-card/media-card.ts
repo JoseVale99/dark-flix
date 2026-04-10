@@ -9,7 +9,7 @@ import { MyListService } from '@services/my-list';
 @Component({
   selector: 'df-media-card',
   template: `
-    <div class="group relative aspect-poster bg-df-card rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:z-50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] hover:ring-1 hover:ring-white/20"
+    <div class="group/card relative aspect-poster bg-df-card rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:z-50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] hover:ring-1 hover:ring-white/20"
          (click)="selected.emit(media())">
 
       @if (!imageLoaded()) {
@@ -21,12 +21,12 @@ import { MyListService } from '@services/my-list';
            [lazySrc]="media() | wpImage : 'poster'"
            [alt]="media().title"
            (load)="imageLoaded.set(true)"
-           class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-50"
+           class="w-full h-full object-cover transition-all duration-500 group-hover/card:scale-110 group-hover/card:brightness-50"
            [class.opacity-0]="!imageLoaded()" />
 
       <!-- Gradiente base siempre visible desde abajo (título legible) -->
-      <div class="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/20 to-transparent
-                  group-hover:from-black/95 group-hover:via-black/60 group-hover:to-black/20
+      <div class="absolute inset-0 z-10 bg-linear-to-t from-black/80 via-black/10 to-transparent
+                  group-hover/card:from-black/95 group-hover/card:via-black/60 group-hover/card:to-black/20
                   transition-all duration-500">
       </div>
 
@@ -44,7 +44,7 @@ import { MyListService } from '@services/my-list';
       <button (click)="$event.stopPropagation(); myListService.toggleList(media())"
               title="Añadir/Quitar de Mi Lista"
               class="group/fav absolute top-2 right-2 z-30 p-1.5 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 transition-all shadow-md backdrop-blur cursor-pointer
-                     opacity-100 md:opacity-0 md:group-hover:opacity-100">
+                     opacity-100 md:opacity-0 md:group-hover/card:opacity-100">
         @if (myListService.isInList(media()._id)) {
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#e50914]" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -56,14 +56,15 @@ import { MyListService } from '@services/my-list';
         }
       </button>
 
-      <!-- Título + Botón Ver Ahora (siempre visible) -->
-      <div class="absolute bottom-0 left-0 right-0 z-20 p-3 flex flex-col gap-2">
-        <p class="text-white font-black text-sm leading-tight line-clamp-2 drop-shadow-lg">
+      <!-- Título siempre visible + Botón solo en hover desktop -->
+      <div class="absolute bottom-0 left-0 right-0 z-20 p-2.5 flex flex-col gap-1.5">
+        <p class="text-white font-bold text-xs leading-tight line-clamp-2 drop-shadow-lg">
           {{ media().title }}
         </p>
-        <button class="w-full flex items-center justify-center gap-1.5 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-2 rounded-lg transition-all shadow-lg
-                       md:opacity-0 md:group-hover:opacity-100 md:translate-y-1 md:group-hover:translate-y-0 transition-all duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0">
+        <!-- Botón solo visible en desktop al hacer hover de la TARJETA -->
+        <button class="hidden md:flex w-full items-center justify-center gap-1.5 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-1.5 rounded-md transition-all shadow-lg
+                       opacity-0 group-hover/card:opacity-100 translate-y-1 group-hover/card:translate-y-0 duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-3 h-3 shrink-0">
             <path d="M8 5v14l11-7z"/>
           </svg>
           Ver ahora
@@ -77,7 +78,7 @@ import { MyListService } from '@services/my-list';
 export class MediaCardComponent {
   media = input.required<ApiMedia>();
   selected = output<ApiMedia>();
-  
+
   public myListService = inject(MyListService);
 
   imageLoaded = signal(false);
