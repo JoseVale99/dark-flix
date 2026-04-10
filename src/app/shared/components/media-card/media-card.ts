@@ -24,10 +24,10 @@ import { MyListService } from '@services/my-list';
            class="w-full h-full object-cover transition-all duration-300 group-hover:brightness-75 group-hover:scale-105"
            [class.opacity-0]="!imageLoaded()" />
 
-      <!-- Overlay Play — siempre visible en móvil, hover en desktop -->
+      <!-- Overlay Play — fondo oscuro + play siempre visibles en móvil, hover en desktop -->
       <div class="absolute inset-0 flex items-center justify-center z-10
-                  [@media(hover:none)]:opacity-100
-                  [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100
+                  [@media(hover:none)]:bg-black/40 [@media(hover:none)]:opacity-100
+                  [@media(hover:hover)]:bg-black/60 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100
                   transition-opacity duration-200">
         <div class="w-12 h-12 rounded-full bg-black/50 border border-white/30 flex items-center justify-center backdrop-blur-sm shadow-lg">
           <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" class="w-5 h-5 ml-0.5">
