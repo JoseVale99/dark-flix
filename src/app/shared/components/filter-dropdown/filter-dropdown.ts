@@ -55,9 +55,11 @@ import { FilterOption } from '../../../core/constants/filter-config';
                          (change)="toggleSelection(opt.id, $event)"
                          class="peer opacity-0 absolute h-0 w-0">
                   <div class="h-4 w-4 rounded border border-white/20 bg-transparent flex items-center justify-center peer-focus:ring-2 ring-white/30 peer-checked:bg-white peer-checked:border-white group-hover/item:border-white/50 transition-all">
-                    <svg *ngIf="isSelected(opt.id)" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-black" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
+                    @if (isSelected(opt.id)) {
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-black" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    }
                   </div>
                 </div>
                 <span class="text-sm text-gray-300 group-hover/item:text-white" [class.text-white]="isSelected(opt.id)">
