@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, inject, input, computed, signal, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { WpMediaService } from '@services/wp-media';
 import { MyListService } from '@services/my-list';
 import { ApiMedia } from '@models';
@@ -38,10 +37,10 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
       } @else if (movie()) {
         <!-- CAPA DE FONDO: Backdrop Absoluto Cinemático -->
         <div class="absolute top-0 left-0 w-full h-screen overflow-hidden pointer-events-none">
-          
+
           <!-- Capa 1: Fondo escenográfico súper borroso (Proyección de luz) -->
           <img dfLazyImage [lazySrc]="movie()! | wpImage:'backdrop'" class="absolute inset-0 w-full h-[150%] object-cover z-0 blur-[90px] opacity-40 mix-blend-screen" alt="Atmosphere">
-          
+
           <!-- Capa 2: Backdrop estirado con máscara Tailwind v4 nativa -->
           <div class="absolute top-0 right-0 w-full md:w-[80%] h-[85vh] z-10 flex justify-end opacity-60 md:mask-[linear-gradient(to_right,transparent,black_20%)] mask-[linear-gradient(to_bottom,black_10%,transparent_90%)]">
             <img dfLazyImage [lazySrc]="movie()! | wpImage:'backdrop'" class="w-full h-full object-cover md:object-right object-top" alt="Backdrop">
@@ -49,13 +48,13 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 
           <!-- Capa 3: "Humo" (Smoke Fades) usando densidad paralela -->
           <div class="absolute inset-0 bg-black/10 z-10"></div> <!-- Oscurecedor unificador ligero -->
-          
+
           <!-- Base sólida inferior para evitar cualquier corte -->
           <div class="absolute inset-x-0 bottom-0 h-[20vh] bg-df-background z-20"></div>
-          
+
           <!-- Humo denso ascendente -->
           <div class="absolute inset-x-0 bottom-[10vh] h-[70vh] bg-linear-to-t from-df-background from-20% via-df-background/80 to-transparent z-20"></div>
-          
+
           <!-- Sombra profunda interior adicional -->
           <div class="absolute inset-0 bg-linear-to-t from-df-background via-transparent to-transparent z-20 opacity-80"></div>
 
@@ -72,7 +71,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 
         <!-- CONTENIDO PRINCIPAL FLOTANTE -->
         <div class="relative z-30 pt-[35vh] md:pt-[40vh] px-4 md:px-12 max-w-7xl mx-auto flex flex-col md:flex-row gap-8 pb-12">
-          
+
           <!-- Left Column: Poster -->
           <div class="hidden md:block w-1/4 shrink-0">
             <div class="aspect-poster rounded-lg shadow-[0_0_40px_rgba(0,0,0,0.9)] overflow-hidden border border-white/5 ring-1 ring-white/10 group">
@@ -102,7 +101,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
             <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-tight mb-2 text-balance text-white"
                 [innerHTML]="movie()!.title">
             </h1>
-            
+
             @if (movie()?.original_title && movie()!.original_title !== movie()!.title) {
               <p class="text-gray-400 font-medium mb-4 italic" [innerHTML]="movie()!.original_title"></p>
             }
@@ -141,12 +140,12 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
               </button>
             </div>
           </div>
-          
+
         </div>
 
         <!-- COMPONENTES EXTENDIDOS (TABS: REPRODUCTORES, DESCARGAS, REPARTO...) -->
         <div class="max-w-7xl mx-auto px-6 pb-24 text-white relative z-30">
-          
+
           <!-- TABS NAVIGATION -->
           <div class="flex flex-wrap gap-4 md:gap-8 border-b border-white/10 mb-8 pt-8">
             @if (movie()?.type === 'tvshows' || movie()?.type === 'animes') {
@@ -198,7 +197,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           <!-- TABS CONTENT -->
           <div class="min-h-50">
             @switch (activeTab()) {
-              
+
               @case ('EPISODIOS') {
                 <div class="animate-fade-in max-w-5xl mx-auto flex flex-col gap-6">
                   <!-- Control de Temporada -->
@@ -228,22 +227,22 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                   } @else {
                     <div class="flex flex-col gap-3">
                       @for (ep of episodesResponse()!.posts; track ep._id) {
-                        <button (click)="selectedEpisodeId.set(ep._id); activeTab.set('REPRODUCIR'); isTheaterMode.set(true)" 
+                        <button (click)="selectedEpisodeId.set(ep._id); activeTab.set('REPRODUCIR'); isTheaterMode.set(true)"
                                 class="flex items-center gap-4 text-left p-4 md:p-5 bg-[#161616] hover:bg-white/10 border border-white/5 transition-colors rounded-xl group relative overflow-hidden cursor-pointer"
                                 [class.border-[#e50914]]="selectedEpisodeId() === ep._id">
-                          
+
                           <!-- Número de capitulo gigante -->
                           <div class="text-4xl md:text-5xl font-black text-white/5 group-hover:text-white/10 transition-colors mr-2 shrink-0">
                             {{ ep.episode_number }}
                           </div>
-                          
+
                           <div class="flex flex-col flex-1 z-10">
                             <h3 class="text-white font-bold text-base md:text-lg group-hover:text-[#e50914] transition-colors leading-tight">
                               {{ ep.title.split(': ').pop() || ep.title }}
                             </h3>
                             <p class="text-gray-500 text-xs md:text-sm font-medium mt-1">Temporada {{ ep.season_number }} • Episodio {{ ep.episode_number }}</p>
                           </div>
-                          
+
                           <!-- Play icon on hover -->
                           <div class="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center shrink-0 group-hover:bg-[#e50914] group-hover:border-[#e50914] transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
@@ -271,7 +270,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                       } @else if (isTheaterMode()) {
                         <div class="text-df-accent font-bold animate-pulse">Reproduciendo en Modo Cine...</div>
                       }
-                      
+
                       <!-- Overlay expand button (Only visible in Tab mode) -->
                       <button (click)="isTheaterMode.set(true)" class="absolute bottom-4 right-4 bg-black/60 hover:bg-[#e50914] backdrop-blur text-white p-3 rounded opacity-0 group-hover:opacity-100 transition-all shadow-lg border border-white/20 cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -279,7 +278,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                         </svg>
                       </button>
                     </div>
-                    
+
                     <!-- Server Selector -->
                     <div class="flex flex-wrap gap-2 mt-4 items-center">
                       <span class="text-sm font-semibold text-gray-400 uppercase tracking-widest mr-2">Servidor:</span>
@@ -308,7 +307,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                     @for (group of groupedDownloads(); track group.quality) {
                       <details class="group bg-[#161616] border border-white/5 rounded-xl overflow-hidden transition-all duration-300">
                         <summary class="flex flex-col md:flex-row items-center cursor-pointer p-4 md:p-6 list-none hover:bg-white/5 transition-colors gap-4 relative">
-                          
+
                           <!-- Ocultar el marcador nativo de "details" -->
                           <style>details > summary::-webkit-details-marker { display: none; }</style>
 
@@ -360,24 +359,24 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                             <a [href]="hackstorePostUrl()" target="_blank" class="flex justify-between items-center p-3 md:p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all text-sm md:text-base group/link overflow-hidden relative cursor-pointer shadow-lg hover:border-white/20">
                                <!-- Shine effect -->
                                <div class="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/link:translate-x-full transition-transform duration-1000 z-0 pointer-events-none"></div>
-                               
+
                                <!-- Info Container -->
                                <div class="flex items-center gap-4 z-10">
                                   <!-- Server Icons Customization -->
                                   @if (dl.url.includes('mega.nz')) {
-                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-600/40 to-black flex items-center justify-center shrink-0 border border-red-500/50 shadow-[0_0_15px_rgba(220,38,38,0.3)]">
+                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-red-600/40 to-black flex items-center justify-center shrink-0 border border-red-500/50 shadow-[0_0_15px_rgba(220,38,38,0.3)]">
                                         <span class="font-black text-white text-lg tracking-tighter shadow-black drop-shadow-md">M</span>
                                      </div>
                                   } @else if (dl.url.includes('mediafire')) {
-                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600/40 to-black flex items-center justify-center shrink-0 border border-blue-500/50 shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-blue-600/40 to-black flex items-center justify-center shrink-0 border border-blue-500/50 shadow-[0_0_15px_rgba(37,99,235,0.3)]">
                                         <span class="font-black text-white px-2">mf</span>
                                      </div>
                                   } @else if (dl.url.includes('1fichier')) {
-                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-600/40 to-black flex items-center justify-center shrink-0 border border-orange-500/50 shadow-[0_0_15px_rgba(234,88,12,0.3)]">
+                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-orange-600/40 to-black flex items-center justify-center shrink-0 border border-orange-500/50 shadow-[0_0_15px_rgba(234,88,12,0.3)]">
                                         <span class="font-black text-white text-xs">1F</span>
                                      </div>
                                   } @else if (dl.url.includes('utorrent')) {
-                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-600/40 to-black flex items-center justify-center shrink-0 border border-green-500/50 shadow-[0_0_15px_rgba(22,163,74,0.3)]">
+                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-green-600/40 to-black flex items-center justify-center shrink-0 border border-green-500/50 shadow-[0_0_15px_rgba(22,163,74,0.3)]">
                                         <span class="font-black text-white text-xs">µT</span>
                                      </div>
                                   } @else {
@@ -387,7 +386,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                                        </svg>
                                      </div>
                                   }
-                                  
+
                                   <div class="flex flex-col">
                                     <span class="font-bold text-gray-200 group-hover/link:text-white transition-colors capitalize md:text-lg">
                                        {{ dl.server || dl.url.split('/')[2].replace('www.', '').split('.')[0] }}
@@ -400,7 +399,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                                     </span>
                                   </div>
                                </div>
-                               
+
                                <!-- Right Accents -->
                                <div class="flex items-center gap-3 md:gap-6 z-10">
                                  <span class="text-gray-400 font-medium tracking-wide text-[10px] md:text-xs bg-black/40 px-3 py-1.5 rounded-lg hidden sm:inline-block border border-white/5 uppercase shadow-inner">{{ dl.lang }}</span>
@@ -472,7 +471,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
       <!-- THEATER MODE MODAL (OVERLAY DE PANTALLA COMPLETA) -->
       @if (isTheaterMode()) {
         <div class="fixed inset-0 z-100 bg-black flex flex-col animate-fade-in">
-          
+
           <!-- Top Controls Bar -->
           <div class="absolute top-0 inset-x-0 h-24 bg-linear-to-b from-black to-transparent flex items-start justify-between px-6 pt-6 z-50 pointer-events-none">
             <h2 class="text-white font-bold tracking-widest text-sm md:text-lg opacity-80 uppercase drop-shadow-md pointer-events-auto">
@@ -516,7 +515,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, LazyImageDirective, WpImagePipe, BadgeComponent, SafePipe, FormsModule, MediaUrlPipe]
+  imports: [RouterModule, LazyImageDirective, WpImagePipe, BadgeComponent, SafePipe, FormsModule, MediaUrlPipe]
 })
 export class MovieDetailsComponent {
   typeSlug = input.required<string>();
@@ -525,7 +524,7 @@ export class MovieDetailsComponent {
   private wpService = inject(WpMediaService);
   private location = inject(Location);
   public myListService = inject(MyListService);
-  
+
   private stateMedia = history.state.media as ApiMedia | undefined;
 
   activeTab = signal<'REPRODUCIR' | 'DESCARGAS' | 'REPARTO' | 'SIMILARES' | 'EPISODIOS'>(
@@ -548,7 +547,7 @@ export class MovieDetailsComponent {
          if (this.stateMedia && this.stateMedia.slug === currentSlug) {
            return of({ data: this.stateMedia, error: false });
          }
-         
+
          return this.wpService.getMediaBySlug(currentSlug, postType).pipe(
            map(res => ({ data: res, error: false })),
            catchError(() => of({ data: null, error: true }))
@@ -556,7 +555,7 @@ export class MovieDetailsComponent {
       })
     )
   );
-  
+
   movie = computed(() => this.mediaState()?.data || null);
 
   activeMediaId = computed(() => {
@@ -610,7 +609,7 @@ export class MovieDetailsComponent {
   groupedDownloads = computed(() => {
     const downloads = this.downloadsState();
     if (!downloads) return [];
-    
+
     const groups = new Map<string, any>();
     for (const dl of downloads) {
       if (!groups.has(dl.quality)) {
@@ -629,7 +628,7 @@ export class MovieDetailsComponent {
 
   hasError = computed(() => this.mediaState()?.error === true);
   loadingOrPending = computed(() => this.mediaState() === undefined && !this.hasError());
-  
+
   currentEmbed = computed(() => {
     const embeds = this.playersState().embeds;
     if (!embeds || embeds.length === 0) return null;
@@ -665,7 +664,7 @@ export class MovieDetailsComponent {
       if (currentMovie) {
         // Registrar visita
         this.wpService.registerHit(currentMovie._id, currentMovie.type).subscribe();
-        
+
         // Reset state on movie change (como cuando se navega desde Similares)
         setTimeout(() => {
           this.activeTab.set((currentMovie.type === 'tvshows' || currentMovie.type === 'animes') ? 'EPISODIOS' : 'REPRODUCIR');

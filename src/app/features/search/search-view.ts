@@ -1,17 +1,16 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { WpMediaService } from '@services/wp-media';
-import { MediaGridComponent } from '@shared/components/media-grid/media-grid';
 import { ApiMedia } from '@models';
 import { switchMap, map, catchError, of, tap, debounceTime } from 'rxjs';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
+import { MediaGridComponent } from '@shared/components/media-grid/media-grid';
 
 @Component({
   selector: 'df-search-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MediaGridComponent],
+  imports: [MediaGridComponent],
   providers: [MediaUrlPipe],
   template: `
     <div class="max-w-400 mx-auto px-4 md:px-8 pt-8 pb-20 md:mt-8 min-h-[70vh]">
@@ -26,9 +25,9 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           </h1>
         }
 
-        <df-media-grid 
-          [title]="''" 
-          [mediaItems]="searchResults() || []" 
+        <df-media-grid
+          [title]="''"
+          [mediaItems]="searchResults() || []"
           (mediaSelected)="onMediaSelected($event)" />
 
         @if (!loading() && searchQuery() && (!searchResults() || searchResults().length === 0)) {
@@ -40,7 +39,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
              <p class="text-sm text-gray-600 mt-2">Intenta buscar usando otras palabras clave o el título de la película.</p>
            </div>
         }
-        
+
         @if (!searchQuery()) {
             <div class="text-center py-20 flex flex-col items-center justify-center h-[50vh]">
                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-gray-600 mb-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">

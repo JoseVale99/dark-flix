@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MyListService } from '@services/my-list';
 import { MediaGridComponent } from '@shared/components/media-grid/media-grid';
@@ -9,7 +8,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 @Component({
   selector: 'df-my-list-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MediaGridComponent],
+  imports: [MediaGridComponent],
   providers: [MediaUrlPipe],
   template: `
     <div class="max-w-400 mx-auto px-4 md:px-8 pt-8 pb-24 md:mt-8 min-h-[70vh]">
@@ -32,9 +31,9 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
            </button>
         </div>
       } @else {
-        <df-media-grid 
-          [title]="''" 
-          [mediaItems]="myListService.list()" 
+        <df-media-grid
+          [title]="''"
+          [mediaItems]="myListService.list()"
           (mediaSelected)="onMediaSelected($event)" />
       }
     </div>

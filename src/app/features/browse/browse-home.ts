@@ -1,5 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of } from 'rxjs';
 import { Router } from '@angular/router';
@@ -17,30 +16,30 @@ import { ApiMedia } from '@models';
 
       <!-- Carruseles Verdaderos Segmentados -->
       <div class="relative z-20 -mt-8 md:-mt-16 space-y-8 md:space-y-12">
-        
-        <df-media-slider 
-          title="Películas Recientes" 
-          [mediaItems]="moviesResponse().data || []" 
+
+        <df-media-slider
+          title="Películas Recientes"
+          [mediaItems]="moviesResponse().data || []"
           [loading]="moviesResponse().loading"
           (mediaSelected)="onMediaSelected($event)" />
 
-        <df-media-slider 
-          title="Series Destacadas" 
-          [mediaItems]="tvShowsResponse().data || []" 
+        <df-media-slider
+          title="Series Destacadas"
+          [mediaItems]="tvShowsResponse().data || []"
           [loading]="tvShowsResponse().loading"
           (mediaSelected)="onMediaSelected($event)" />
 
-        <df-media-slider 
-          title="Animes Populares" 
-          [mediaItems]="animesResponse().data || []" 
+        <df-media-slider
+          title="Animes Populares"
+          [mediaItems]="animesResponse().data || []"
           [loading]="animesResponse().loading"
           (mediaSelected)="onMediaSelected($event)" />
-          
+
       </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, HeroBannerComponent, MediaSliderComponent]
+  imports: [HeroBannerComponent, MediaSliderComponent]
 })
 export class BrowseHomeComponent {
   private wpService = inject(WpMediaService);

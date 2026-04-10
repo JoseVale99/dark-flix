@@ -1,5 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, effect, computed, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, DestroyRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -13,7 +12,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 @Component({
   selector: 'df-catalog-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MediaGridComponent, FormsModule, FilterDropdownComponent],
+  imports: [MediaGridComponent, FormsModule, FilterDropdownComponent],
   providers: [MediaUrlPipe],
   template: `
     <div class="max-w-400 mx-auto px-4 md:px-8 pt-8 pb-24 md:mt-8 min-h-[70vh]">
@@ -26,14 +25,14 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 
         <!-- Filters Dropdown Panel -->
         <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
-          
+
           <df-filter-dropdown
             title="Género"
             searchPlaceholder="Buscar género..."
             [options]="genres"
             [(selected)]="selectedGenres"
             (selectedChange)="applyFilters()" />
-            
+
           <df-filter-dropdown
             title="País"
             searchPlaceholder="Buscar país..."
@@ -144,7 +143,7 @@ export class CatalogViewComponent {
      this.currentPage.set(1);
      this.items.set([]);
      this.hasMoreItems.set(true);
-     
+
      // Sincronizar hacia el Query URL activo de forma silenciosa (sin recargar la pagina)
      this.router.navigate([], {
         relativeTo: this.route,
@@ -155,7 +154,7 @@ export class CatalogViewComponent {
         },
         queryParamsHandling: 'merge'
      });
-     
+
      this.fetchCatalog();
   }
 
