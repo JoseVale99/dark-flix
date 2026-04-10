@@ -9,31 +9,28 @@ import { MyListService } from '@services/my-list';
 @Component({
   selector: 'df-media-card',
   template: `
-    <div class="group relative aspect-poster bg-df-card rounded overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:z-50 hover:shadow-[0_15px_30px_rgba(0,0,0,0.6)] hover:ring-1 hover:ring-white/10"
+    <div class="group relative aspect-poster bg-df-card rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:z-50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] hover:ring-1 hover:ring-white/20"
          (click)="selected.emit(media())">
 
       @if (!imageLoaded()) {
         <df-skeleton-card class="absolute inset-0 z-0" />
       }
 
-      <!-- Imagen: normal siempre, oscurece solo en hover desktop -->
+      <!-- Imagen: blur en hover desktop / sutil en móvil -->
       <img dfLazyImage
            [lazySrc]="media() | wpImage : 'poster'"
            [alt]="media().title"
            (load)="imageLoaded.set(true)"
-           class="w-full h-full object-cover transition-all duration-300 group-hover:brightness-75 group-hover:scale-105"
+           class="w-full h-full object-cover transition-all duration-500
+                  group-hover:scale-110 group-hover:blur-[2px] group-hover:brightness-50
+                  [@media(hover:none)]:scale-[1.03] [@media(hover:none)]:brightness-60 [@media(hover:none)]:blur-[1px]"
            [class.opacity-0]="!imageLoaded()" />
 
-      <!-- Overlay Play — visible en móvil, hover en desktop -->
-      <div class="absolute inset-0 flex items-center justify-center z-10
-                  [@media(hover:none)]:bg-gradient-to-t [@media(hover:none)]:from-black/70 [@media(hover:none)]:via-black/20 [@media(hover:none)]:to-transparent [@media(hover:none)]:opacity-100
-                  [@media(hover:hover)]:bg-black/60 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100
-                  transition-opacity duration-200">
-        <div class="w-12 h-12 rounded-full bg-black/40 border border-white/40 flex items-center justify-center backdrop-blur-sm shadow-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" class="w-5 h-5 ml-0.5">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-        </div>
+      <!-- Overlay: gradiente oscuro siempre desde abajo, negro total en hover -->
+      <div class="absolute inset-0 z-10 transition-all duration-500
+                  bg-gradient-to-t from-black/90 via-black/20 to-transparent
+                  group-hover:from-black/95 group-hover:via-black/70 group-hover:to-black/30
+                  [@media(hover:none)]:from-black/85 [@media(hover:none)]:via-black/50 [@media(hover:none)]:to-black/10">
       </div>
 
       <!-- Metadata Badges -->
@@ -46,29 +43,41 @@ import { MyListService } from '@services/my-list';
         }
       </div>
 
-      <!-- Quick Favorite Toggle Button -->
+      <!-- Quick Favorite Button -->
       <button (click)="$event.stopPropagation(); myListService.toggleList(media())"
               title="Añadir/Quitar de Mi Lista"
-              class="group/fav absolute top-2 right-2 z-30 p-1.5 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 transition-all shadow-md backdrop-blur opacity-100 md:opacity-0 md:group-hover:opacity-100 cursor-pointer">
+              class="group/fav absolute top-2 right-2 z-30 p-1.5 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 transition-all shadow-md backdrop-blur cursor-pointer
+                     opacity-100 md:opacity-0 md:group-hover:opacity-100">
         @if (myListService.isInList(media()._id)) {
-          <!-- MODO: EN LISTA -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#e50914] scale-110 drop-shadow-[0_0_8px_rgba(229,9,20,0.8)] block group-hover/fav:hidden" fill="currentColor" viewBox="0 0 24 24">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#e50914]" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white scale-110 drop-shadow-md hidden group-hover/fav:block opacity-80 group-active/fav:scale-90 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M16.5 3C14.76 3 13.09 3.81 12 5.09L10 8L12 12L9.5 16L12 21.35L13.45 20.03C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3V3ZM7.5 3C4.42 3 2 5.42 2 8.5 2 12.28 5.4 15.36 10.55 20.03L12 21.35L8.5 13L10.5 9L7.5 3V3Z" />
-          </svg>
         } @else {
-          <!-- MODO: NO EN LISTA -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white group-hover/fav:text-[#e50914] group-hover/fav:scale-110 group-active/fav:scale-90 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white group-hover/fav:text-[#e50914] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
           </svg>
         }
       </button>
 
-      <!-- Title Gradient -->
-      <div class="absolute bottom-0 left-0 right-0 p-2 bg-linear-to-t from-black/90 to-transparent z-20">
-        <p class="text-white text-xs font-semibold truncate">{{ media().title }}</p>
+      <!-- Contenido inferior: título + botón (siempre en móvil, hover en desktop) -->
+      <div class="absolute bottom-0 left-0 right-0 z-20 p-3 flex flex-col gap-2
+                  translate-y-2 group-hover:translate-y-0 transition-transform duration-300
+                  [@media(hover:none)]:translate-y-0">
+
+        <!-- Título -->
+        <p class="text-white font-black text-sm leading-tight line-clamp-2 drop-shadow-lg">
+          {{ media().title }}
+        </p>
+
+        <!-- Botón Ver ahora -->
+        <button class="w-full flex items-center justify-center gap-2 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-2 px-3 rounded-lg transition-all shadow-lg
+                       opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300
+                       [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          Ver ahora
+        </button>
       </div>
     </div>
   `,
