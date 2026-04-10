@@ -62,7 +62,7 @@ import { MyListService } from '@services/my-list';
           {{ media().title }}
         </p>
         <!-- Botón solo visible en desktop al hacer hover de la TARJETA -->
-        <button class="hidden md:flex w-full items-center justify-center gap-1.5 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-1.5 rounded-md transition-all shadow-lg
+        <button class="hidden md:flex w-full items-center justify-center gap-1.5 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-1.5 rounded-md transition-all shadow-lg cursor-pointer
                        opacity-0 group-hover/card:opacity-100 translate-y-1 group-hover/card:translate-y-0 duration-200">
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-3 h-3 shrink-0">
             <path d="M8 5v14l11-7z"/>
