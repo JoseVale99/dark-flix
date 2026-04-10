@@ -26,9 +26,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 
         <!-- Logo -->
         <a routerLink="/" class="flex flex-col select-none cursor-pointer group">
-          <h1 class="text-2xl md:text-3xl font-black tracking-tighter" style="font-family: 'Outfit', sans-serif;">
-            <span class="text-white group-hover:text-gray-300 transition-colors">DARK</span><span class="text-[#e50914]">FLIX</span>
-          </h1>
+          <img src="/images/logo/dark-flix.png" alt="DarkFlix" class="h-9 md:h-12 object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300">
         </a>
 
         <!-- Desktop Global Navigation -->
