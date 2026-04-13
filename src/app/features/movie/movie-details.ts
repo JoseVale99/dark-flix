@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, input, computed, signal, effect } from '@angular/core';
 import { WpMediaService } from '@services/wp-media';
 import { MyListService } from '@services/my-list';
+import { WatchHistoryService } from '@services/watch-history';
 import { ApiMedia } from '@models';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap, combineLatest, filter, concat } from 'rxjs';
@@ -588,6 +589,7 @@ export class MovieDetailsComponent {
   private wpService = inject(WpMediaService);
   private location = inject(Location);
   public myListService = inject(MyListService);
+  public watchHistoryService = inject(WatchHistoryService);
 
   private stateMedia = history.state.media as ApiMedia | undefined;
 
@@ -752,6 +754,7 @@ export class MovieDetailsComponent {
       if (currentMovie) {
         // Registrar visita
         this.wpService.registerHit(currentMovie._id, currentMovie.type).subscribe();
+        this.watchHistoryService.addToHistory(currentMovie);
 
         // Reset state on movie change (como cuando se navega desde Similares)
         setTimeout(() => {
