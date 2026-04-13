@@ -3,7 +3,7 @@ import { WpMediaService } from '@services/wp-media';
 import { MyListService } from '@services/my-list';
 import { ApiMedia } from '@models';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, switchMap, combineLatest, filter } from 'rxjs';
+import { catchError, map, of, switchMap, combineLatest, filter, concat } from 'rxjs';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
 import { BadgeComponent } from '@shared/components/badge/badge';
@@ -650,8 +650,11 @@ export class MovieDetailsComponent {
   playersState = toSignal(
     toObservable(this.activeMediaId).pipe(
       filter(activeId => !!activeId),
-      switchMap(currentId => this.wpService.getMoviePlayers(currentId!).pipe(
-        catchError(() => of({ embeds: [], downloads: [] }))
+      switchMap(currentId => concat(
+        of({ embeds: [], downloads: [] }),
+        this.wpService.getMoviePlayers(currentId!).pipe(
+          catchError(() => of({ embeds: [], downloads: [] }))
+        )
       ))
     ), { initialValue: { embeds: [], downloads: [] } }
   );
@@ -659,8 +662,11 @@ export class MovieDetailsComponent {
   downloadsState = toSignal(
     toObservable(this.activeMediaId).pipe(
       filter(activeId => !!activeId),
-      switchMap(currentId => this.wpService.getMovieDownloads(currentId!).pipe(
-        catchError(() => of([]))
+      switchMap(currentId => concat(
+        of([]),
+        this.wpService.getMovieDownloads(currentId!).pipe(
+          catchError(() => of([]))
+        )
       ))
     ), { initialValue: [] }
   );
@@ -752,7 +758,9 @@ export class MovieDetailsComponent {
           this.activeTab.set((currentMovie.type === 'tvshows' || currentMovie.type === 'animes') ? 'EPISODIOS' : 'REPRODUCIR');
           this.selectedEpisodeId.set(undefined);
           this.selectedSeason.set('1');
+          this.selectedEmbedIndex.set(0);
           this.isTheaterMode.set(false);
+          this.showHelperPanel.set(false);
           if (typeof window !== 'undefined') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }
