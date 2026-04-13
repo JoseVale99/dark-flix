@@ -2,6 +2,14 @@
 
 @import 'tailwindcss';
 
+@theme {
+  --animate-shimmer: shimmer 2s linear infinite;
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+}
 /* Utilidad para Sliders estilo Netflix: Scroll suave sin barra visible */
 .hide-scrollbar {
   -ms-overflow-style: none;  /* IE y Edge */

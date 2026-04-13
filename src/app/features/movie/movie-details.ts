@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, input, computed, signal, effect } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
 import { WpMediaService } from '@services/wp-media';
 import { MyListService } from '@services/my-list';
 import { WatchHistoryService } from '@services/watch-history';
@@ -19,11 +20,30 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
   template: `
     <div class="min-h-screen w-full bg-df-background pb-20 overflow-x-hidden relative">
       @if (loadingOrPending()) {
-        <div class="w-full h-[60vh] bg-df-card animate-pulse"></div>
-        <div class="p-4 md:p-12 space-y-4 max-w-4xl mx-auto">
-          <div class="h-10 bg-df-card w-2/3 rounded"></div>
-          <div class="h-4 bg-df-card w-full rounded"></div>
-          <div class="h-4 bg-df-card w-5/6 rounded"></div>
+        <!-- Skeleton Cinematic Backdrop -->
+        <div class="relative w-full h-[60vh] md:h-[85vh] bg-linear-to-r from-[#141414] via-[#202020] to-[#141414] bg-size-[200%_100%] animate-shimmer overflow-hidden">
+           <div class="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-df-background to-transparent z-10"></div>
+        </div>
+        <!-- Skeleton Content Area -->
+        <div class="relative z-30 -mt-32 md:-mt-48 px-4 md:px-12 max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
+           <!-- Poster Skeleton -->
+           <div class="hidden md:block w-1/4 shrink-0 shadow-2xl">
+              <div class="aspect-poster rounded-lg bg-linear-to-r from-[#18181b] via-[#27272a] to-[#18181b] bg-size-[200%_100%] animate-shimmer ring-1 ring-white/5"></div>
+           </div>
+           <!-- Info Skeleton -->
+           <div class="flex-1 space-y-6 pt-4 w-full">
+              <div class="h-10 md:h-14 bg-linear-to-r from-[#18181b] via-[#27272a] to-[#18181b] bg-size-[200%_100%] animate-shimmer rounded w-3/4"></div>
+              <div class="flex gap-2">
+                 <div class="h-6 w-16 bg-[#18181b] rounded animate-pulse"></div>
+                 <div class="h-6 w-20 bg-[#18181b] rounded animate-pulse"></div>
+              </div>
+              <div class="space-y-3 max-w-3xl">
+                 <div class="h-4 bg-linear-to-r from-[#18181b] via-[#27272a] to-[#18181b] bg-size-[200%_100%] animate-shimmer rounded w-full"></div>
+                 <div class="h-4 bg-linear-to-r from-[#18181b] via-[#27272a] to-[#18181b] bg-size-[200%_100%] animate-shimmer rounded w-[90%]"></div>
+                 <div class="h-4 bg-linear-to-r from-[#18181b] via-[#27272a] to-[#18181b] bg-size-[200%_100%] animate-shimmer rounded w-[80%]"></div>
+              </div>
+              <div class="h-12 w-40 bg-[#e50914]/20 rounded animate-pulse mt-8"></div>
+           </div>
         </div>
       } @else if (hasError()) {
         <div class="flex flex-col items-center justify-center h-screen text-red-500">
@@ -590,6 +610,8 @@ export class MovieDetailsComponent {
   private location = inject(Location);
   public myListService = inject(MyListService);
   public watchHistoryService = inject(WatchHistoryService);
+  private titleService = inject(Title);
+  private metaService = inject(Meta);
 
   private stateMedia = history.state.media as ApiMedia | undefined;
 
@@ -752,6 +774,15 @@ export class MovieDetailsComponent {
     effect(() => {
       const currentMovie = this.movie();
       if (currentMovie) {
+        // Actualizar META/SEO nativo
+        this.titleService.setTitle(`Ver ${currentMovie.title} | DarkFlix`);
+        this.metaService.updateTag({ name: 'description', content: currentMovie.overview || 'Disfruta de este título en DarkFlix.' });
+        this.metaService.updateTag({ property: 'og:title', content: currentMovie.title });
+        this.metaService.updateTag({ property: 'og:description', content: currentMovie.overview || '' });
+        if (currentMovie.images?.poster) {
+           this.metaService.updateTag({ property: 'og:image', content: `https://hackstore.mx${currentMovie.images.poster}` });
+        }
+
         // Registrar visita
         this.wpService.registerHit(currentMovie._id, currentMovie.type).subscribe();
         this.watchHistoryService.addToHistory(currentMovie);
