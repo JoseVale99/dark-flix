@@ -6,6 +6,8 @@ import { filter, debounceTime, distinctUntilChanged, switchMap, catchError, tap 
 import { of } from 'rxjs';
 import { WpMediaService } from '@services/wp-media';
 import { SearchHistoryService } from '@services/search-history';
+import { ProfileService } from '@services/profile';
+import { PROFILE_ICON_PATHS, ProfileIconKey } from '@core/models/profile-icons';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 import { WpImagePipe } from '@shared/pipes/wp-image';
 
@@ -51,6 +53,34 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                </svg>
           </div>
+
+          <!-- Avatar del Perfil Activo -->
+          @if (profileService.activeProfile(); as profile) {
+            <div class="relative">
+              <button (click)="profileMenuOpen.update(v => !v)"
+                      class="w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer border-2 border-transparent hover:border-white transition-all"
+                      [style.background-color]="profile.color + '33'">
+                <svg viewBox="0 0 256 256" class="w-5 h-5" [style.fill]="profile.color">
+                  <path [attr.d]="getProfileIconPath(profile.avatar)" />
+                </svg>
+              </button>
+
+              @if (profileMenuOpen()) {
+                <div class="absolute right-0 top-12 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl w-48 py-2 z-50 animate-fade-in">
+                  <div class="px-4 py-2 border-b border-white/10 mb-1">
+                    <p class="text-white font-bold text-sm">{{ profile.name }}</p>
+                    <p class="text-gray-500 text-xs">Perfil activo</p>
+                  </div>
+                  <button (click)="changeProfile()" class="w-full flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm transition-colors cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Cambiar Perfil
+                  </button>
+                </div>
+              }
+            </div>
+          }
         </div>
 
       </div>
@@ -177,6 +207,9 @@ export class TopNavComponent {
   searchTotal = computed(() => this.searchState().total);
 
   public readonly searchHistoryService = inject(SearchHistoryService);
+  public readonly profileService = inject(ProfileService);
+
+  profileMenuOpen = signal(false);
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -222,5 +255,15 @@ export class TopNavComponent {
         this.forceHideSearch();
       }
     }, 200);
+  }
+
+  changeProfile(): void {
+    this.profileMenuOpen.set(false);
+    this.profileService.logout();
+    this.router.navigate(['/profiles']);
+  }
+
+  getProfileIconPath(key: string): string {
+    return PROFILE_ICON_PATHS[key as ProfileIconKey] ?? PROFILE_ICON_PATHS['user'];
   }
 }
