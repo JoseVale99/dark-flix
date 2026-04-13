@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { WpMediaService } from '@services/wp-media';
+import { WatchHistoryService } from '@services/watch-history';
 import { HeroBannerComponent } from '@shared/components/hero-banner/hero-banner';
 import { MediaSliderComponent } from '@shared/components/media-slider/media-slider';
 import { ApiMedia } from '@models';
@@ -16,6 +17,14 @@ import { ApiMedia } from '@models';
 
       <!-- Carruseles Verdaderos Segmentados -->
       <div class="relative z-20 -mt-8 md:-mt-16 space-y-8 md:space-y-12">
+
+        @if (watchHistory().length > 0) {
+          <df-media-slider
+            title="Vistos Recientemente"
+            [mediaItems]="watchHistory()"
+            [loading]="false"
+            (mediaSelected)="onMediaSelected($event)" />
+        }
 
         <df-media-slider
           title="Películas Recientes"
@@ -44,6 +53,9 @@ import { ApiMedia } from '@models';
 export class BrowseHomeComponent {
   private wpService = inject(WpMediaService);
   private router = inject(Router);
+  private watchHistoryService = inject(WatchHistoryService);
+
+  public watchHistory = this.watchHistoryService.history;
 
   private heroResponse = toSignal(
     this.wpService.getMediaSliders().pipe(
