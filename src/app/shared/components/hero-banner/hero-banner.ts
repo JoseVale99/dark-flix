@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, input, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject, computed, signal, afterNextRender, PLATFORM_ID } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
+import { isPlatformBrowser } from '@angular/common';
 import { ApiMedia } from '@models';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
@@ -15,7 +16,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
     <div class="relative w-full h-[75vh] md:h-[85vh] flex flex-col justify-center overflow-hidden px-4 md:px-20 mb-8 md:mb-12 border-b border-gray-800">
 
       <!-- Capa 1: Fondo atmosférico (Súper desenfocado para disimular backdrops baja res) -->
-      @if (featuredPost() && !trailerUrl()) {
+      @if (featuredPost() && !trailerReady()) {
         <img
           dfLazyImage
           [lazySrc]="featuredPost() | wpImage:'backdrop'"
@@ -23,23 +24,26 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           alt="Atmosphere">
       }
 
-      <!-- Capa 2: Imagen real o VIDEO -->
-      @if (trailerUrl()) {
-        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-black">
-          <iframe
-            [src]="trailerUrl()"
-            class="absolute top-1/2 left-1/2 w-[300vw] h-[300vh] min-w-[120%] min-h-[120%] md:w-[150vw] md:h-[150vh] xl:w-screen xl:h-[150vh] -translate-x-1/2 -translate-y-1/2 opacity-70"
-            frameborder="0"
-            allow="autoplay; encrypted-media"
-            allowfullscreen>
-          </iframe>
-        </div>
-      } @else if (featuredPost()) {
+      <!-- Capa 2: Imagen real de fondo (siempre visible hasta que el vídeo esté listo) -->
+      @if (featuredPost() && !trailerReady()) {
         <img
           dfLazyImage
           [lazySrc]="featuredPost() | wpImage:'backdrop'"
           class="absolute inset-0 w-full h-full object-cover object-top z-1 opacity-60"
           alt="Backdrop">
+      }
+
+      <!-- Capa 2b: Trailer de YouTube — solo desktop, solo tras 2 seg de delay -->
+      @if (trailerReady() && trailerUrl()) {
+        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-black">
+          <iframe
+            [src]="trailerUrl()"
+            class="absolute top-1/2 left-1/2 w-[150vw] h-[150vh] -translate-x-1/2 -translate-y-1/2 opacity-70"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen>
+          </iframe>
+        </div>
       }
 
       <!-- Dimmer general y Gradiente base -->
@@ -89,13 +93,13 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
         <div class="hidden lg:flex w-full md:w-1/2 h-full items-center justify-center relative perspective-[1000px]">
           @if (featuredPost()) {
              <div class="relative w-[320px] xl:w-100 aspect-poster rounded-2xl overflow-hidden shadow-[0_40px_80px_-20px_rgba(0,0,0,1)] transform rotate-y-[-15deg] rotate-x-[5deg] hover:rotate-y-0 hover:rotate-x-0 hover:scale-[1.02] transition-all duration-800 ring-1 ring-white/10 cursor-pointer">
-                <img
-                  dfLazyImage
-                  [lazySrc]="featuredPost() | wpImage:'poster'"
-                  class="w-full h-full object-cover"
-                  [alt]="featuredPost()?.title">
-                <!-- Brillo volumétrico -->
-                <div class="absolute inset-0 bg-linear-to-tr from-black/50 via-transparent to-white/10 mix-blend-overlay"></div>
+               <img
+                 dfLazyImage
+                 [lazySrc]="featuredPost() | wpImage:'poster'"
+                 class="w-full h-full object-cover"
+                 [alt]="featuredPost()?.title">
+               <!-- Brillo volumétrico -->
+               <div class="absolute inset-0 bg-linear-to-tr from-black/50 via-transparent to-white/10 mix-blend-overlay"></div>
              </div>
           }
         </div>
@@ -106,6 +110,20 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 export class HeroBannerComponent {
   featuredPost = input<ApiMedia | undefined>();
   private sanitizer = inject(DomSanitizer);
+  private platformId = inject(PLATFORM_ID);
+
+  /** Se activa solo en desktop tras 2 segundos de delay para no bloquear el primer render */
+  trailerReady = signal(false);
+
+  constructor() {
+    afterNextRender(() => {
+      // Solo en desktop (md breakpoint = 768px) para no gastar datos móviles
+      if (!isPlatformBrowser(this.platformId)) return;
+      if (window.matchMedia('(min-width: 768px)').matches) {
+        setTimeout(() => this.trailerReady.set(true), 2000);
+      }
+    });
+  }
 
   trailerUrl = computed(() => {
     const post = this.featuredPost();
