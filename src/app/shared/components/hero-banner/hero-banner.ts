@@ -26,11 +26,11 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
       <!-- Capa 2: Imagen real o VIDEO -->
       @if (trailerUrl()) {
         <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-black">
-          <iframe 
-            [src]="trailerUrl()" 
-            class="absolute top-1/2 left-1/2 w-[300vw] h-[300vh] min-w-[120%] min-h-[120%] md:w-[150vw] md:h-[150vh] xl:w-[100vw] xl:h-[150vh] -translate-x-1/2 -translate-y-1/2 opacity-70" 
-            frameborder="0" 
-            allow="autoplay; encrypted-media" 
+          <iframe
+            [src]="trailerUrl()"
+            class="absolute top-1/2 left-1/2 w-[300vw] h-[300vh] min-w-[120%] min-h-[120%] md:w-[150vw] md:h-[150vh] xl:w-screen xl:h-[150vh] -translate-x-1/2 -translate-y-1/2 opacity-70"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
             allowfullscreen>
           </iframe>
         </div>
@@ -110,7 +110,7 @@ export class HeroBannerComponent {
   trailerUrl = computed(() => {
     const post = this.featuredPost();
     if (!post || !post.trailer) return null;
-    
+
     // Si el trailer ya es un ID directo de 11 caracteres (ej. "hiD3zk0ZRFg")
     let videoId = '';
     if (post.trailer.length === 11 && !post.trailer.includes('/')) {
@@ -128,7 +128,7 @@ export class HeroBannerComponent {
       const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&iv_load_policy=3`;
       return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
     }
-    
+
     return null;
   });
 }
