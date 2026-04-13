@@ -484,39 +484,37 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
       @if (isTheaterMode()) {
         <div class="fixed inset-0 z-100 bg-black flex flex-col animate-fade-in">
 
-          <!-- Top Controls Bar -->
-          <div class="absolute top-0 inset-x-0 h-24 bg-linear-to-b from-black to-transparent flex items-start justify-between px-6 pt-6 z-50 pointer-events-none">
-            <h2 class="text-white font-bold tracking-widest text-sm md:text-lg opacity-80 uppercase drop-shadow-md pointer-events-auto">
-              {{ movie()?.title }} <span class="mx-2 text-[#e50914]">•</span> <span class="font-normal">{{ currentEmbed()?.server || 'Servidor en Línea' }}</span>
+          <!-- Top Bar: Título + Cerrar (siempre visible, fondo sólido en móvil) -->
+          <div class="flex items-center justify-between px-4 md:px-6 py-3 bg-black/95 md:bg-black/80 backdrop-blur-md z-50 shrink-0 border-b border-white/5">
+            <h2 class="text-white font-bold tracking-wide text-xs md:text-base uppercase drop-shadow-md truncate flex-1 mr-4">
+              {{ movie()?.title }} <span class="mx-1 text-[#e50914]">•</span> <span class="font-normal text-gray-400">{{ currentEmbed()?.server || 'Servidor' }}</span>
             </h2>
-            <button (click)="isTheaterMode.set(false)" class="text-white/70 hover:text-white bg-black/40 hover:bg-[#e50914] border border-white/10 rounded-full p-2 transition-all pointer-events-auto backdrop-blur cursor-pointer shadow-2xl">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button (click)="isTheaterMode.set(false)" class="text-white bg-white/10 hover:bg-[#e50914] border border-white/10 rounded-full p-2 transition-all backdrop-blur cursor-pointer shadow-2xl shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-7 md:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
           <!-- Video Player Iframe -->
-          <div class="flex-1 w-full h-full relative flex flex-col justify-center bg-black">
+          <div class="flex-1 w-full relative bg-black min-h-0">
              @if (currentEmbed()) {
-               <!-- max-h-screen para evitar scrolls indeseados -->
-               <iframe [src]="currentEmbed()!.url | safe:'resourceUrl'" class="w-full h-[90vh] md:h-screen border-none" allowfullscreen></iframe>
+               <iframe [src]="currentEmbed()!.url | safe:'resourceUrl'" class="w-full h-full border-none" allowfullscreen></iframe>
              }
           </div>
 
-          <!-- Bottom Floating Server Selector -->
-          <div class="absolute bottom-6 inset-x-0 flex justify-center z-50 pointer-events-none">
-             <div class="flex flex-wrap justify-center gap-2 bg-black/50 backdrop-blur-md p-2 md:p-3 rounded-2xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] pointer-events-auto max-w-4xl max-h-[25vh] overflow-y-auto hide-scrollbar">
+          <!-- Bottom Server Selector (siempre visible, fondo sólido en móvil) -->
+          <div class="shrink-0 bg-black/95 md:bg-black/80 backdrop-blur-md border-t border-white/5 px-3 py-2.5 z-50">
+             <div class="flex overflow-x-auto hide-scrollbar snap-x gap-2 max-w-4xl mx-auto">
                 @for (embed of playersState().embeds; track $index) {
                   <button (click)="selectedEmbedIndex.set($index)"
                           [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
                           [class.text-white]="selectedEmbedIndex() === $index"
                           [class.border-[#e50914]]="selectedEmbedIndex() === $index"
-                          [class.bg-black/40]="selectedEmbedIndex() !== $index"
+                          [class.bg-white/10]="selectedEmbedIndex() !== $index"
                           [class.text-gray-300]="selectedEmbedIndex() !== $index"
                           [class.border-white/10]="selectedEmbedIndex() !== $index"
-                          [class.hover:bg-white/20]="selectedEmbedIndex() !== $index"
-                          class="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all border">
+                          class="shrink-0 snap-start whitespace-nowrap px-4 py-2 rounded-xl text-xs font-semibold transition-all border cursor-pointer hover:bg-white/20">
                     {{ embed.server || 'Server ' + ($index + 1) }} - {{ embed.lang }}
                   </button>
                 }
