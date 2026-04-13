@@ -255,20 +255,35 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                       Buscando enlaces de reproducción...
                     </div>
                   } @else {
-                    <!-- Iframe Container -->
+                    <!-- Iframe Container (solo visible cuando NO está en theater mode) -->
                     <div class="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl relative border border-white/10 flex items-center justify-center group">
-                      @if (!isTheaterMode() && currentEmbed()) {
-                        <iframe [src]="currentEmbed()!.url | safe:'resourceUrl'" class="absolute inset-0 w-full h-full" allowfullscreen></iframe>
-                      } @else if (isTheaterMode()) {
-                        <div class="text-df-accent font-bold animate-pulse">Reproduciendo en Modo Cine...</div>
+                      @if (currentEmbed()) {
+                        @if (isTheaterMode()) {
+                          <!-- Placeholder: el video se muestra en el modal -->
+                          <div class="flex flex-col items-center gap-3 text-center p-4">
+                            <div class="w-16 h-16 rounded-full bg-[#e50914]/20 flex items-center justify-center border border-[#e50914]/30">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[#e50914]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                              </svg>
+                            </div>
+                            <p class="text-df-accent font-bold text-sm">Reproduciendo en Modo Cine</p>
+                            <button (click)="isTheaterMode.set(false)" class="text-xs text-gray-400 hover:text-white underline cursor-pointer transition-colors">
+                              Volver al modo normal
+                            </button>
+                          </div>
+                        } @else {
+                          <iframe [src]="currentEmbed()!.url | safe:'resourceUrl'" class="absolute inset-0 w-full h-full" allowfullscreen></iframe>
+                        }
                       }
 
-                      <!-- Overlay expand button (Only visible in Tab mode) -->
-                      <button (click)="isTheaterMode.set(true)" class="absolute bottom-4 right-4 bg-black/60 hover:bg-[#e50914] backdrop-blur text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-lg border border-white/20 cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14v-2m0 0h2m-2 0l4 4m10-4v-2m0 0h-2m2 0l-4 4m-6-8V4m0 0H6m2 0l-4 4m10 4V4m0 0h2m-2 0l4 4" />
-                        </svg>
-                      </button>
+                      <!-- Overlay expand button -->
+                      @if (!isTheaterMode() && currentEmbed()) {
+                        <button (click)="isTheaterMode.set(true)" class="absolute bottom-4 right-4 bg-black/60 hover:bg-[#e50914] backdrop-blur text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-lg border border-white/20 cursor-pointer">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                          </svg>
+                        </button>
+                      }
                     </div>
 
                     <!-- Server Selector Responsive -->
