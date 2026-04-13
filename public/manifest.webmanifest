@@ -3,7 +3,11 @@
   "short_name": "DarkFlix",
   "description": "La mejor plataforma de streaming. Películas, series y animes.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
   "icons": [

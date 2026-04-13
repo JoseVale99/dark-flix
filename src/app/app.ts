@@ -58,5 +58,19 @@ export class App {
         takeUntilDestroyed()
       )
       .subscribe(() => this.progressSvc.complete());
+
+    // ── PWA Link Handling ───────────────────────────────────────────────────
+    if (typeof window !== 'undefined' && 'launchQueue' in window) {
+      (window as any).launchQueue.setConsumer((launchParams: { targetURL?: string }) => {
+        if (launchParams.targetURL) {
+          const url = new URL(launchParams.targetURL);
+          // Solo navegamos si es una ruta interna (misma app)
+          if (url.origin === window.location.origin) {
+            console.log('[DarkFlix PWA] Lanzamiento detectado:', url.pathname);
+            this.router.navigateByUrl(url.pathname + url.search);
+          }
+        }
+      });
+    }
   }
 }
