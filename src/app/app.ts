@@ -14,6 +14,7 @@ import { ProgressBarService } from '@services/progress-bar';
 import { NetworkService } from '@services/network';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav';
 import { TopNavComponent } from '@shared/components/top-nav/top-nav';
+import { PwaInstallBannerComponent } from '@shared/components/pwa-install-banner/pwa-install-banner';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +23,8 @@ import { TopNavComponent } from '@shared/components/top-nav/top-nav';
     RouterOutlet,
     ProgressBarComponent,
     BottomNavComponent,
-    TopNavComponent
+    TopNavComponent,
+    PwaInstallBannerComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

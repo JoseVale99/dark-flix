@@ -56,11 +56,20 @@ import { MyListService } from '@services/my-list';
         }
       </button>
 
-      <!-- Título siempre visible + Botón solo en hover desktop -->
-      <div class="absolute bottom-0 left-0 right-0 z-20 p-2.5 flex flex-col gap-1.5">
+      <!-- Título siempre visible + Rating + Botón solo en hover desktop -->
+      <div class="absolute bottom-0 left-0 right-0 z-20 p-2.5 flex flex-col gap-1">
         <p class="text-white font-bold text-xs leading-tight line-clamp-2 drop-shadow-lg">
           {{ media().title }}
         </p>
+        <!-- Rating badge (solo si hay rating > 0) -->
+        @if (getRating()) {
+          <div class="flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-yellow-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <span class="text-yellow-400 font-bold text-[10px]">{{ getRating() }}</span>
+          </div>
+        }
         <!-- Botón solo visible en desktop al hacer hover de la TARJETA -->
         <button class="hidden md:flex w-full items-center justify-center gap-1.5 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-1.5 rounded-md transition-all shadow-lg cursor-pointer
                        opacity-0 group-hover/card:opacity-100 translate-y-1 group-hover/card:translate-y-0 duration-200">
@@ -90,5 +99,10 @@ export class MediaCardComponent {
   getYear(): string | null {
     const rd = this.media().release_date;
     return rd ? rd.split('-')[0] : null;
+  }
+
+  getRating(): string | null {
+    const r = parseFloat(this.media().rating ?? '0');
+    return r > 0 ? r.toFixed(1) : null;
   }
 }
