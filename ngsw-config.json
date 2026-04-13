@@ -3,8 +3,9 @@
   "index": "/index.html",
   "assetGroups": [
     {
-      "name": "app",
+      "name": "app-shell",
       "installMode": "prefetch",
+      "updateMode": "prefetch",
       "resources": {
         "files": [
           "/favicon.ico",
@@ -29,11 +30,31 @@
   ],
   "dataGroups": [
     {
-      "name": "api-performance",
-      "urls": ["/wp-api/**"],
+      "name": "api-catalog",
+      "urls": [
+        "/wp-api/v1/sliders",
+        "/wp-api/v1/listing/**"
+      ],
+      "cacheConfig": {
+        "maxSize": 50,
+        "maxAge": "6h",
+        "timeout": "10s",
+        "strategy": "performance"
+      }
+    },
+    {
+      "name": "api-detail",
+      "urls": [
+        "/wp-api/v1/single/**",
+        "/wp-api/v1/player**",
+        "/wp-api/v1/cast/**",
+        "/wp-api/v1/related**",
+        "/wp-api/v1/search**"
+      ],
       "cacheConfig": {
         "maxSize": 100,
         "maxAge": "1h",
+        "timeout": "5s",
         "strategy": "freshness"
       }
     }
