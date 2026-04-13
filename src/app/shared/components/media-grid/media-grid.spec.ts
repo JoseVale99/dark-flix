@@ -2,13 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MediaGridComponent } from './media-grid';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { signal, WritableSignal, NO_ERRORS_SCHEMA } from '@angular/core';
-import { WpPost } from '../../../core/models/wp-post.model';
+import { ApiMedia } from '@models';
 import { MediaCardComponent } from '../media-card/media-card';
 
 describe('MediaGridComponent', () => {
   let component: MediaGridComponent;
   let fixture: ComponentFixture<MediaGridComponent>;
-  let arraySignal: WritableSignal<WpPost[]>;
+  let arraySignal: WritableSignal<ApiMedia[]>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -40,15 +40,16 @@ describe('MediaGridComponent', () => {
     
     const container = fixture.nativeElement.querySelector('.grid');
     expect(container.className).toContain('grid-cols-2');
-    expect(container.className).toContain('md:grid-cols-4');
-    expect(container.textContent).toContain('No hay elementos disponibles');
+    expect(container.className).toContain('md:grid-cols-3');
+    expect(container.className).toContain('lg:grid-cols-4');
+    expect(container.textContent).toContain('Aún no hay contenido disponible.');
   });
 
   it('renderiza tantas df-media-card como items en input array empleando un bucle optimizado por IDs', () => {
     const mockPosts = [
-       { id: 101, title: { rendered: 'Pelicula 1' } } as WpPost,
-       { id: 102, title: { rendered: 'Pelicula 2' } } as WpPost,
-       { id: 103, title: { rendered: 'Pelicula 3' } } as WpPost
+       { _id: '101', title: 'Pelicula 1' } as unknown as ApiMedia,
+       { _id: '102', title: 'Pelicula 2' } as unknown as ApiMedia,
+       { _id: '103', title: 'Pelicula 3' } as unknown as ApiMedia
     ];
     arraySignal.set(mockPosts);
     fixture.detectChanges();

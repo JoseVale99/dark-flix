@@ -10,6 +10,13 @@ describe('MediaSliderComponent', () => {
   let componentRef: ComponentRef<MediaSliderComponent>;
 
   beforeEach(async () => {
+    // Mock para que jsdom no falle por no tener ResizeObserver
+    global.ResizeObserver = class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    } as any;
+
     await TestBed.configureTestingModule({
       imports: [MediaSliderComponent]
     }).compileComponents();

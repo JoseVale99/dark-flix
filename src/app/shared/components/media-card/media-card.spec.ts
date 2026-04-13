@@ -55,7 +55,7 @@ describe('MediaCardComponent', () => {
         componentRef.setInput('media', randomMedia as unknown as ApiMedia);
         fixture.detectChanges();
 
-        const cardElement = fixture.nativeElement.querySelector('.group');
+        const cardElement = fixture.nativeElement.querySelector('.aspect-poster');
         cardElement.click();
 
         // Verificamos propiedad
@@ -79,8 +79,8 @@ describe('MediaCardComponent', () => {
         } as unknown as ApiMedia);
         fixture.detectChanges();
 
-        const titleElement = fixture.nativeElement.querySelector('.truncate');
-        expect(titleElement.textContent).toBe(randomTitle);
+        const titleElement = fixture.nativeElement.querySelector('.line-clamp-2');
+        expect(titleElement?.textContent?.trim()).toBe(randomTitle.trim());
       })
     );
   });

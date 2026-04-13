@@ -20,7 +20,7 @@ describe('WpImagePipe', () => {
       }
     } as ApiMedia;
 
-    expect(pipe.transform(mockPost, 'poster')).toBe('https://hackstore.mx/thumbs/poster.webp');
+    expect(pipe.transform(mockPost, 'poster')).toBe('https://hackstore.mx/wp-content/uploads/thumbs/poster.webp');
   });
 
   it('debe devolver url del backdrop nativo full', () => {
@@ -31,6 +31,6 @@ describe('WpImagePipe', () => {
       }
     } as ApiMedia;
 
-    expect(pipe.transform(mockPost, 'backdrop')).toBe('https://hackstore.mx/backdrops/bg.webp');
+    expect(pipe.transform(mockPost, 'backdrop')).toBe('https://hackstore.mx/wp-content/uploads/backdrops/bg.webp');
   });
 });

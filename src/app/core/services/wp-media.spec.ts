@@ -31,26 +31,30 @@ describe('WpMediaService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('getMediaCatalog() hace petición GET a listado y emite posts descapsulados', () => {
+  it('getPagedCatalog() hace petición GET a listado y emite posts descapsulados', () => {
     const mockPosts: ApiMedia[] = [
-      { _id: 1, title: 'Breaking Bad' } as ApiMedia,
-      { _id: 2, title: 'Stranger Things' } as ApiMedia
+      { _id: 1, title: 'Breaking Bad' } as unknown as ApiMedia,
+      { _id: 2, title: 'Stranger Things' } as unknown as ApiMedia
     ];
 
     const mockResponse: ApiMediaResponse = {
        error: false,
        message: '',
-       data: { posts: mockPosts }
+       data: { 
+         posts: mockPosts,
+         pagination: { current_page: 1, last_page: 1 } 
+       }
     };
 
-    service.getMediaCatalog().subscribe(posts => {
-      expect(posts.length).toBe(2);
-      expect(posts[0].title).toBe('Breaking Bad');
-      expect(posts[1].title).toBe('Stranger Things');
+    service.getPagedCatalog('movies').subscribe(res => {
+      expect(res.posts.length).toBe(2);
+      expect(res.posts[0].title).toBe('Breaking Bad');
+      expect(res.posts[1].title).toBe('Stranger Things');
+      expect(res.hasMore).toBe(false);
     });
 
     // Validar HTTP Request mock
-    const req = httpTesting.expectOne(`https://hackstore.mx/wp-api/v1/listing/movies?page=1&orderBy=latest&order=desc&postType=movies&postsPerPage=12`);
+    const req = httpTesting.expectOne(`/wp-api/v1/listing/movies?page=1&orderBy=latest&order=desc&postType=movies&postsPerPage=24`);
     expect(req.request.method).toEqual('GET');
 
     // Emitir mock
