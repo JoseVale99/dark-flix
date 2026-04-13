@@ -92,8 +92,8 @@ describe('CacheInterceptor', () => {
     http.get(url).subscribe();
     httpMock.expectOne(url).flush([]);
 
-    // Avanzar el tiempo más allá del TTL (5 min + 1ms)
-    vi.advanceTimersByTime(5 * 60 * 1000 + 1);
+    // Avanzar el tiempo más allá del TTL (1 hora + 1ms)
+    vi.advanceTimersByTime(1 * 60 * 60 * 1000 + 1);
 
     // Segunda petición — debe ir a la red porque el TTL expiró
     http.get(url).subscribe();

@@ -71,8 +71,8 @@ function buildResponse(entry: CacheEntry): HttpResponse<unknown> {
 // ── interceptor ───────────────────────────────────────────────────────────────
 
 export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
-  // Solo cachear GET y solo URLs de la API de Hackstore
-  if (req.method !== 'GET' || !req.url.includes('/wp-api/')) {
+  // Solo cachear GET y solo URLs de la API (Hackstore Custom o WP Standard)
+  if (req.method !== 'GET' || (!req.url.includes('/wp-api/') && !req.url.includes('/wp-json/'))) {
     return next(req);
   }
 
