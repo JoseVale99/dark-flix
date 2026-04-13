@@ -14,13 +14,13 @@ import { FormsModule } from '@angular/forms';
       <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.08)_0%,transparent_70%)] pointer-events-none"></div>
 
       <!-- Header: Logo PNG + Botón Cerrar (Z-INDEX SUPERIOR) -->
-      <div class="absolute top-0 left-0 w-full p-5 md:p-8 flex items-center justify-between z-[200]">
+      <div class="absolute top-0 left-0 w-full p-5 md:p-8 flex items-center justify-between z-200">
         <img src="images/logo/dark-flix.png" class="h-8 md:h-12 object-contain" alt="DarkFlix">
 
         @if (profileService.isProfileSelected()) {
           <button (click)="goHome()"
-                  class="bg-[#e50914] hover:bg-[#ff0a16] text-white rounded-full p-3 shadow-[0_0_25px_rgba(229,9,20,0.6)] 
-                         transition-all cursor-pointer group flex items-center justify-center border-none active:scale-95 z-[210]">
+                  class="bg-[#e50914] hover:bg-[#ff0a16] text-white rounded-full p-3 shadow-[0_0_25px_rgba(229,9,20,0.6)]
+                         transition-all cursor-pointer group flex items-center justify-center border-none active:scale-95 z-210">
             <svg viewBox="0 0 256 256" class="w-6 h-6 fill-white drop-shadow-lg">
               <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z" />
             </svg>
