@@ -584,18 +584,26 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 
       <!-- THEATER MODE MODAL (OVERLAY DE PANTALLA COMPLETA) -->
       @if (isTheaterMode()) {
-        <div class="fixed inset-0 z-100 bg-black flex flex-col animate-fade-in">
+        <div class="fixed inset-0 z-100 bg-black flex flex-col animate-fade-in overflow-hidden"
+             (mousemove)="onPlayerInteraction()"
+             (click)="onPlayerInteraction()"
+             (touchstart)="onPlayerInteraction()">
 
-          <!-- Top Bar: Título + Cerrar (siempre visible, fondo sólido en móvil) -->
-          <div class="flex items-center justify-between px-4 md:px-6 py-3 bg-black/95 md:bg-black/80 backdrop-blur-md z-50 shrink-0 border-b border-white/5">
-            <h2 class="text-white font-bold tracking-wide text-xs md:text-base uppercase drop-shadow-md truncate flex-1 mr-4">
-              {{ movie()?.title }} <span class="mx-1 text-[#e50914]">•</span> <span class="font-normal text-gray-400">{{ currentEmbed()?.server || 'Servidor' }}</span>
-            </h2>
-            <button (click)="isTheaterMode.set(false)" class="text-white bg-white/10 hover:bg-[#e50914] border border-white/10 rounded-full p-2 transition-all backdrop-blur cursor-pointer shadow-2xl shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-7 md:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+          <!-- Top Bar: Título + Cerrar (Flotante) -->
+          <div class="absolute top-0 left-0 right-0 px-4 md:px-6 py-3 bg-linear-to-b from-black/90 to-transparent z-50 transition-all duration-500"
+               [class.opacity-0]="!showControls()"
+               [class.-translate-y-full]="!showControls()"
+               [class.pointer-events-none]="!showControls()">
+            <div class="flex items-center justify-between max-w-7xl mx-auto">
+              <h2 class="text-white font-bold tracking-wide text-xs md:text-lg uppercase drop-shadow-md truncate flex-1 mr-4">
+                {{ movie()?.title }} <span class="mx-1 text-[#e50914]">•</span> <span class="font-normal text-gray-400 capitalize">{{ currentEmbed()?.server || 'Servidor' }}</span>
+              </h2>
+              <button (click)="isTheaterMode.set(false)" class="text-white bg-white/10 hover:bg-[#e50914] border border-white/10 rounded-full p-2.5 transition-all backdrop-blur-md cursor-pointer shadow-2xl shrink-0 active:scale-90">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-7 md:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <!-- Video Player Iframe -->
@@ -604,76 +612,74 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                <iframe [src]="currentEmbed()!.url | safe:'resourceUrl'" class="w-full h-full border-none" allowfullscreen></iframe>
              }
 
-             <!-- Botón flotante "¿No funciona?" -->
-             <div class="absolute bottom-4 right-4 z-50">
-               @if (!showHelperPanel()) {
-                 <button (click)="showHelperPanel.set(true)"
-                         class="bg-black/80 hover:bg-[#e50914] text-white text-xs font-bold px-4 py-2.5 rounded-full border border-white/20 backdrop-blur-md cursor-pointer transition-all shadow-lg flex items-center gap-2">
-                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                   </svg>
-                   ¿No funciona?
-                 </button>
-               } @else {
-                 <!-- Panel de ayuda expandido -->
-                 <div class="bg-black/95 backdrop-blur-xl rounded-2xl border border-white/10 p-4 shadow-2xl w-64 animate-fade-in">
-                   <div class="flex items-center justify-between mb-3">
-                     <p class="text-white font-bold text-sm">¿Problemas para ver?</p>
-                     <button (click)="showHelperPanel.set(false)" class="text-gray-400 hover:text-white cursor-pointer">
-                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                       </svg>
-                     </button>
-                   </div>
-                   <p class="text-gray-400 text-xs mb-3">Prueba otro servidor o visita la web original.</p>
-                   <div class="flex flex-col gap-2">
-                     <!-- Siguiente servidor -->
-                     @if (playersState().embeds.length > 1) {
-                       <button (click)="tryNextServer(); showHelperPanel.set(false)"
-                               class="w-full flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-white/5">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#e50914]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                         </svg>
-                         Probar otro servidor
-                       </button>
-                     }
-                     <!-- Ir a la web -->
-                     <a [href]="hackstorePostUrl()" target="_blank"
-                        class="w-full flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-white/5">
-                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                       </svg>
-                       Ver en la web
-                     </a>
-                     <!-- Cerrar -->
-                     <button (click)="isTheaterMode.set(false); showHelperPanel.set(false)"
-                             class="w-full flex items-center gap-2 bg-[#e50914]/20 hover:bg-[#e50914]/40 text-[#e50914] text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-[#e50914]/20">
-                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                       </svg>
-                       Cerrar reproductor
-                     </button>
-                   </div>
-                 </div>
-               }
+             <!-- Botón flotante "¿No funciona?" (Hides with controls) -->
+             <div class="absolute bottom-24 right-4 md:right-8 z-50 transition-all duration-500"
+                  [class.opacity-0]="!showControls()"
+                  [class.translate-y-10]="!showControls()"
+                  [class.pointer-events-none]="!showControls()">
+                @if (!showHelperPanel()) {
+                  <button (click)="showHelperPanel.set(true)"
+                          class="bg-black/60 hover:bg-[#e50914] text-white text-[10px] md:text-xs font-bold px-4 py-2.5 rounded-full border border-white/20 backdrop-blur-md cursor-pointer transition-all shadow-lg flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    ¿Problemas con el video?
+                  </button>
+                } @else {
+                  <!-- Panel de ayuda expandido -->
+                  <div class="bg-black/95 backdrop-blur-xl rounded-2xl border border-white/10 p-4 shadow-2xl w-64 animate-fade-in border-b-4 border-b-[#e50914]">
+                    <div class="flex items-center justify-between mb-3">
+                      <p class="text-white font-bold text-sm">¿Problemas para ver?</p>
+                      <button (click)="showHelperPanel.set(false)" class="text-gray-400 hover:text-white cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      @if (playersState().embeds.length > 1) {
+                        <button (click)="tryNextServer(); showHelperPanel.set(false)"
+                                class="w-full flex items-center gap-2 bg-white/10 hover:bg-[#e50914] text-white text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-white/5">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          Probar otro servidor
+                        </button>
+                      }
+                      <a [href]="hackstorePostUrl()" target="_blank"
+                         class="w-full flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-white/5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                        </svg>
+                        Ver página original
+                      </a>
+                    </div>
+                  </div>
+                }
              </div>
           </div>
 
           <!-- Bottom Server Selector (siempre visible, fondo sólido en móvil) -->
-          <div class="shrink-0 bg-black/95 md:bg-black/80 backdrop-blur-md border-t border-white/5 px-3 py-2.5 z-50">
-             <div class="flex overflow-x-auto hide-scrollbar snap-x gap-2 max-w-4xl mx-auto">
-                @for (embed of playersState().embeds; track $index) {
-                  <button (click)="selectedEmbedIndex.set($index)"
-                          [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
-                          [class.text-white]="selectedEmbedIndex() === $index"
-                          [class.border-[#e50914]]="selectedEmbedIndex() === $index"
-                          [class.bg-white/10]="selectedEmbedIndex() !== $index"
-                          [class.text-gray-300]="selectedEmbedIndex() !== $index"
-                          [class.border-white/10]="selectedEmbedIndex() !== $index"
-                          class="shrink-0 snap-start whitespace-nowrap px-4 py-2 rounded-xl text-xs font-semibold transition-all border cursor-pointer hover:bg-white/20">
-                    {{ embed.server || 'Server ' + ($index + 1) }} - {{ embed.lang }}
-                  </button>
-                }
+          <!-- Bottom Server Selector: CÁPSULA FLOTANTE (Hides with controls) -->
+          <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 w-full max-w-fit px-4"
+               [class.opacity-0]="!showControls()"
+               [class.translate-y-full]="!showControls()"
+               [class.pointer-events-none]="!showControls()">
+             <div class="bg-zinc-900/90 backdrop-blur-xl border border-white/10 px-4 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-3 overflow-hidden">
+                <span class="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-widest border-r border-white/10 pr-3 mr-1">Servidores</span>
+                <div class="flex overflow-x-auto hide-scrollbar gap-2 max-w-[80vw] md:max-w-4xl snap-x">
+                   @for (embed of playersState().embeds; track $index) {
+                     <button (click)="$event.stopPropagation(); selectedEmbedIndex.set($index); resetControlsTimer()"
+                             [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
+                             [class.text-white]="selectedEmbedIndex() === $index"
+                             [class.scale-105]="selectedEmbedIndex() === $index"
+                             [class.bg-white/5]="selectedEmbedIndex() !== $index"
+                             [class.text-gray-400]="selectedEmbedIndex() !== $index"
+                             class="shrink-0 snap-start whitespace-nowrap px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold transition-all border border-white/5 cursor-pointer hover:bg-white/10 active:scale-95">
+                       {{ embed.server || 'Server ' + ($index + 1) }} ({{ embed.lang }})
+                     </button>
+                   }
+                </div>
              </div>
           </div>
         </div>
@@ -704,9 +710,27 @@ export class MovieDetailsComponent {
   showHelperPanel = signal(false);
   lightboxIndex = signal<number | null>(null);
   shareCopied = signal(false);
+  showControls = signal(true);
+  private controlsTimer: any;
 
   selectedSeason = signal<string>('1');
   selectedEpisodeId = signal<string | number | undefined>(undefined);
+
+  public onPlayerInteraction(): void {
+    if (!this.isTheaterMode()) return;
+    this.showControls.set(true);
+    this.resetControlsTimer();
+  }
+
+  public resetControlsTimer(): void {
+    if (this.controlsTimer) clearTimeout(this.controlsTimer);
+    this.controlsTimer = setTimeout(() => {
+      // No ocultar si el panel de ayuda está abierto
+      if (!this.showHelperPanel()) {
+        this.showControls.set(false);
+      }
+    }, 3500);
+  }
 
   mediaState = toSignal(
     combineLatest([toObservable(this.typeSlug), toObservable(this.slug)]).pipe(
@@ -877,6 +901,17 @@ export class MovieDetailsComponent {
   });
 
   constructor() {
+    // Efecto para gestión de controles en Modo Teatro
+    effect(() => {
+      if (this.isTheaterMode()) {
+        this.resetControlsTimer();
+      } else {
+        this.showControls.set(true);
+        if (this.controlsTimer) clearTimeout(this.controlsTimer);
+      }
+    });
+
+    // Efecto para SEO, Historial y Reset de Estado
     effect(() => {
       const currentMovie = this.movie();
       if (currentMovie) {
