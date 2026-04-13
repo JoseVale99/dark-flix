@@ -610,6 +610,14 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           <div class="flex-1 w-full relative bg-black min-h-0">
              @if (currentEmbed()) {
                <iframe [src]="currentEmbed()!.url | safe:'resourceUrl'" class="w-full h-full border-none" allowfullscreen></iframe>
+
+               <!-- Interaction Overlay: Captures first tap when controls are hidden -->
+               @if (!showControls()) {
+                 <div class="absolute inset-0 z-40 bg-transparent cursor-pointer"
+                      (click)="onPlayerInteraction()"
+                      (touchstart)="onPlayerInteraction()">
+                 </div>
+               }
              }
 
              <!-- Botón flotante "¿No funciona?" (Hides with controls) -->
