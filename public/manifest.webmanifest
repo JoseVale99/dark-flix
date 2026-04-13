@@ -5,6 +5,8 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "minimal-ui"],
+  "handle_links": "auto",
   "launch_handler": {
     "client_mode": ["navigate-existing", "auto"]
   },
