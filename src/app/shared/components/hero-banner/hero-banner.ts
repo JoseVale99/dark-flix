@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ApiMedia } from '@models';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
@@ -14,7 +15,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
     <div class="relative w-full h-[75vh] md:h-[85vh] flex flex-col justify-center overflow-hidden px-4 md:px-20 mb-8 md:mb-12 border-b border-gray-800">
 
       <!-- Capa 1: Fondo atmosférico (Súper desenfocado para disimular backdrops baja res) -->
-      @if (featuredPost()) {
+      @if (featuredPost() && !trailerUrl()) {
         <img
           dfLazyImage
           [lazySrc]="featuredPost() | wpImage:'backdrop'"
@@ -22,8 +23,18 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           alt="Atmosphere">
       }
 
-      <!-- Capa 2: Imagen real de fondo nítida -->
-      @if (featuredPost()) {
+      <!-- Capa 2: Imagen real o VIDEO -->
+      @if (trailerUrl()) {
+        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-black">
+          <iframe 
+            [src]="trailerUrl()" 
+            class="absolute top-1/2 left-1/2 w-[300vw] h-[300vh] min-w-[120%] min-h-[120%] md:w-[150vw] md:h-[150vh] xl:w-[100vw] xl:h-[150vh] -translate-x-1/2 -translate-y-1/2 opacity-70" 
+            frameborder="0" 
+            allow="autoplay; encrypted-media" 
+            allowfullscreen>
+          </iframe>
+        </div>
+      } @else if (featuredPost()) {
         <img
           dfLazyImage
           [lazySrc]="featuredPost() | wpImage:'backdrop'"
@@ -32,8 +43,8 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
       }
 
       <!-- Dimmer general y Gradiente base -->
-      <div class="absolute inset-0 bg-black/40 z-2"></div>
       <div class="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-df-background via-df-background/70 to-transparent z-2"></div>
+      <div class="absolute inset-y-0 left-0 w-1/2 bg-linear-to-r from-black/60 to-transparent z-2 pointer-events-none"></div>
 
       <!-- Contenedor Principal (Grid/Flex) -->
       <div class="relative z-20 flex flex-col md:flex-row items-center justify-between w-full max-w-7xl mx-auto pt-10 md:pt-20 gap-8 md:gap-4">
@@ -94,4 +105,30 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 })
 export class HeroBannerComponent {
   featuredPost = input<ApiMedia | undefined>();
+  private sanitizer = inject(DomSanitizer);
+
+  trailerUrl = computed(() => {
+    const post = this.featuredPost();
+    if (!post || !post.trailer) return null;
+    
+    // Si el trailer ya es un ID directo de 11 caracteres (ej. "hiD3zk0ZRFg")
+    let videoId = '';
+    if (post.trailer.length === 11 && !post.trailer.includes('/')) {
+      videoId = post.trailer;
+    } else {
+      // Buscar si es URL completa de YouTube
+      const match = post.trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})/);
+      if (match && match[1]) {
+        videoId = match[1];
+      }
+    }
+
+    if (videoId) {
+      // URL de YouTube optimizada para Background
+      const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&iv_load_policy=3`;
+      return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    }
+    
+    return null;
+  });
 }

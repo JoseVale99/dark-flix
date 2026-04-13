@@ -11,6 +11,7 @@ import { filter } from 'rxjs';
 
 import { ProgressBarComponent } from '@shared/components/progress-bar/progress-bar';
 import { ProgressBarService } from '@services/progress-bar';
+import { NetworkService } from '@services/network';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav';
 import { TopNavComponent } from '@shared/components/top-nav/top-nav';
 
@@ -29,6 +30,7 @@ import { TopNavComponent } from '@shared/components/top-nav/top-nav';
 export class App {
   private readonly router      = inject(Router);
   private readonly progressSvc = inject(ProgressBarService);
+  public readonly networkService = inject(NetworkService);
 
   constructor() {
     // takeUntilDestroyed() se desuscribe automáticamente cuando
