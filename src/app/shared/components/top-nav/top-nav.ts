@@ -47,7 +47,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 
           <!-- Botón PWA: Solo visible en Navegador -->
           @if (!pwaService.isStandalone()) {
-             <button (click)="pwaService.promptInstall()"
+             <button (click)="pwaService.openInApp()"
                      class="flex items-center gap-2 bg-gradient-to-r from-[#e50914] to-[#b20710] hover:scale-105 active:scale-95 text-white px-3 py-1.5 rounded-full shadow-lg transition-all border border-white/10 group cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-white" viewBox="0 0 256 256">
                   <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,200H40V56h80l8,16h88Z" />

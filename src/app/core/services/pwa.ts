@@ -52,4 +52,25 @@ export class PwaService {
       this.deferredPrompt.set(null);
     }
   }
+
+  /**
+   * Intenta abrir la PWA instalada mediante el protocolo personalizado.
+   * Si no responde (porque no está instalada), ofrece la instalación.
+   */
+  openInApp(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    // Intentamos "despertar" a la aplicación instalada
+    console.log('[PwaService] Intentando abrir app vía protocolo web+darkflix...');
+    window.location.href = 'web+darkflix://open';
+
+    // Fallback: Si en 600ms no ha pasado nada, es probable que no esté instalada
+    // o el sistema no haya capturado el protocolo. Mostramos el diálogo de instalación.
+    setTimeout(() => {
+      if (this.canInstall()) {
+        console.log('[PwaService] Protocolo no capturado, ofreciendo instalación...');
+        this.promptInstall();
+      }
+    }, 600);
+  }
 }

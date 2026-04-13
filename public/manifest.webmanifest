@@ -10,6 +10,12 @@
   "launch_handler": {
     "client_mode": ["navigate-existing", "auto"]
   },
+  "protocol_handlers": [
+    {
+      "protocol": "web+darkflix",
+      "url": "/?url=%s"
+    }
+  ],
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
   "icons": [
