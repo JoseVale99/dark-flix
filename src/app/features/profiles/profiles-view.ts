@@ -13,22 +13,24 @@ import { FormsModule } from '@angular/forms';
       <!-- Background atmosphere -->
       <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.08)_0%,transparent_70%)] pointer-events-none"></div>
 
-      <!-- Botón cerrar: volver al Inicio solo si ya hay perfil activo en sesión -->
-      @if (profileService.isProfileSelected()) {
-        <button (click)="goHome()"
-                title="Volver al inicio"
-                class="absolute top-5 right-5 md:top-8 md:right-8 z-50
-                       bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white
-                       rounded-full p-2.5 transition-all cursor-pointer group">
-          <svg viewBox="0 0 256 256" class="w-5 h-5 fill-white/60 group-hover:fill-white transition-colors">
-            <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z" />
-          </svg>
-        </button>
-      }
+      <!-- Header: Logo PNG + Botón Cerrar (Z-INDEX SUPERIOR) -->
+      <div class="absolute top-0 left-0 w-full p-5 md:p-8 flex items-center justify-between z-[200]">
+        <img src="images/logo/dark-flix.png" class="h-8 md:h-12 object-contain" alt="DarkFlix">
+
+        @if (profileService.isProfileSelected()) {
+          <button (click)="goHome()"
+                  class="bg-[#e50914] hover:bg-[#ff0a16] text-white rounded-full p-3 shadow-[0_0_25px_rgba(229,9,20,0.6)] 
+                         transition-all cursor-pointer group flex items-center justify-center border-none active:scale-95 z-[210]">
+            <svg viewBox="0 0 256 256" class="w-6 h-6 fill-white drop-shadow-lg">
+              <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z" />
+            </svg>
+          </button>
+        }
+      </div>
 
       @if (!editMode()) {
         <!-- ── SELECCIÓN DE PERFIL ── -->
-        <div class="flex flex-col items-center gap-12 animate-fade-in">
+        <div class="flex flex-col items-center gap-12 animate-fade-in mt-12">
           <div class="text-center">
             <h1 class="text-white text-3xl md:text-5xl font-black tracking-tight mb-2">¿Quién está viendo?</h1>
             <p class="text-gray-500 text-sm md:text-base">Selecciona tu perfil para continuar</p>
@@ -39,32 +41,25 @@ import { FormsModule } from '@angular/forms';
               @let isActive = profileService.activeProfile()?.id === profile.id;
               <button (click)="selectProfile(profile)" class="group flex flex-col items-center gap-3 cursor-pointer">
                 <div class="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl flex items-center justify-center
-                            transition-all duration-200 shadow-xl"
-                     [class.ring-2]="isActive"
+                            transition-all duration-300 shadow-2xl"
+                     [class.ring-[6px]]="isActive"
                      [class.ring-white]="isActive"
-                     [class.scale-105]="isActive"
-                     [class.border-2]="!isActive"
+                     [class.scale-110]="isActive"
                      [class.border-transparent]="!isActive"
-                     [class.group-hover:border-white]="!isActive"
+                     [class.group-hover:ring-2]="!isActive"
+                     [class.group-hover:ring-white/50]="!isActive"
                      [class.group-hover:scale-105]="!isActive"
-                     [style.background-color]="profile.color + '22'"
-                     [style.box-shadow]="isActive ? '0 0 20px ' + profile.color + '44' : ''">
-                  <svg viewBox="0 0 256 256" class="w-12 h-12 md:w-16 md:h-16 transition-transform group-hover:scale-110 duration-300"
-                       [style.fill]="profile.color">
+                     [style.background-color]="isActive ? profile.color + '66' : profile.color + '22'"
+                     [style.box-shadow]="isActive ? '0 0 50px ' + profile.color : ''">
+                  <svg viewBox="0 0 256 256" class="w-12 h-12 md:w-16 md:h-16 transition-all duration-300"
+                       [style.fill]="isActive ? '#ffffff' : profile.color"
+                       [class.drop-shadow-[0_0_20px_rgba(255,255,255,0.9)]]="isActive">
                     <path [attr.d]="getIconPath(profile.avatar)" />
                   </svg>
-                  <!-- Checkmark indicador de perfil activo -->
-                  @if (isActive) {
-                    <div class="absolute -bottom-2 -right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
-                      <svg viewBox="0 0 256 256" class="w-3.5 h-3.5" fill="#141414">
-                        <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z" />
-                      </svg>
-                    </div>
-                  }
                 </div>
-                <span class="font-semibold text-sm md:text-base transition-colors max-w-24 md:max-w-32 text-center leading-tight truncate px-1"
+                <span class="font-bold text-sm md:text-base transition-colors max-w-24 md:max-w-32 text-center leading-tight truncate px-1"
                       [class.text-white]="isActive"
-                      [class.text-gray-300]="!isActive"
+                      [class.text-gray-400]="!isActive"
                       [class.group-hover:text-white]="!isActive">
                   {{ profile.name }}
                 </span>

@@ -18,7 +18,7 @@ const COLORS  = ['#e50914', '#6366f1', '#10b981', '#f59e0b', '#ec4899', '#3b82f6
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
   private readonly storageKey  = 'df_profiles';
-  private readonly sessionKey  = 'df_active_profile_id';
+  private readonly sessionKey  = 'df_active_profile_id'; // Se mantiene el nombre pero usaremos localStorage
   private readonly platformId  = inject(PLATFORM_ID);
 
   // ── State ──────────────────────────────────────────────────────────────────
@@ -44,8 +44,8 @@ export class ProfileService {
       localStorage.setItem(this.storageKey, JSON.stringify(DEFAULT_PROFILES));
     }
 
-    // Restaurar perfil activo de esta sesión (sessionStorage no persiste al cerrar tab)
-    const activeId = sessionStorage.getItem(this.sessionKey);
+    // Restaurar perfil activo (Persistente entre pestañas/sesiones)
+    const activeId = localStorage.getItem(this.sessionKey);
     if (activeId) {
       const found = this.profiles().find(p => p.id === activeId) ?? null;
       this.activeProfile.set(found);
@@ -56,7 +56,7 @@ export class ProfileService {
   selectProfile(profile: DfProfile): void {
     this.activeProfile.set(profile);
     if (isPlatformBrowser(this.platformId)) {
-      sessionStorage.setItem(this.sessionKey, profile.id);
+      localStorage.setItem(this.sessionKey, profile.id);
     }
   }
 
@@ -97,7 +97,7 @@ export class ProfileService {
   logout(): void {
     this.activeProfile.set(null);
     if (isPlatformBrowser(this.platformId)) {
-      sessionStorage.removeItem(this.sessionKey);
+      localStorage.removeItem(this.sessionKey);
     }
   }
 

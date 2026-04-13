@@ -11,8 +11,19 @@
 }
 
 <df-progress-bar />
-<df-top-nav />
-<div class="pb-16 md:pb-0 min-h-screen bg-df-background text-white pt-16 md:pt-20">
+
+@if (!isProfilesPage()) {
+  <df-top-nav />
+}
+
+<div [class.pt-16]="!isProfilesPage()" 
+     [class.md:pt-20]="!isProfilesPage()"
+     [class.pb-16]="!isProfilesPage() && networkService.isOnline()" 
+     [class.md:pb-0]="!isProfilesPage()"
+     class="min-h-screen bg-df-background text-white">
   <router-outlet />
 </div>
-<df-bottom-nav />
+
+@if (!isProfilesPage()) {
+  <df-bottom-nav />
+}

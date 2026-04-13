@@ -6,8 +6,8 @@ import {
   NavigationEnd,
   NavigationError,
 } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
 
 import { ProgressBarComponent } from '@shared/components/progress-bar/progress-bar';
 import { ProgressBarService } from '@services/progress-bar';
@@ -33,6 +33,14 @@ export class App {
   private readonly router      = inject(Router);
   private readonly progressSvc = inject(ProgressBarService);
   public readonly networkService = inject(NetworkService);
+
+  public readonly isProfilesPage = toSignal(
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd),
+      map(() => this.router.url.split('?')[0] === '/profiles')
+    ),
+    { initialValue: typeof window !== 'undefined' && window.location.pathname === '/profiles' }
+  );
 
   constructor() {
     // takeUntilDestroyed() se desuscribe automáticamente cuando

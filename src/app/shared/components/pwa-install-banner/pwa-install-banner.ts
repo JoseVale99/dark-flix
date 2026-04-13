@@ -1,14 +1,19 @@
-import { ChangeDetectionStrategy, Component, signal, PLATFORM_ID, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, PLATFORM_ID, inject, computed } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Router, NavigationEnd } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
 
 @Component({
   selector: 'df-pwa-install-banner',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (visible()) {
-      <div class="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-250 w-[calc(100%-2rem)] max-w-md
+      <div [class.bottom-6]="isProfilesPage()"
+           [class.bottom-20]="!isProfilesPage()"
+           class="fixed left-1/2 -translate-x-1/2 z-250 w-[calc(100%-2rem)] max-w-md
                   bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl
-                  flex items-center gap-4 px-5 py-4 animate-fade-in">
+                  flex items-center gap-4 px-5 py-4 animate-fade-in shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
 
         <!-- Logo / Ícono -->
         <div class="shrink-0 w-12 h-12 bg-[#e50914] rounded-xl flex items-center justify-center shadow-lg">
@@ -40,7 +45,17 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class PwaInstallBannerComponent {
   private platformId = inject(PLATFORM_ID);
+  private router     = inject(Router);
   visible = signal(false);
+
+  // Detectar si estamos en perfiles para ajustar posición
+  isProfilesPage = toSignal(
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd),
+      map(() => this.router.url.includes('/profiles'))
+    ),
+    { initialValue: typeof window !== 'undefined' && window.location.pathname.includes('profiles') }
+  );
 
   // El navegador dispara este evento cuando la PWA es instalable
   private deferredPrompt: any = null;
