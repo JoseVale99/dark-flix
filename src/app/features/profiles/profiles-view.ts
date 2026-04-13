@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
       <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.08)_0%,transparent_70%)] pointer-events-none"></div>
 
       <!-- Header: Logo PNG -->
-      <div class="absolute top-0 left-0 w-full p-5 md:p-8 flex items-center justify-between z-[200]">
+      <div class="absolute top-0 left-0 w-full p-5 md:p-8 flex items-center justify-between z-200">
         <img src="images/logo/dark-flix.png" class="h-8 md:h-12 object-contain" alt="DarkFlix">
       </div>
 
