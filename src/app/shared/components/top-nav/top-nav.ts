@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { WpMediaService } from '@services/wp-media';
 import { SearchHistoryService } from '@services/search-history';
 import { ProfileService } from '@services/profile';
+import { PwaService } from '@services/pwa';
 import { PROFILE_ICON_PATHS, ProfileIconKey } from '@core/models/profile-icons';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 import { WpImagePipe } from '@shared/pipes/wp-image';
@@ -41,8 +42,19 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
           <a routerLink="/mi-lista" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">Mi Lista</a>
         </div>
 
-        <!-- Right Side: Search & Profile -->
+        <!-- Right Side: Search & Profile & PWA -->
         <div class="flex items-center gap-4 md:gap-6 ml-auto relative">
+
+          <!-- Botón PWA: Solo visible en Navegador -->
+          @if (!pwaService.isStandalone()) {
+             <button (click)="pwaService.promptInstall()"
+                     class="flex items-center gap-2 bg-gradient-to-r from-[#e50914] to-[#b20710] hover:scale-105 active:scale-95 text-white px-3 py-1.5 rounded-full shadow-lg transition-all border border-white/10 group cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-white" viewBox="0 0 256 256">
+                  <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,200H40V56h80l8,16h88Z" />
+                </svg>
+                <span class="text-[10px] md:text-xs font-black uppercase tracking-tighter">App</span>
+             </button>
+          }
 
           <!-- Lupa Trigger (Botón de Búsqueda Fijo) -->
           <div class="flex items-center justify-end">
@@ -208,6 +220,7 @@ export class TopNavComponent {
 
   public readonly searchHistoryService = inject(SearchHistoryService);
   public readonly profileService = inject(ProfileService);
+  public readonly pwaService     = inject(PwaService);
 
   profileMenuOpen = signal(false);
 

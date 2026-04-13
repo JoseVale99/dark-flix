@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, Component, signal, PLATFORM_ID, inject, computed } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { ChangeDetectionStrategy, Component, signal, inject, computed } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
+import { PwaService } from '@services/pwa';
 
 @Component({
   selector: 'df-pwa-install-banner',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (visible()) {
+    @if (showBanner()) {
       <div [class.bottom-6]="isProfilesPage()"
            [class.bottom-20]="!isProfilesPage()"
            class="fixed left-1/2 -translate-x-1/2 z-250 w-[calc(100%-2rem)] max-w-md
@@ -44,9 +44,16 @@ import { filter, map } from 'rxjs';
   `
 })
 export class PwaInstallBannerComponent {
-  private platformId = inject(PLATFORM_ID);
   private router     = inject(Router);
-  visible = signal(false);
+  public pwaService  = inject(PwaService);
+  
+  private dismissed  = signal(false);
+  private autoShown  = signal(false);
+
+  // Mostrar el banner solo si es instalable, no se ha descartado y pasaron 4s
+  showBanner = computed(() => 
+    this.pwaService.canInstall() && !this.dismissed() && this.autoShown()
+  );
 
   // Detectar si estamos en perfiles para ajustar posición
   isProfilesPage = toSignal(
@@ -57,38 +64,18 @@ export class PwaInstallBannerComponent {
     { initialValue: typeof window !== 'undefined' && window.location.pathname.includes('profiles') }
   );
 
-  // El navegador dispara este evento cuando la PWA es instalable
-  private deferredPrompt: any = null;
-
   constructor() {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    // Prevenimos el mini-infobar del browser y guardamos el evento para lanzarlo nosotros
-    window.addEventListener('beforeinstallprompt', (e: Event) => {
-      e.preventDefault();
-      this.deferredPrompt = e;
-      // Mostrar el banner tras 4 segundos para no interrumpir la primera carga
-      setTimeout(() => this.visible.set(true), 4000);
-    });
-
-    // Si el usuario ya instaló la app, ocultamos el banner
-    window.addEventListener('appinstalled', () => {
-      this.visible.set(false);
-      this.deferredPrompt = null;
-    });
+    // Retardo inicial de 4 segundos
+    if (typeof window !== 'undefined') {
+      setTimeout(() => this.autoShown.set(true), 4000);
+    }
   }
 
   install(): void {
-    if (!this.deferredPrompt) return;
-    this.deferredPrompt.prompt();
-    this.deferredPrompt.userChoice.then(() => {
-      this.deferredPrompt = null;
-      this.visible.set(false);
-    });
+    this.pwaService.promptInstall();
   }
 
   dismiss(): void {
-    this.visible.set(false);
-    this.deferredPrompt = null;
+    this.dismissed.set(true);
   }
 }
