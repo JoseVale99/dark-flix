@@ -501,6 +501,60 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
              @if (currentEmbed()) {
                <iframe [src]="currentEmbed()!.url | safe:'resourceUrl'" class="w-full h-full border-none" allowfullscreen></iframe>
              }
+
+             <!-- Botón flotante "¿No funciona?" -->
+             <div class="absolute bottom-4 right-4 z-50">
+               @if (!showHelperPanel()) {
+                 <button (click)="showHelperPanel.set(true)"
+                         class="bg-black/80 hover:bg-[#e50914] text-white text-xs font-bold px-4 py-2.5 rounded-full border border-white/20 backdrop-blur-md cursor-pointer transition-all shadow-lg flex items-center gap-2">
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                   </svg>
+                   ¿No funciona?
+                 </button>
+               } @else {
+                 <!-- Panel de ayuda expandido -->
+                 <div class="bg-black/95 backdrop-blur-xl rounded-2xl border border-white/10 p-4 shadow-2xl w-64 animate-fade-in">
+                   <div class="flex items-center justify-between mb-3">
+                     <p class="text-white font-bold text-sm">¿Problemas para ver?</p>
+                     <button (click)="showHelperPanel.set(false)" class="text-gray-400 hover:text-white cursor-pointer">
+                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                       </svg>
+                     </button>
+                   </div>
+                   <p class="text-gray-400 text-xs mb-3">Prueba otro servidor o visita la web original.</p>
+                   <div class="flex flex-col gap-2">
+                     <!-- Siguiente servidor -->
+                     @if (playersState().embeds.length > 1) {
+                       <button (click)="tryNextServer(); showHelperPanel.set(false)"
+                               class="w-full flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-white/5">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#e50914]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                         </svg>
+                         Probar otro servidor
+                       </button>
+                     }
+                     <!-- Ir a la web -->
+                     <a [href]="hackstorePostUrl()" target="_blank"
+                        class="w-full flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-white/5">
+                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                       </svg>
+                       Ver en la web
+                     </a>
+                     <!-- Cerrar -->
+                     <button (click)="isTheaterMode.set(false); showHelperPanel.set(false)"
+                             class="w-full flex items-center gap-2 bg-[#e50914]/20 hover:bg-[#e50914]/40 text-[#e50914] text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-[#e50914]/20">
+                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                       </svg>
+                       Cerrar reproductor
+                     </button>
+                   </div>
+                 </div>
+               }
+             </div>
           </div>
 
           <!-- Bottom Server Selector (siempre visible, fondo sólido en móvil) -->
@@ -542,6 +596,7 @@ export class MovieDetailsComponent {
   );
   selectedEmbedIndex = signal<number>(0);
   isTheaterMode = signal(false);
+  showHelperPanel = signal(false);
 
   selectedSeason = signal<string>('1');
   selectedEpisodeId = signal<string | number | undefined>(undefined);
@@ -575,6 +630,13 @@ export class MovieDetailsComponent {
       window.scrollTo({ top: window.innerHeight * 0.65, behavior: 'smooth' });
     } else {
       this.isTheaterMode.set(true);
+    }
+  }
+
+  tryNextServer() {
+    const total = this.playersState().embeds.length;
+    if (total > 1) {
+      this.selectedEmbedIndex.set((this.selectedEmbedIndex() + 1) % total);
     }
   }
 
