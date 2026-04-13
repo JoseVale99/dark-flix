@@ -23,6 +23,7 @@ export interface ApiMedia {
   years?: number[];
   original_title?: string;
   tagline?: string;
+  gallery?: string; // Newline-separated screenshot paths from the API
 }
 
 export interface ApiMediaResponse {

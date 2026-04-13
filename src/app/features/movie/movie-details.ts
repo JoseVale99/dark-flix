@@ -197,6 +197,14 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                     [class.border-transparent]="activeTab() !== 'REPARTO'">
               REPARTO
             </button>
+            <button (click)="activeTab.set('GALERÍA')"
+                    [class.text-white]="activeTab() === 'GALERÍA'"
+                    [class.border-white]="activeTab() === 'GALERÍA'"
+                    class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
+                    [class.text-gray-400]="activeTab() !== 'GALERÍA'"
+                    [class.border-transparent]="activeTab() !== 'GALERÍA'">
+              GALERÍA
+            </button>
             <button (click)="activeTab.set('SIMILARES')"
                     [class.text-white]="activeTab() === 'SIMILARES'"
                     [class.border-white]="activeTab() === 'SIMILARES'"
@@ -495,6 +503,65 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                   }
                 </div>
               }
+
+              @case ('GALERÍA') {
+                <div class="animate-fade-in">
+                  @if (galleryImages().length === 0) {
+                    <div class="text-gray-400 py-8">Esta película no tiene galería de imágenes disponible.</div>
+                  } @else {
+                    <!-- Grid of thumbnails -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      @for (img of galleryImages(); track img; let i = $index) {
+                        <div (click)="lightboxIndex.set(i)"
+                             class="relative aspect-video rounded-lg overflow-hidden cursor-pointer group border border-white/5 bg-df-card">
+                          <img [src]="'https://image.tmdb.org/t/p/w780' + img"
+                               class="w-full h-full object-cover group-hover:scale-105 group-hover:brightness-75 transition-all duration-500"
+                               loading="lazy">
+                          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
+                            </svg>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <!-- LIGHTBOX OVERLAY -->
+                @if (lightboxIndex() !== null) {
+                  <div class="fixed inset-0 z-300 bg-black/95 backdrop-blur-md flex items-center justify-center animate-fade-in"
+                       (click)="lightboxIndex.set(null)">
+                    <!-- Prev -->
+                    <button (click)="$event.stopPropagation(); lightboxIndex.set((lightboxIndex()! - 1 + galleryImages().length) % galleryImages().length)"
+                            class="absolute left-2 md:left-6 z-10 bg-black/60 hover:bg-[#e50914] text-white rounded-full p-3 border border-white/10 transition-all cursor-pointer shadow-2xl">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                      </svg>
+                    </button>
+                    <!-- Image -->
+                    <img [src]="'https://image.tmdb.org/t/p/w1280' + galleryImages()[lightboxIndex()!]"
+                         (click)="$event.stopPropagation()"
+                         class="max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-2xl border border-white/10">
+                    <!-- Next -->
+                    <button (click)="$event.stopPropagation(); lightboxIndex.set((lightboxIndex()! + 1) % galleryImages().length)"
+                            class="absolute right-2 md:right-6 z-10 bg-black/60 hover:bg-[#e50914] text-white rounded-full p-3 border border-white/10 transition-all cursor-pointer shadow-2xl">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </button>
+                    <!-- Counter + close -->
+                    <div class="absolute top-4 right-4 flex items-center gap-3">
+                      <span class="text-white/70 text-sm font-medium">{{ lightboxIndex()! + 1 }} / {{ galleryImages().length }}</span>
+                      <button (click)="lightboxIndex.set(null)" class="bg-black/60 hover:bg-[#e50914] text-white rounded-full p-2 border border-white/10 transition-all cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                }
+              }
             }
           </div>
         </div>
@@ -615,12 +682,13 @@ export class MovieDetailsComponent {
 
   private stateMedia = history.state.media as ApiMedia | undefined;
 
-  activeTab = signal<'REPRODUCIR' | 'DESCARGAS' | 'REPARTO' | 'SIMILARES' | 'EPISODIOS'>(
+  activeTab = signal<'REPRODUCIR' | 'DESCARGAS' | 'REPARTO' | 'SIMILARES' | 'EPISODIOS' | 'GALERÍA'>(
     (this.stateMedia?.type === 'tvshows' || this.stateMedia?.type === 'animes') ? 'EPISODIOS' : 'REPRODUCIR'
   );
   selectedEmbedIndex = signal<number>(0);
   isTheaterMode = signal(false);
   showHelperPanel = signal(false);
+  lightboxIndex = signal<number | null>(null);
 
   selectedSeason = signal<string>('1');
   selectedEpisodeId = signal<string | number | undefined>(undefined);
@@ -768,6 +836,13 @@ export class MovieDetailsComponent {
      if (mv.type === 'tvshows' || mv.type === 'series') cat = 'series';
      else if (mv.type === 'animes') cat = 'animes';
      return `https://hackstore.mx/${cat}/${mv.slug}`;
+  });
+
+  // Galería: parsear el campo gallery (rutas TMDB separadas por saltos de línea)
+  galleryImages = computed(() => {
+    const raw = this.movie()?.gallery;
+    if (!raw) return [];
+    return raw.split('\n').map(p => p.trim()).filter(p => p.length > 0);
   });
 
   constructor() {

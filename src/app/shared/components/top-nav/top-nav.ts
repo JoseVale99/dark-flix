@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { filter, debounceTime, distinctUntilChanged, switchMap, catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { WpMediaService } from '@services/wp-media';
+import { SearchHistoryService } from '@services/search-history';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 import { WpImagePipe } from '@shared/pipes/wp-image';
 
@@ -83,7 +84,30 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
           }
         </div>
 
-        <!-- Resultados en Modal -->
+          <!-- Búsquedas Recientes (solo si el campo está vacío) -->
+          @if (!searchQuery() && searchHistoryService.history().length > 0) {
+            <div class="w-full max-w-5xl mx-auto mt-6">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-gray-400 text-xs font-bold uppercase tracking-widest">Búsquedas recientes</span>
+                <button (click)="searchHistoryService.clear()" class="text-gray-500 hover:text-white text-xs transition-colors cursor-pointer">Limpiar</button>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                @for (q of searchHistoryService.history(); track q) {
+                  <button (click)="onSearchInput(q)"
+                          class="flex items-center gap-2 bg-white/5 hover:bg-white/15 border border-white/10 text-gray-300 text-sm font-medium px-4 py-2 rounded-full transition-all cursor-pointer group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {{ q }}
+                    <span (click)="$event.stopPropagation(); searchHistoryService.remove(q)"
+                          class="ml-1 text-gray-600 group-hover:text-gray-300 transition-colors">✕</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Resultados en Modal -->
         <div class="flex-1 mt-8 w-full max-w-7xl mx-auto overflow-y-auto hide-scrollbar pb-32">
           @if (searchQuery() && !isSearching() && searchResults().length === 0) {
             <div class="flex flex-col items-center justify-center mt-20 text-white/50">
@@ -152,6 +176,8 @@ export class TopNavComponent {
   searchResults = computed(() => this.searchState().posts);
   searchTotal = computed(() => this.searchState().total);
 
+  public readonly searchHistoryService = inject(SearchHistoryService);
+
   constructor() {
     if (typeof window !== 'undefined') {
       window.addEventListener('scroll', () => {
@@ -180,6 +206,11 @@ export class TopNavComponent {
   }
 
   forceHideSearch() {
+    // Guardar la búsqueda en historial si hay resultados
+    const q = this.searchQuery().trim();
+    if (q.length >= 2 && this.searchResults().length > 0) {
+      this.searchHistoryService.add(q);
+    }
     this.isSearchActive.set(false);
     this.searchQuery.set('');
     this.isSearching.set(false);

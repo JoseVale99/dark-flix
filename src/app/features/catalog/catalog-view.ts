@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, DestroyRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, DestroyRef, ViewChild, ElementRef, afterNextRender } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -65,18 +65,12 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           <div class="mt-16 flex justify-center">
             @if (loading()) {
                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
-            } @else if (hasMoreItems()) {
-               <button (click)="loadMore()"
-                       class="text-white bg-white/10 hover:bg-white/20 border border-white/20 font-bold py-4 px-12 rounded-lg transition-all hover:scale-105 active:scale-95 shadow-lg flex items-center gap-3 text-lg cursor-pointer">
-                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                 </svg>
-                 Cargar Más
-               </button>
-            } @else {
+            } @else if (!hasMoreItems()) {
                <p class="text-gray-500 font-bold text-center">Has llegado al final del catálogo.</p>
             }
           </div>
+          <!-- Sentinel para Infinite Scroll -->
+          <div #scrollSentinel class="h-4"></div>
         }
       }
     </div>
@@ -87,7 +81,9 @@ export class CatalogViewComponent {
   private router = inject(Router);
   private wpService = inject(WpMediaService);
   private mediaUrlPipe = inject(MediaUrlPipe);
-  private destroyRef = inject(DestroyRef); // Inyector nativo para auto-limpieza
+  private destroyRef = inject(DestroyRef);
+
+  @ViewChild('scrollSentinel') private sentinel!: ElementRef<HTMLElement>;
 
   // Properties
   genres = CATALOG_GENRES;
@@ -136,6 +132,15 @@ export class CatalogViewComponent {
         this.hasMoreItems.set(true);
         this.fetchCatalog();
       }
+    });
+    // Configurar IntersectionObserver para Infinite Scroll
+    afterNextRender(() => {
+      if (!this.sentinel?.nativeElement) return;
+      const observer = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) this.loadMore();
+      }, { rootMargin: '200px' });
+      observer.observe(this.sentinel.nativeElement);
+      this.destroyRef.onDestroy(() => observer.disconnect());
     });
   }
 
