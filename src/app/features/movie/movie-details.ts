@@ -159,6 +159,20 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                   Mi Lista
                 }
               </button>
+
+              <!-- Botón Compartir (Web Share API) -->
+              <button (click)="shareMovie()"
+                      title="Compartir"
+                      class="bg-black/40 hover:bg-black/60 border border-white/20 text-white font-bold py-3 px-5 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-xl cursor-pointer relative">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                @if (shareCopied()) {
+                  <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap animate-fade-in">
+                    ¡Copiado!
+                  </span>
+                }
+              </button>
             </div>
           </div>
 
@@ -689,6 +703,7 @@ export class MovieDetailsComponent {
   isTheaterMode = signal(false);
   showHelperPanel = signal(false);
   lightboxIndex = signal<number | null>(null);
+  shareCopied = signal(false);
 
   selectedSeason = signal<string>('1');
   selectedEpisodeId = signal<string | number | undefined>(undefined);
@@ -725,7 +740,23 @@ export class MovieDetailsComponent {
     }
   }
 
-  tryNextServer() {
+  /** Comparte la película usando Web Share API o fallback a clipboard */
+  shareMovie(): void {
+    const mv = this.movie();
+    if (!mv) return;
+    const url = window.location.href;
+    const text = `${mv.title} — mírala en DarkFlix`;
+    if (navigator.share) {
+      navigator.share({ title: mv.title, text, url }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        this.shareCopied.set(true);
+        setTimeout(() => this.shareCopied.set(false), 2500);
+      });
+    }
+  }
+
+  tryNextServer(): void {
     const total = this.playersState().embeds.length;
     if (total > 1) {
       this.selectedEmbedIndex.set((this.selectedEmbedIndex() + 1) % total);
