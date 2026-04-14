@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, input, computed, signal, effect } from '@angular/core';
-import { Title, Meta } from '@angular/platform-browser';
+import { Title, Meta, DomSanitizer } from '@angular/platform-browser';
 import { WpMediaService } from '@services/wp-media';
 import { MyListService } from '@services/my-list';
 import { WatchHistoryService } from '@services/watch-history';
@@ -174,6 +174,16 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                   </span>
                 }
               </button>
+
+              @if (movie()?.trailer) {
+                <button (click)="activeTab.set('TRAILER'); scrollToTabs()"
+                        class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3 px-6 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-xl text-center text-lg w-fit cursor-pointer backdrop-blur-md">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                  </svg>
+                  TRÁILER
+                </button>
+              }
             </div>
           </div>
 
@@ -228,6 +238,16 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     [class.border-transparent]="activeTab() !== 'SIMILARES'">
               SIMILARES
             </button>
+            @if (movie()?.trailer) {
+              <button (click)="activeTab.set('TRAILER')"
+                      [class.text-white]="activeTab() === 'TRAILER'"
+                      [class.border-white]="activeTab() === 'TRAILER'"
+                      class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
+                      [class.text-gray-400]="activeTab() !== 'TRAILER'"
+                      [class.border-transparent]="activeTab() !== 'TRAILER'">
+                TRAILER
+              </button>
+            }
           </div>
 
           <!-- TABS CONTENT -->
@@ -624,6 +644,72 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                   </div>
                 }
               }
+              @case ('TRAILER') {
+                <div class="animate-fade-in flex flex-col items-center">
+                  @if (trailerUrl()) {
+                    <div class="w-full max-w-5xl aspect-video rounded-2xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.7)] border border-white/10 bg-black relative group">
+                      
+                      @if (!showTrailerPlayer()) {
+                        <!-- Poster Overlay View -->
+                        <div class="absolute inset-0 z-10 flex items-center justify-center cursor-pointer overflow-hidden" (click)="showTrailerPlayer.set(true)">
+                          <!-- Backdrop with blur-in effect -->
+                          <img [src]="movie()! | wpImage:'backdrop'" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-50" alt="Trailer Preview">
+                          
+                          <!-- Glassmorphism Content -->
+                          <div class="absolute inset-0 bg-black/20 flex flex-col items-center justify-center gap-6">
+                            <!-- Glowing Play Button -->
+                            <div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-[#e50914] flex items-center justify-center shadow-[0_0_50px_rgba(229,9,20,0.6)] group-hover:scale-110 transition-transform duration-500 relative">
+                               <div class="absolute inset-0 rounded-full animate-ping bg-[#e50914] opacity-20"></div>
+                               <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 md:w-14 md:h-14 text-white ml-2" fill="currentColor" viewBox="0 0 24 24">
+                                 <path d="M8 5v14l11-7z" />
+                               </svg>
+                            </div>
+                            
+                            <div class="text-center">
+                              <p class="text-white font-black text-xl md:text-3xl uppercase tracking-tighter drop-shadow-2xl">Reproducir Tráiler</p>
+                              <p class="text-white/60 text-xs md:text-sm font-bold uppercase tracking-widest mt-1">Official Teaser &bull; HD</p>
+                            </div>
+                          </div>
+                        </div>
+                      } @else {
+                        <!-- Actual YouTube Iframe -->
+                        <iframe [src]="trailerUrl()!"
+                                class="w-full h-full"
+                                frameborder="0"
+                                allow="autoplay; encrypted-media; picture-in-picture"
+                                allowfullscreen>
+                        </iframe>
+                      }
+
+                      <!-- Decorative corner accents -->
+                      <div class="absolute top-0 left-0 w-24 h-24 border-t-2 border-l-2 border-[#e50914]/40 rounded-tl-2xl pointer-events-none group-hover:border-[#e50914]/70 transition-colors z-20"></div>
+                      <div class="absolute bottom-0 right-0 w-24 h-24 border-b-2 border-r-2 border-[#e50914]/40 rounded-br-2xl pointer-events-none group-hover:border-[#e50914]/70 transition-colors z-20"></div>
+                    </div>
+
+                    <div class="mt-10 flex flex-col md:flex-row items-center justify-between w-full max-w-5xl gap-6">
+                      <div class="text-center md:text-left">
+                        <h3 class="text-2xl md:text-3xl font-black text-white mb-2 uppercase tracking-tight">Tráiler Oficial</h3>
+                        <p class="text-gray-400 max-w-2xl text-sm md:text-base font-medium">
+                          Disfruta de un vistazo exclusivo a <span class="text-white font-bold">{{ movie()?.title }}</span>.
+                          Prepárate para la experiencia completa en DarkFlix.
+                        </p>
+                      </div>
+                      <button (click)="playMedia()" class="shrink-0 bg-white text-black hover:bg-[#e50914] hover:text-white font-black py-3 px-8 rounded-full transition-all active:scale-95 uppercase tracking-widest text-xs cursor-pointer shadow-2xl">
+                        Ver Película Ahora
+                      </button>
+                    </div>
+                  } @else {
+                    <div class="text-gray-400 py-20 flex flex-col items-center gap-6 bg-white/5 w-full rounded-2xl border border-white/5">
+                      <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <p class="font-bold tracking-wide uppercase text-xs">El tráiler no está disponible temporalmente</p>
+                    </div>
+                  }
+                </div>
+              }
             }
           </div>
         </div>
@@ -798,10 +884,11 @@ export class MovieDetailsComponent {
   public watchHistoryService = inject(WatchHistoryService);
   private titleService = inject(Title);
   private metaService = inject(Meta);
+  private sanitizer = inject(DomSanitizer);
 
   private stateMedia = history.state.media as ApiMedia | undefined;
 
-  activeTab = signal<'REPRODUCIR' | 'DESCARGAS' | 'REPARTO' | 'SIMILARES' | 'EPISODIOS' | 'GALERÍA'>(
+  activeTab = signal<'REPRODUCIR' | 'DESCARGAS' | 'REPARTO' | 'SIMILARES' | 'EPISODIOS' | 'GALERÍA' | 'TRAILER'>(
     (this.stateMedia?.type === 'tvshows' || this.stateMedia?.type === 'animes') ? 'EPISODIOS' : 'REPRODUCIR'
   );
   selectedEmbedIndex = signal<number>(0);
@@ -809,6 +896,7 @@ export class MovieDetailsComponent {
   showHelperPanel = signal(false);
   lightboxIndex = signal<number | null>(null);
   shareCopied = signal(false);
+  showTrailerPlayer = signal(false);
   showControls = signal(true);
   private controlsTimer: any;
 
@@ -1029,6 +1117,39 @@ export class MovieDetailsComponent {
     return raw.split('\n').map(p => p.trim()).filter(p => p.length > 0);
   });
 
+  trailerUrl = computed(() => {
+    const trailer = this.movie()?.trailer;
+    if (!trailer) return null;
+
+    let videoId = '';
+    // Si el trailer ya es un ID directo de 11 caracteres
+    if (trailer.length === 11 && !trailer.includes('/')) {
+      videoId = trailer;
+    } else {
+      // Buscar si es URL completa de YouTube
+      const match = trailer.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})/);
+      if (match && match[1]) {
+        videoId = match[1];
+      }
+    }
+
+    if (videoId) {
+      // Usar autoplay=1 cuando se activa el player para que el usuario no tenga que dar click de nuevo
+      const autoplay = this.showTrailerPlayer() ? '1' : '0';
+      return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&autoplay=${autoplay}`);
+    }
+
+    return null;
+  });
+
+  scrollToTabs() {
+    // Buscar la sección de tabs por su contenedor
+    const element = document.querySelector('.max-w-7xl.mx-auto.px-6.pb-24');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   constructor() {
     // Efecto para resetear estado del iframe cuando cambia el embed seleccionado
     effect(() => {
@@ -1075,6 +1196,7 @@ export class MovieDetailsComponent {
           this.selectedEmbedIndex.set(0);
           this.isTheaterMode.set(false);
           this.showHelperPanel.set(false);
+          this.showTrailerPlayer.set(false);
           if (typeof window !== 'undefined') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }
