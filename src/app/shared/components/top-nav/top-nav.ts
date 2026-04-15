@@ -106,6 +106,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
                  type="text"
                  [(ngModel)]="searchQuery"
                  (ngModelChange)="onSearchInput($event)"
+                 (keydown.enter)="handleEnterSearch()"
                  placeholder="¿Qué te gustaría ver hoy?"
                  class="w-full bg-transparent border-b-2 border-white/20 focus:border-[#e50914] text-white text-3xl md:text-5xl outline-none py-4 md:py-6 font-black placeholder-white/30 transition-colors drop-shadow-lg">
 
@@ -190,7 +191,7 @@ export class TopNavComponent {
            this.isSearching.set(false);
            return of({posts: [], total: 0});
         }
-        return this.wpService.searchMedia(query, 3).pipe(
+        return this.wpService.searchMedia(query, 12).pipe(
           tap(() => this.isSearching.set(false)),
           catchError(() => {
             this.isSearching.set(false);
@@ -236,6 +237,14 @@ export class TopNavComponent {
 
   onSearchInput(query: string) {
     this.searchQuery.set(query);
+  }
+
+  handleEnterSearch() {
+    const q = this.searchQuery().trim();
+    if (!q) return;
+
+    this.forceHideSearch();
+    this.router.navigate(['/search'], { queryParams: { q } });
   }
 
   forceHideSearch() {
