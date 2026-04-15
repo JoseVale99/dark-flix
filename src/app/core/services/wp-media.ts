@@ -102,7 +102,7 @@ export class WpMediaService {
     if (type === 'series') internalEndpoint = 'tvshows';
     if (type === 'animes') internalEndpoint = 'animes';
 
-    let url = `${this.baseUrl}/listing/${internalEndpoint}?page=${page}&orderBy=latest&order=desc&postType=${internalEndpoint}&postsPerPage=24`;
+    let url = `${this.baseUrl}/listing/${internalEndpoint}?`;
 
     if (filters) {
        const cleanFilters: any = {};
@@ -111,9 +111,11 @@ export class WpMediaService {
        if (filters.countries && filters.countries.length > 0) cleanFilters.countries = filters.countries;
 
        if (Object.keys(cleanFilters).length > 0) {
-          url += `&filter=${encodeURIComponent(JSON.stringify(cleanFilters))}`;
+          url += `filter=${encodeURIComponent(JSON.stringify(cleanFilters))}&`;
        }
     }
+
+    url += `page=${page}&orderBy=latest&order=desc&postType=${internalEndpoint}&postsPerPage=24`;
 
     return this.http.get<any>(url)
       .pipe(map(res => {
