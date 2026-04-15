@@ -343,7 +343,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                             <div class="absolute inset-0 flex flex-col items-center justify-center bg-black cursor-pointer group/play"
                                  (click)="activatePlayer()">
                               @if (movie()?.images?.poster) {
-                                <img [src]="movie()!.images!.poster | wpImage" alt="poster"
+                              <img [src]="movie() | wpImage" alt="poster"
                                      class="absolute inset-0 w-full h-full object-cover opacity-40" />
                               }
                               <!-- Botón Play -->
@@ -811,11 +811,13 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                    </div>
                  </div>
                }
-               <iframe [src]="currentEmbed()!.url | safe:'resourceUrl'" class="w-full h-full border-none" allowfullscreen
-                 dfIframeLoader
-                 (loadError)="onIframeError()"
-                 (loadTimeout)="onIframeTimeout()"
-                 (loadSuccess)="onIframeSuccess()"></iframe>
+               @if (playerActivated() && playerUrl()) {
+                 <iframe [src]="playerUrl()! | safe:'resourceUrl'" class="w-full h-full border-none" allowfullscreen
+                   dfIframeLoader
+                   (loadError)="onIframeError()"
+                   (loadTimeout)="onIframeTimeout()"
+                   (loadSuccess)="onIframeSuccess()"></iframe>
+               }
 
                <!-- Interaction Overlay: Captures first tap when controls are hidden -->
                @if (!showControls()) {
@@ -1222,10 +1224,11 @@ export class MovieDetailsComponent {
 
   constructor() {
     // Efecto para resetear estado del iframe cuando cambia el embed seleccionado
-    // IMPORTANTE: Usamos untracked en las escrituras para evitar bucles reactivos que congelan la app en móvil
+    // Solo actúa si el player ya fue activado por el usuario (Click-to-Play)
     effect(() => {
       const url = this.currentEmbed()?.url;
-      if (url && url !== this.lastHandledEmbedUrl) {
+      const isActive = this.playerActivated();
+      if (url && isActive && url !== this.lastHandledEmbedUrl) {
         this.lastHandledEmbedUrl = url;
         untracked(() => {
           this.iframeError.set(false);
@@ -1237,12 +1240,15 @@ export class MovieDetailsComponent {
 
     // Efecto para gestión de controles en Modo Teatro
     effect(() => {
-      if (this.isTheaterMode()) {
-        this.resetControlsTimer();
-      } else {
-        this.showControls.set(true);
-        if (this.controlsTimer) clearTimeout(this.controlsTimer);
-      }
+      const theater = this.isTheaterMode();
+      untracked(() => {
+        if (theater) {
+          this.resetControlsTimer();
+        } else {
+          this.showControls.set(true);
+          if (this.controlsTimer) clearTimeout(this.controlsTimer);
+        }
+      });
     });
 
     // Efecto para SEO, Historial y Reset de Estado
