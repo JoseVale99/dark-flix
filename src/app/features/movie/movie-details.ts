@@ -357,15 +357,13 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                 </div>
                                 <h3 class="text-white font-bold text-lg mb-2">Error al cargar el video</h3>
                                 <p class="text-gray-400 text-sm mb-4">Este servidor no está disponible. Prueba con otro servidor o reporta el error.</p>
-                                <div class="flex flex-col gap-2">
-                                  @if (hasMoreServers()) {
+                                  <div class="flex flex-col gap-2">
                                     <button (click)="tryNextServer()" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
                                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                       </svg>
-                                      Probar otro servidor
+                                      {{ hasMoreServers() ? 'Probar otro servidor' : 'Reintentar carga' }}
                                     </button>
-                                  }
                                   <a [href]="hackstorePostUrl()" target="_blank" class="bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
@@ -884,6 +882,7 @@ export class MovieDetailsComponent {
   private titleService = inject(Title);
   private metaService = inject(Meta);
   private sanitizer = inject(DomSanitizer);
+  private lastResetMediaId: string | number = '';
 
   private stateMedia = history.state.media as ApiMedia | undefined;
 
@@ -941,7 +940,8 @@ export class MovieDetailsComponent {
            map(res => ({ data: res, error: false })),
            catchError(() => of({ data: null, error: true }))
          );
-      })
+      }),
+      distinctUntilChanged((prev, curr) => prev?.data?._id === curr?.data?._id)
     )
   );
 
@@ -974,12 +974,16 @@ export class MovieDetailsComponent {
   }
 
   tryNextServer(): void {
-    const total = this.playersState().embeds.length;
-    if (total > 1) {
-      this.selectedEmbedIndex.set((this.selectedEmbedIndex() + 1) % total);
-      // Reset error state when switching servers
+    const embeds = this.playersState().embeds;
+    const total = embeds.length;
+    if (total > 0) {
+      if (total > 1) {
+        this.selectedEmbedIndex.set((this.selectedEmbedIndex() + 1) % total);
+      }
+      // Reset error state regardless of total (allows "Retry" for single server)
       this.iframeError.set(false);
       this.iframeLoading.set(true);
+      this.loader?.reset();
     }
   }
 
@@ -1203,20 +1207,23 @@ export class MovieDetailsComponent {
         this.watchHistoryService.addToHistory(currentMovie);
 
         // Reset state on movie change (como cuando se navega desde Similares)
-        // Usamos untracked para evitar ciclos y batch de señales
-        untracked(() => {
-          this.activeTab.set((currentMovie.type === 'tvshows' || currentMovie.type === 'animes') ? 'EPISODIOS' : 'REPRODUCIR');
-          this.selectedEpisodeId.set(undefined);
-          this.selectedSeason.set('1');
-          this.selectedEmbedIndex.set(0);
-          this.isTheaterMode.set(false);
-          this.showHelperPanel.set(false);
-          this.showTrailerPlayer.set(false);
-          
-          if (typeof window !== 'undefined') {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-        });
+        // Solo si la ID es diferente a la última manejada
+        if (currentMovie._id !== this.lastResetMediaId) {
+          this.lastResetMediaId = currentMovie._id;
+          untracked(() => {
+            this.activeTab.set((currentMovie.type === 'tvshows' || currentMovie.type === 'animes') ? 'EPISODIOS' : 'REPRODUCIR');
+            this.selectedEpisodeId.set(undefined);
+            this.selectedSeason.set('1');
+            this.selectedEmbedIndex.set(0);
+            this.isTheaterMode.set(false);
+            this.showHelperPanel.set(false);
+            this.showTrailerPlayer.set(false);
+            
+            if (typeof window !== 'undefined') {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          });
+        }
       }
     });
   }
