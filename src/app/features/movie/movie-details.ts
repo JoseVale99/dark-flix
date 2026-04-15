@@ -337,26 +337,50 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                             </button>
                           </div>
                         } @else {
-                          <!-- Loading state -->
-                          @if (iframeLoading()) {
-                            <div class="absolute inset-0 flex items-center justify-center bg-black z-10">
-                              <div class="flex flex-col items-center gap-3">
-                                <div class="w-12 h-12 border-4 border-[#e50914]/30 border-t-[#e50914] rounded-full animate-spin"></div>
-                                <p class="text-gray-400 text-sm font-medium">Cargando video...</p>
-                              </div>
-                            </div>
-                          }
-                          <!-- Error state -->
-                          @if (iframeError()) {
-                            <div class="absolute inset-0 flex items-center justify-center bg-black z-20 p-6">
-                              <div class="text-center max-w-sm">
-                                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/30">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          <!-- CLICK-TO-PLAY: Solo mostrar iframe si el usuario lo activó -->
+                          @if (!playerActivated()) {
+                            <!-- Poster con botón de reproducir -->
+                            <div class="absolute inset-0 flex flex-col items-center justify-center bg-black cursor-pointer group/play"
+                                 (click)="activatePlayer()">
+                              @if (movie()?.images?.poster) {
+                                <img [src]="movie()!.images!.poster | wpImage" alt="poster"
+                                     class="absolute inset-0 w-full h-full object-cover opacity-40" />
+                              }
+                              <!-- Botón Play -->
+                              <div class="relative z-10 flex flex-col items-center gap-3">
+                                <div class="w-20 h-20 rounded-full bg-[#e50914] flex items-center justify-center shadow-2xl shadow-red-900/60
+                                            group-hover/play:scale-110 transition-transform duration-200 active:scale-95">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
                                   </svg>
                                 </div>
-                                <h3 class="text-white font-bold text-lg mb-2">Error al cargar el video</h3>
-                                <p class="text-gray-400 text-sm mb-4">Este servidor no está disponible. Prueba con otro servidor o reporta el error.</p>
+                                <span class="text-white font-bold text-sm tracking-wider uppercase">Reproducir</span>
+                                @if (currentEmbed()) {
+                                  <span class="text-gray-400 text-xs">{{ currentEmbed()!.server }} &bull; {{ currentEmbed()!.lang }}</span>
+                                }
+                              </div>
+                            </div>
+                          } @else {
+                            <!-- Loading state -->
+                            @if (iframeLoading()) {
+                              <div class="absolute inset-0 flex items-center justify-center bg-black z-10">
+                                <div class="flex flex-col items-center gap-3">
+                                  <div class="w-12 h-12 border-4 border-[#e50914]/30 border-t-[#e50914] rounded-full animate-spin"></div>
+                                  <p class="text-gray-400 text-sm font-medium">Cargando video...</p>
+                                </div>
+                              </div>
+                            }
+                            <!-- Error state -->
+                            @if (iframeError()) {
+                              <div class="absolute inset-0 flex items-center justify-center bg-black z-20 p-6">
+                                <div class="text-center max-w-sm">
+                                  <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/30">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                  </div>
+                                  <h3 class="text-white font-bold text-lg mb-2">Error al cargar el video</h3>
+                                  <p class="text-gray-400 text-sm mb-4">Este servidor no está disponible.</p>
                                   <div class="flex flex-col gap-2">
                                     <button (click)="tryNextServer()" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
                                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -364,30 +388,25 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                       </svg>
                                       {{ hasMoreServers() ? 'Probar otro servidor' : 'Reintentar carga' }}
                                     </button>
-                                  <a [href]="hackstorePostUrl()" target="_blank" class="bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                    </svg>
-                                    Ver página original
-                                  </a>
+                                    <a [href]="hackstorePostUrl()" target="_blank" class="bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
+                                      Ver página original
+                                    </a>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          }
-                          @if (!iframeError() && playerUrl()) {
-                            <iframe
-                              [src]="playerUrl()! | safe:'resourceUrl'"
-                              class="absolute inset-0 w-full h-full transition-all duration-300"
-                              [class.invisible]="iframeLoading() || iframeError()"
-                              [class.opacity-0]="iframeLoading() || iframeError()"
-                              [class.pointer-events-none]="iframeLoading() || iframeError()"
-                              allowfullscreen
-                              dfIframeLoader
-                              [timeoutMs]="7000"
-                              (loadError)="onIframeError()"
-                              (loadTimeout)="onIframeTimeout()"
-                              (loadSuccess)="onIframeSuccess()">
-                            </iframe>
+                            }
+                            @if (playerUrl()) {
+                              <iframe
+                                [src]="playerUrl()! | safe:'resourceUrl'"
+                                class="absolute inset-0 w-full h-full"
+                                allowfullscreen
+                                dfIframeLoader
+                                [timeoutMs]="10000"
+                                (loadError)="onIframeError()"
+                                (loadTimeout)="onIframeTimeout()"
+                                (loadSuccess)="onIframeSuccess()">
+                              </iframe>
+                            }
                           }
                         }
                       }
@@ -396,7 +415,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     <!-- Server Selector Responsive -->
                     <div class="flex flex-wrap gap-2 mt-4">
                       @for (embed of playersState().embeds; track $index) {
-                        <button (click)="selectedEmbedIndex.set($index)"
+                        <button (click)="selectedEmbedIndex.set($index); playerActivated.set(false); iframeError.set(false)"
                                 [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
                                 [class.text-white]="selectedEmbedIndex() === $index"
                                 [class.shadow-[0_0_20px_rgba(229,9,20,0.4)]]="selectedEmbedIndex() === $index"
@@ -921,7 +940,8 @@ export class MovieDetailsComponent {
 
   // Iframe error handling state
   iframeError = signal(false);
-  iframeLoading = signal(true);
+  iframeLoading = signal(false);
+  playerActivated = signal(false);
 
 
   public onPlayerInteraction(): void {
@@ -997,9 +1017,11 @@ export class MovieDetailsComponent {
       if (total > 1) {
         this.selectedEmbedIndex.set((this.selectedEmbedIndex() + 1) % total);
       }
-      // Reset error state regardless of total (allows "Retry" for single server)
+      // Reset state to show poster again - prevents re-loading dead scripts
       this.iframeError.set(false);
-      this.iframeLoading.set(true);
+      this.iframeLoading.set(false);
+      this.playerActivated.set(false);
+      this.lastHandledEmbedUrl = '';
       this.loader?.reset();
     }
   }
@@ -1014,6 +1036,14 @@ export class MovieDetailsComponent {
   onIframeTimeout(): void {
     this.iframeError.set(true);
     this.iframeLoading.set(false);
+  }
+
+  /** Activates the player - only called when user explicitly taps the play button */
+  activatePlayer(): void {
+    this.iframeError.set(false);
+    this.iframeLoading.set(true);
+    this.playerActivated.set(true);
+    this.lastHandledEmbedUrl = '';
   }
 
   /** Manually trigger error state if player is stuck or showing 404 */
@@ -1122,8 +1152,8 @@ export class MovieDetailsComponent {
   });
 
   playerUrl = computed(() => {
-    // Si no estamos en la pestaña de reproducir, matamos la URL para liberar recursos
     if (this.activeTab() !== 'REPRODUCIR') return null;
+    if (!this.playerActivated()) return null;
     return this.currentEmbed()?.url || null;
   });
 
