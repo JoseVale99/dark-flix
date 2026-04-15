@@ -399,6 +399,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                               <iframe
                                 [src]="playerUrl()! | safe:'resourceUrl'"
                                 class="absolute inset-0 w-full h-full"
+                                sandbox="allow-scripts allow-same-origin allow-presentation"
                                 allowfullscreen
                                 dfIframeLoader
                                 [timeoutMs]="10000"
@@ -429,14 +430,14 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                         </button>
                       }
                       
-                      <!-- Manual Error Link -->
-                      @if (!iframeError() && !iframeLoading()) {
+                      <!-- Manual Error Link: siempre visible cuando el player está activo -->
+                      @if (playerActivated() && !iframeError()) {
                         <div class="w-full flex justify-end mt-1">
                           <button (click)="triggerManualError()" class="text-[10px] text-gray-500 hover:text-red-500 transition-colors flex items-center gap-1 opacity-60 hover:opacity-100 cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
-                            ¿No carga el video? Reportar enlace
+                            ¿No carga? Toca aquí
                           </button>
                         </div>
                       }
@@ -812,7 +813,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                  </div>
                }
                @if (playerActivated() && playerUrl()) {
-                 <iframe [src]="playerUrl()! | safe:'resourceUrl'" class="w-full h-full border-none" allowfullscreen
+                 <iframe [src]="playerUrl()! | safe:'resourceUrl'" class="w-full h-full border-none" sandbox="allow-scripts allow-same-origin allow-presentation" allowfullscreen
                    dfIframeLoader
                    (loadError)="onIframeError()"
                    (loadTimeout)="onIframeTimeout()"
@@ -1048,10 +1049,12 @@ export class MovieDetailsComponent {
     this.lastHandledEmbedUrl = '';
   }
 
-  /** Manually trigger error state if player is stuck or showing 404 */
+  /** Manually trigger error state - DESTROYS the iframe to free mobile resources */
   triggerManualError(): void {
-    this.iframeError.set(true);
+    this.playerActivated.set(false);
+    this.iframeError.set(false);
     this.iframeLoading.set(false);
+    this.lastHandledEmbedUrl = '';
   }
 
   /** Called when iframe loads successfully */
