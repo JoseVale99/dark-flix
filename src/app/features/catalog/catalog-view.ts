@@ -1,7 +1,8 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed, DestroyRef, ViewChild, ElementRef, afterNextRender } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { Subject, switchMap, map, scan, tap, filter, catchError, of } from 'rxjs';
 import { CATALOG_GENRES, CATALOG_COUNTRIES, CATALOG_YEARS } from '../../core/constants/filter-config';
 import { FilterDropdownComponent } from '@shared/components/filter-dropdown/filter-dropdown';
 import { WpMediaService } from '@services/wp-media';
@@ -93,7 +94,6 @@ export class CatalogViewComponent {
   // States
   currentType = signal<string>('peliculas');
   currentPage = signal<number>(1);
-  items = signal<ApiMedia[]>([]);
   loading = signal<boolean>(false);
   hasMoreItems = signal<boolean>(true);
 
@@ -101,6 +101,39 @@ export class CatalogViewComponent {
   selectedGenres = signal<Array<string|number>>([]);
   selectedCountries = signal<Array<string|number>>([]);
   selectedYears = signal<Array<string|number>>([]);
+
+  // Stream Trigger
+  private searchTrigger$ = new Subject<{ replace: boolean }>();
+
+  // Stream de datos puramente reactivo (Sin fugas de memoria)
+  private catalogStream$ = this.searchTrigger$.pipe(
+    tap(() => this.loading.set(true)),
+    switchMap(({ replace }) => {
+      const type = this.currentType();
+      const page = this.currentPage();
+      const filters = this.getNumericFilters();
+
+      return this.wpService.getPagedCatalog(type, page, filters).pipe(
+        map(response => ({ response, replace })),
+        catchError(() => {
+          this.loading.set(false);
+          return of(null);
+        })
+      );
+    }),
+    filter((data): data is {response: {posts: ApiMedia[], hasMore: boolean}, replace: boolean} => data !== null),
+    tap(data => {
+      this.hasMoreItems.set(data.response.hasMore);
+      this.loading.set(false);
+    }),
+    scan((acc: ApiMedia[], curr: {response: {posts: ApiMedia[]}, replace: boolean}) => {
+      if (curr.replace) return curr.response.posts;
+      return [...acc, ...curr.response.posts];
+    }, [] as ApiMedia[])
+  );
+
+  // El Signal de items ahora depende directamente del stream sin .subscribe() manual
+  items = toSignal(this.catalogStream$, { initialValue: [] });
 
   pageTitle = computed(() => {
      const t = this.currentType();
@@ -117,7 +150,6 @@ export class CatalogViewComponent {
       const paramSlug = params.get('catalogType') || 'peliculas';
       
       if (paramSlug !== this.currentType()) {
-         console.log('Cambiando categoría a:', paramSlug);
          this.currentType.set(paramSlug);
          this.selectedGenres.set([]);
          this.selectedYears.set([]);
@@ -131,78 +163,48 @@ export class CatalogViewComponent {
     // Configurar IntersectionObserver para Infinite Scroll
     afterNextRender(() => {
       if (!this.sentinel?.nativeElement) return;
-      const observer = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting) this.loadMore();
+      
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+            this.loadMore();
+        }
       }, { rootMargin: '200px' });
+
       observer.observe(this.sentinel.nativeElement);
       this.destroyRef.onDestroy(() => observer.disconnect());
     });
   }
 
   onFilterChange() {
-     console.log('--- [DARKFLIX] Cambio de Filtro Detectado (Manual) ---');
      this.currentPage.set(1);
-     this.items.set([]);
      this.hasMoreItems.set(true);
-     this.loading.set(false); // Desbloqueo forzado por seguridad
-     this.fetchCatalog();
+     this.searchTrigger$.next({ replace: true });
   }
 
-  fetchCatalog() {
-    const type = this.currentType();
-    const page = this.currentPage();
-
-    // Reset de seguridad para búsquedas nuevas
-    if (page === 1) {
-      console.log('Reseteando loading para página 1');
-      this.loading.set(false);
-    }
-
-    if (this.loading()) {
-      console.log('Evitando petición duplicada (cargando ya en curso)');
-      return;
-    }
-
-    this.loading.set(true);
-
-    // Mapeo riguroso a Números para que la API no falle
+  private getNumericFilters() {
     const filters: any = {};
     if (this.selectedGenres().length > 0) {
-      filters.genres = this.selectedGenres().map(id => Number(id)).filter(n => !isNaN(n));
+      filters.genres = this.selectedGenres().map((id: string|number) => Number(id)).filter((n: number) => !isNaN(n));
     }
     if (this.selectedYears().length > 0) {
-      filters.years = this.selectedYears().map(id => Number(id)).filter(n => !isNaN(n));
+      filters.years = this.selectedYears().map((id: string|number) => Number(id)).filter((n: number) => !isNaN(n));
     }
     if (this.selectedCountries().length > 0) {
-      filters.countries = this.selectedCountries().map(id => Number(id)).filter(n => !isNaN(n));
+      filters.countries = this.selectedCountries().map((id: string|number) => Number(id)).filter((n: number) => !isNaN(n));
     }
-
-    console.log(`Lanzando Petición API -> [${type}] Pag:[${page}] Filters:`, filters);
-
-    this.wpService.getPagedCatalog(type, page, filters).subscribe({
-      next: (response) => {
-        console.log('Éxito API:', response.posts.length, 'ítems recibidos.');
-        this.items.update(current => [...current, ...response.posts]);
-        this.hasMoreItems.set(response.hasMore);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        console.error('Error Crítico API:', err);
-        this.loading.set(false);
-      }
-    });
+    return filters;
   }
 
   loadMore() {
     if (this.hasMoreItems() && !this.loading()) {
-      this.currentPage.update(p => p + 1);
-      this.fetchCatalog();
+      this.currentPage.update((p: number) => p + 1);
+      this.searchTrigger$.next({ replace: false });
     }
   }
 
   onMediaSelected(media: ApiMedia) {
     const url = this.mediaUrlPipe.transform(media);
-    const segments = url.split('/').filter(s => s !== '');
+    const segments = url.split('/').filter((s: string) => s !== '');
     this.router.navigate(['/', ...segments], { state: { media } });
   }
 }
