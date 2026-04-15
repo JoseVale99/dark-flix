@@ -1,11 +1,11 @@
-import { Component, ChangeDetectionStrategy, inject, input, computed, signal, effect, ViewChild } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, computed, signal, effect, ViewChild, untracked } from '@angular/core';
 import { Title, Meta, DomSanitizer } from '@angular/platform-browser';
 import { WpMediaService } from '@services/wp-media';
 import { MyListService } from '@services/my-list';
 import { WatchHistoryService } from '@services/watch-history';
 import { ApiMedia } from '@models';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, switchMap, combineLatest, filter, concat, delay } from 'rxjs';
+import { catchError, map, of, switchMap, combineLatest, filter, concat, delay, distinctUntilChanged, take } from 'rxjs';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
 import { BadgeComponent } from '@shared/components/badge/badge';
@@ -376,9 +376,9 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                               </div>
                             </div>
                           }
-                          @if (!iframeError()) {
+                          @if (!iframeError() && playerUrl()) {
                             <iframe
-                              [src]="currentEmbed()!.url | safe:'resourceUrl'"
+                              [src]="playerUrl()! | safe:'resourceUrl'"
                               class="absolute inset-0 w-full h-full"
                               allowfullscreen
                               dfIframeLoader
@@ -1015,6 +1015,7 @@ export class MovieDetailsComponent {
 
   playersState = toSignal(
     toObservable(this.activeMediaId).pipe(
+      distinctUntilChanged(),
       filter(activeId => !!activeId),
       switchMap(currentId => concat(
         of({ embeds: [], downloads: [] }),
@@ -1027,6 +1028,7 @@ export class MovieDetailsComponent {
 
   downloadsState = toSignal(
     toObservable(this.activeMediaId).pipe(
+      distinctUntilChanged(),
       filter(activeId => !!activeId),
       switchMap(currentId => concat(
         of([]),
@@ -1040,6 +1042,7 @@ export class MovieDetailsComponent {
   episodesResponse = toSignal(
     combineLatest([toObservable(this.movie), toObservable(this.selectedSeason)]).pipe(
       filter(([m]) => m?.type === 'tvshows' || m?.type === 'animes'),
+      distinctUntilChanged((prev, curr) => prev[0]?._id === curr[0]?._id && prev[1] === curr[1]),
       switchMap(([currentMovie, season]) => this.wpService.getTvShowEpisodes(currentMovie!._id, season).pipe(
         catchError(() => of(undefined))
       ))
@@ -1049,6 +1052,7 @@ export class MovieDetailsComponent {
   castState = toSignal(
     toObservable(this.movie).pipe(
       filter(m => !!m),
+      distinctUntilChanged((prev, curr) => prev?._id === curr?._id),
       switchMap(currentMovie => this.wpService.getMovieCast(currentMovie!._id, currentMovie!.type || 'movies').pipe(catchError(() => of([]))))
     ), { initialValue: [] }
   );
@@ -1056,6 +1060,7 @@ export class MovieDetailsComponent {
   relatedState = toSignal(
     toObservable(this.movie).pipe(
       filter(m => !!m),
+      distinctUntilChanged((prev, curr) => prev?._id === curr?._id),
       switchMap(currentMovie => this.wpService.getRelatedMedia(currentMovie!._id).pipe(catchError(() => of([]))))
     ), { initialValue: [] }
   );
@@ -1087,6 +1092,12 @@ export class MovieDetailsComponent {
     const embeds = this.playersState().embeds;
     if (!embeds || embeds.length === 0) return null;
     return embeds[this.selectedEmbedIndex()] || embeds[0];
+  });
+
+  playerUrl = computed(() => {
+    // Si no estamos en la pestaña de reproducir, matamos la URL para liberar recursos
+    if (this.activeTab() !== 'REPRODUCIR') return null;
+    return this.currentEmbed()?.url || null;
   });
 
   getYear = computed(() => {
@@ -1187,12 +1198,13 @@ export class MovieDetailsComponent {
            this.metaService.updateTag({ property: 'og:image', content: `https://hackstore.mx${currentMovie.images.poster}` });
         }
 
-        // Registrar visita
-        this.wpService.registerHit(currentMovie._id, currentMovie.type).subscribe();
+        // Registrar visita (limpio)
+        this.wpService.registerHit(currentMovie._id, currentMovie.type).pipe(take(1)).subscribe();
         this.watchHistoryService.addToHistory(currentMovie);
 
         // Reset state on movie change (como cuando se navega desde Similares)
-        setTimeout(() => {
+        // Usamos untracked para evitar ciclos y batch de señales
+        untracked(() => {
           this.activeTab.set((currentMovie.type === 'tvshows' || currentMovie.type === 'animes') ? 'EPISODIOS' : 'REPRODUCIR');
           this.selectedEpisodeId.set(undefined);
           this.selectedSeason.set('1');
@@ -1200,10 +1212,11 @@ export class MovieDetailsComponent {
           this.isTheaterMode.set(false);
           this.showHelperPanel.set(false);
           this.showTrailerPlayer.set(false);
+          
           if (typeof window !== 'undefined') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }
-        }, 0);
+        });
       }
     });
   }
