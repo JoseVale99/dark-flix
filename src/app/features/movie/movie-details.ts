@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, input, computed, signal, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, computed, signal, effect, ViewChild } from '@angular/core';
 import { Title, Meta, DomSanitizer } from '@angular/platform-browser';
 import { WpMediaService } from '@services/wp-media';
 import { MyListService } from '@services/my-list';
@@ -900,9 +900,12 @@ export class MovieDetailsComponent {
   selectedSeason = signal<string>('1');
   selectedEpisodeId = signal<string | number | undefined>(undefined);
 
+  @ViewChild(IframeLoaderDirective) loader?: IframeLoaderDirective;
+
   // Iframe error handling state
   iframeError = signal(false);
   iframeLoading = signal(true);
+
 
   public onPlayerInteraction(): void {
     if (!this.isTheaterMode()) return;
@@ -1111,7 +1114,7 @@ export class MovieDetailsComponent {
   galleryImages = computed(() => {
     const raw = this.movie()?.gallery;
     if (!raw) return [];
-    return raw.split('\n').map(p => p.trim()).filter(p => p.length > 0);
+    return raw.split('\n').map((p: string) => p.trim()).filter((p: string) => p.length > 0);
   });
 
   trailerUrl = computed(() => {
@@ -1155,6 +1158,7 @@ export class MovieDetailsComponent {
         // Reset iframe state when switching to a new embed
         this.iframeError.set(false);
         this.iframeLoading.set(true);
+        this.loader?.reset();
       }
     });
 

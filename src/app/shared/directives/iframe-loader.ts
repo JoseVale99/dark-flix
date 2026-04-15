@@ -34,10 +34,8 @@ export class IframeLoaderDirective {
   @HostListener('load')
   onLoad(): void {
     this.clearTimer();
-    if (this.loadingState() === 'loading') {
-      this.loadingState.set('success');
-      this.loadSuccess.emit();
-    }
+    this.loadingState.set('success');
+    this.loadSuccess.emit();
   }
 
   @HostListener('error')
