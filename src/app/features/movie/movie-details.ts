@@ -381,6 +381,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                             class="absolute inset-0 w-full h-full"
                             allowfullscreen
                             dfIframeLoader
+                            [timeoutMs]="8000"
                             (loadError)="onIframeError()"
                             (loadTimeout)="onIframeTimeout()"
                             (loadSuccess)="onIframeSuccess()">
@@ -399,23 +400,21 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     </div>
 
                     <!-- Server Selector Responsive -->
-                    <div class="flex flex-col md:flex-row gap-3 mt-4 md:items-center">
-                      <span class="text-xs md:text-sm font-black text-gray-500 uppercase tracking-widest shrink-0 ml-1">Servidor Activo:</span>
-
-                      <!-- Scroll horizontal suave para los botones -->
-                      <div class="flex overflow-x-auto hide-scrollbar snap-x gap-2 pb-2 -mb-2 w-full px-1">
-                        @for (embed of playersState().embeds; track $index) {
-                          <button (click)="selectedEmbedIndex.set($index)"
-                                  [class.bg-white]="selectedEmbedIndex() === $index"
-                                  [class.text-black]="selectedEmbedIndex() === $index"
-                                  [class.shadow-[0_0_15px_rgba(255,255,255,0.4)]]="selectedEmbedIndex() === $index"
-                                  [class.bg-[#1a1a1a]]="selectedEmbedIndex() !== $index"
-                                  [class.text-gray-300]="selectedEmbedIndex() !== $index"
-                                  class="shrink-0 snap-start whitespace-nowrap px-5 py-2.5 rounded-full text-xs font-bold hover:bg-white/20 transition-all border border-white/10 cursor-pointer">
-                            {{ embed.server || 'Server ' + ($index + 1) }} • {{ embed.lang }}
-                          </button>
-                        }
-                      </div>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                      @for (embed of playersState().embeds; track $index) {
+                        <button (click)="selectedEmbedIndex.set($index)"
+                                [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
+                                [class.text-white]="selectedEmbedIndex() === $index"
+                                [class.shadow-[0_0_20px_rgba(229,9,20,0.4)]]="selectedEmbedIndex() === $index"
+                                [class.scale-105]="selectedEmbedIndex() === $index"
+                                [class.border-[#e50914]]="selectedEmbedIndex() === $index"
+                                [class.bg-white/5]="selectedEmbedIndex() !== $index"
+                                [class.text-gray-400]="selectedEmbedIndex() !== $index"
+                                [class.border-white/10]="selectedEmbedIndex() !== $index"
+                                class="shrink-0 whitespace-nowrap px-5 py-2 rounded-xl text-[10px] md:text-sm font-black transition-all border cursor-pointer hover:bg-white/10 active:scale-95 shadow-lg">
+                          {{ embed.server || 'Server ' + ($index + 1) }} ({{ embed.lang }})
+                        </button>
+                      }
                     </div>
                   }
                 </div>
@@ -848,32 +847,33 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                 }
               </div>
             </div>
-          </div>
-        }
-
-        <!-- Bottom Server Selector (siempre visible, fondo sólido en móvil) -->
-        <!-- Bottom Server Selector: CÁPSULA FLOTANTE (Hides with controls) -->
-        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 w-full max-w-fit px-4"
-             [class.opacity-0]="!showControls()"
-             [class.translate-y-full]="!showControls()"
-             [class.pointer-events-none]="!showControls()">
-          <div class="bg-zinc-900/90 backdrop-blur-xl border border-white/10 px-4 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-3 overflow-hidden">
-            <span class="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-widest border-r border-white/10 pr-3 mr-1">Servidores</span>
-            <div class="flex overflow-x-auto hide-scrollbar gap-2 max-w-[80vw] md:max-w-4xl snap-x">
-              @for (embed of playersState().embeds; track $index) {
-                <button (click)="$event.stopPropagation(); selectedEmbedIndex.set($index); resetControlsTimer()"
-                        [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
-                        [class.text-white]="selectedEmbedIndex() === $index"
-                        [class.scale-105]="selectedEmbedIndex() === $index"
-                        [class.bg-white/5]="selectedEmbedIndex() !== $index"
-                        [class.text-gray-400]="selectedEmbedIndex() !== $index"
-                        class="shrink-0 snap-start whitespace-nowrap px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold transition-all border border-white/5 cursor-pointer hover:bg-white/10 active:scale-95">
-                  {{ embed.server || 'Server ' + ($index + 1) }} ({{ embed.lang }})
-                </button>
-              }
+              <!-- Server Selector Capsule (Only in Theater Mode) -->
+              <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 w-full max-w-fit px-4"
+                   [class.opacity-0]="!showControls()"
+                   [class.translate-y-full]="!showControls()"
+                   [class.pointer-events-none]="!showControls()">
+                <div class="bg-zinc-900/90 backdrop-blur-xl border border-white/10 px-4 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-3 overflow-hidden">
+                  <span class="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-widest border-r border-white/10 pr-3 mr-1">Servidores</span>
+                  <div class="flex overflow-x-auto hide-scrollbar gap-2 max-w-[80vw] md:max-w-4xl snap-x">
+                    @for (embed of playersState().embeds; track $index) {
+                      <button (click)="$event.stopPropagation(); selectedEmbedIndex.set($index); resetControlsTimer()"
+                              [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
+                              [class.text-white]="selectedEmbedIndex() === $index"
+                              [class.shadow-[0_0_15px_rgba(229,9,20,0.5)]]="selectedEmbedIndex() === $index"
+                              [class.scale-105]="selectedEmbedIndex() === $index"
+                              [class.border-[#e50914]]="selectedEmbedIndex() === $index"
+                              [class.bg-white/5]="selectedEmbedIndex() !== $index"
+                              [class.text-gray-400]="selectedEmbedIndex() !== $index"
+                               [class.border-white/10]="selectedEmbedIndex() !== $index"
+                              class="shrink-0 snap-start whitespace-nowrap px-4 py-2 rounded-xl text-[10px] md:text-xs font-black transition-all border cursor-pointer hover:bg-white/10 active:scale-95">
+                        {{ embed.server || 'Server ' + ($index + 1) }} ({{ embed.lang }})
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+        }
       }
     </div>
   `,
