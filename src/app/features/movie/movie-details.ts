@@ -190,7 +190,8 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
         </div>
 
         <!-- COMPONENTES EXTENDIDOS (TABS: REPRODUCTORES, DESCARGAS, REPARTO...) -->
-        <div class="max-w-7xl mx-auto px-6 pb-24 text-white relative z-30">
+        @defer (on viewport; prefetch on idle) {
+          <div class="max-w-7xl mx-auto px-6 pb-24 text-white relative z-30">
 
           <!-- TABS NAVIGATION SCROLLABLE ON MOBILE -->
           <div class="flex gap-6 md:gap-8 border-b border-white/10 mb-8 pt-8 overflow-x-auto hide-scrollbar snap-x w-full">
@@ -713,15 +714,19 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
             }
           </div>
         </div>
-
+      } @placeholder {
+        <div class="max-w-7xl mx-auto px-6 pb-24 flex flex-col items-center justify-center min-h-64 text-white/20">
+          <div class="w-10 h-10 border-4 border-white/5 border-t-[#e50914] rounded-full animate-spin mb-4"></div>
+          <p class="text-xs font-bold uppercase tracking-widest animate-pulse">Cargando detalles...</p>
+        </div>
       }
 
-      <!-- THEATER MODE MODAL (OVERLAY DE PANTALLA COMPLETA) -->
-      @if (isTheaterMode()) {
-        <div class="fixed inset-0 z-100 bg-black flex flex-col animate-fade-in overflow-hidden"
-             (mousemove)="onPlayerInteraction()"
-             (click)="onPlayerInteraction()"
-             (touchstart)="onPlayerInteraction()">
+        <!-- THEATER MODE MODAL (OVERLAY DE PANTALLA COMPLETA) -->
+        @if (isTheaterMode()) {
+          <div class="fixed inset-0 z-100 bg-black flex flex-col animate-fade-in overflow-hidden"
+               (mousemove)="onPlayerInteraction()"
+               (click)="onPlayerInteraction()"
+               (touchstart)="onPlayerInteraction()">
 
           <!-- Top Bar: Título + Cerrar (Flotante) -->
           <div class="absolute top-0 left-0 right-0 px-4 md:px-6 py-3 bg-linear-to-b from-black/90 to-transparent z-50 transition-all duration-500"
@@ -841,31 +846,32 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     </div>
                   </div>
                 }
-             </div>
+              </div>
+            </div>
           </div>
+        }
 
-          <!-- Bottom Server Selector (siempre visible, fondo sólido en móvil) -->
-          <!-- Bottom Server Selector: CÁPSULA FLOTANTE (Hides with controls) -->
-          <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 w-full max-w-fit px-4"
-               [class.opacity-0]="!showControls()"
-               [class.translate-y-full]="!showControls()"
-               [class.pointer-events-none]="!showControls()">
-             <div class="bg-zinc-900/90 backdrop-blur-xl border border-white/10 px-4 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-3 overflow-hidden">
-                <span class="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-widest border-r border-white/10 pr-3 mr-1">Servidores</span>
-                <div class="flex overflow-x-auto hide-scrollbar gap-2 max-w-[80vw] md:max-w-4xl snap-x">
-                   @for (embed of playersState().embeds; track $index) {
-                     <button (click)="$event.stopPropagation(); selectedEmbedIndex.set($index); resetControlsTimer()"
-                             [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
-                             [class.text-white]="selectedEmbedIndex() === $index"
-                             [class.scale-105]="selectedEmbedIndex() === $index"
-                             [class.bg-white/5]="selectedEmbedIndex() !== $index"
-                             [class.text-gray-400]="selectedEmbedIndex() !== $index"
-                             class="shrink-0 snap-start whitespace-nowrap px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold transition-all border border-white/5 cursor-pointer hover:bg-white/10 active:scale-95">
-                       {{ embed.server || 'Server ' + ($index + 1) }} ({{ embed.lang }})
-                     </button>
-                   }
-                </div>
-             </div>
+        <!-- Bottom Server Selector (siempre visible, fondo sólido en móvil) -->
+        <!-- Bottom Server Selector: CÁPSULA FLOTANTE (Hides with controls) -->
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 w-full max-w-fit px-4"
+             [class.opacity-0]="!showControls()"
+             [class.translate-y-full]="!showControls()"
+             [class.pointer-events-none]="!showControls()">
+          <div class="bg-zinc-900/90 backdrop-blur-xl border border-white/10 px-4 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-3 overflow-hidden">
+            <span class="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-widest border-r border-white/10 pr-3 mr-1">Servidores</span>
+            <div class="flex overflow-x-auto hide-scrollbar gap-2 max-w-[80vw] md:max-w-4xl snap-x">
+              @for (embed of playersState().embeds; track $index) {
+                <button (click)="$event.stopPropagation(); selectedEmbedIndex.set($index); resetControlsTimer()"
+                        [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
+                        [class.text-white]="selectedEmbedIndex() === $index"
+                        [class.scale-105]="selectedEmbedIndex() === $index"
+                        [class.bg-white/5]="selectedEmbedIndex() !== $index"
+                        [class.text-gray-400]="selectedEmbedIndex() !== $index"
+                        class="shrink-0 snap-start whitespace-nowrap px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold transition-all border border-white/5 cursor-pointer hover:bg-white/10 active:scale-95">
+                  {{ embed.server || 'Server ' + ($index + 1) }} ({{ embed.lang }})
+                </button>
+              }
+            </div>
           </div>
         </div>
       }
