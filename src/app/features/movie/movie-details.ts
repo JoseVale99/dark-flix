@@ -376,16 +376,18 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                               </div>
                             </div>
                           }
-                          <iframe
-                            [src]="currentEmbed()!.url | safe:'resourceUrl'"
-                            class="absolute inset-0 w-full h-full"
-                            allowfullscreen
-                            dfIframeLoader
-                            [timeoutMs]="8000"
-                            (loadError)="onIframeError()"
-                            (loadTimeout)="onIframeTimeout()"
-                            (loadSuccess)="onIframeSuccess()">
-                          </iframe>
+                          @if (!iframeError()) {
+                            <iframe
+                              [src]="currentEmbed()!.url | safe:'resourceUrl'"
+                              class="absolute inset-0 w-full h-full"
+                              allowfullscreen
+                              dfIframeLoader
+                              [timeoutMs]="7000"
+                              (loadError)="onIframeError()"
+                              (loadTimeout)="onIframeTimeout()"
+                              (loadSuccess)="onIframeSuccess()">
+                            </iframe>
+                          }
                         }
                       }
                     </div>
