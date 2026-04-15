@@ -30,9 +30,12 @@ export class IframeLoaderDirective {
   readonly loadingState = signal<'loading' | 'success' | 'error'>('loading');
 
   private loadTimer: ReturnType<typeof setTimeout> | null = null;
+  private hasEmitted = false;
 
   @HostListener('load')
   onLoad(): void {
+    if (this.hasEmitted) return;
+    this.hasEmitted = true;
     this.clearTimer();
     this.loadingState.set('success');
     this.loadSuccess.emit();
@@ -40,6 +43,8 @@ export class IframeLoaderDirective {
 
   @HostListener('error')
   onError(): void {
+    if (this.hasEmitted) return;
+    this.hasEmitted = true;
     this.clearTimer();
     this.loadingState.set('error');
     this.loadError.emit();
@@ -48,9 +53,11 @@ export class IframeLoaderDirective {
   /** Start (or restart) the timeout timer */
   start(): void {
     this.clearTimer();
+    this.hasEmitted = false;
     this.loadingState.set('loading');
     this.loadTimer = setTimeout(() => {
-      if (this.loadingState() === 'loading') {
+      if (this.loadingState() === 'loading' && !this.hasEmitted) {
+        this.hasEmitted = true;
         this.loadingState.set('error');
         this.loadTimeout.emit();
       }
@@ -59,6 +66,8 @@ export class IframeLoaderDirective {
 
   /** Manually report an error */
   reportError(): void {
+    if (this.hasEmitted) return;
+    this.hasEmitted = true;
     this.clearTimer();
     this.loadingState.set('error');
     this.loadError.emit();

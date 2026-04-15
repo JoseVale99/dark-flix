@@ -5,7 +5,7 @@ import { MyListService } from '@services/my-list';
 import { WatchHistoryService } from '@services/watch-history';
 import { ApiMedia } from '@models';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, switchMap, combineLatest, filter, concat, delay, distinctUntilChanged, take } from 'rxjs';
+import { catchError, map, of, switchMap, combineLatest, filter, concat, delay, distinctUntilChanged, take, debounceTime } from 'rxjs';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
 import { BadgeComponent } from '@shared/components/badge/badge';
@@ -377,7 +377,10 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                           @if (!iframeError() && playerUrl()) {
                             <iframe
                               [src]="playerUrl()! | safe:'resourceUrl'"
-                              class="absolute inset-0 w-full h-full"
+                              class="absolute inset-0 w-full h-full transition-all duration-300"
+                              [class.invisible]="iframeLoading() || iframeError()"
+                              [class.opacity-0]="iframeLoading() || iframeError()"
+                              [class.pointer-events-none]="iframeLoading() || iframeError()"
                               allowfullscreen
                               dfIframeLoader
                               [timeoutMs]="7000"
@@ -938,6 +941,7 @@ export class MovieDetailsComponent {
 
   mediaState = toSignal(
     combineLatest([toObservable(this.typeSlug), toObservable(this.slug)]).pipe(
+      debounceTime(100),
       switchMap(([currentTypeSlug, currentSlug]) => {
          let postType = 'movies';
          if (currentTypeSlug === 'series') postType = 'tvshows';
