@@ -898,6 +898,7 @@ export class MovieDetailsComponent {
   private metaService = inject(Meta);
   private sanitizer = inject(DomSanitizer);
   private lastResetMediaId: string | number = '';
+  private lastHandledEmbedUrl = '';
 
   private stateMedia = history.state.media as ApiMedia | undefined;
 
@@ -1191,12 +1192,15 @@ export class MovieDetailsComponent {
 
   constructor() {
     // Efecto para resetear estado del iframe cuando cambia el embed seleccionado
+    // IMPORTANTE: Usamos untracked en las escrituras para evitar bucles reactivos que congelan la app en móvil
     effect(() => {
-      const embed = this.currentEmbed();
-      if (embed) {
-        // Reset iframe state when switching to a new embed
-        this.iframeError.set(false);
-        this.iframeLoading.set(true);
+      const url = this.currentEmbed()?.url;
+      if (url && url !== this.lastHandledEmbedUrl) {
+        this.lastHandledEmbedUrl = url;
+        untracked(() => {
+          this.iframeError.set(false);
+          this.iframeLoading.set(true);
+        });
         this.loader?.reset();
       }
     });
