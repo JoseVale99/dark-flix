@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
   Router,
   RouterOutlet,
@@ -15,6 +15,7 @@ import { NetworkService } from '@services/network';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav';
 import { TopNavComponent } from '@shared/components/top-nav/top-nav';
 import { PwaInstallBannerComponent } from '@shared/components/pwa-install-banner/pwa-install-banner';
+import { SplashScreenComponent } from '@shared/components/splash-screen/splash-screen';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,8 @@ import { PwaInstallBannerComponent } from '@shared/components/pwa-install-banner
     ProgressBarComponent,
     BottomNavComponent,
     TopNavComponent,
-    PwaInstallBannerComponent
+    PwaInstallBannerComponent,
+    SplashScreenComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -42,6 +44,9 @@ export class App {
     { initialValue: typeof window !== 'undefined' && window.location.pathname === '/profiles' }
   );
 
+  public readonly isAppReady = signal<boolean>(false);
+  private readonly hasInitialized = signal<boolean>(false);
+
   constructor() {
     // takeUntilDestroyed() se desuscribe automáticamente cuando
     // el componente se destruye — no necesita ngOnDestroy manual
@@ -50,14 +55,27 @@ export class App {
         filter((e) => e instanceof NavigationStart),
         takeUntilDestroyed()
       )
-      .subscribe(() => this.progressSvc.start());
+      .subscribe(() => {
+         this.progressSvc.start();
+      });
 
     this.router.events
       .pipe(
         filter((e) => e instanceof NavigationEnd || e instanceof NavigationError),
         takeUntilDestroyed()
       )
-      .subscribe(() => this.progressSvc.complete());
+      .subscribe(() => {
+         this.progressSvc.complete();
+         
+         // Remove splash screen after first navigation completes successfully.
+         // Added a small delay so the animation feels intentional and allows components inside the router-outlet to fully paint.
+         if (!this.hasInitialized()) {
+           this.hasInitialized.set(true);
+           setTimeout(() => {
+             this.isAppReady.set(true);
+           }, 800);
+         }
+      });
 
   }
 }
