@@ -817,6 +817,17 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                    (loadError)="onIframeError()"
                    (loadTimeout)="onIframeTimeout()"
                    (loadSuccess)="onIframeSuccess()"></iframe>
+               } @else if (!playerActivated() && !iframeLoading() && !iframeError()) {
+                 <div class="absolute inset-0 flex items-center justify-center bg-black cursor-pointer group z-30" (click)="activatePlayer()">
+                   @if (movie()?.images?.backdrop) {
+                     <img [src]="movie() | wpImage:'backdrop'" alt="backdrop" class="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm" />
+                   }
+                   <div class="relative z-50 w-20 h-20 rounded-full bg-[#e50914] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white ml-2" fill="currentColor" viewBox="0 0 24 24">
+                       <path d="M8 5v14l11-7z"></path>
+                     </svg>
+                   </div>
+                 </div>
                }
 
                <!-- Interaction Overlay: Captures first tap when controls are hidden -->
@@ -873,7 +884,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                   </div>
                 }
               </div>
-            </div>
+
               <!-- Server Selector Capsule (Only in Theater Mode) -->
               <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 w-full max-w-fit px-4"
                    [class.opacity-0]="!showControls()"
@@ -881,6 +892,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                    [class.pointer-events-none]="!showControls()">
                 <div class="bg-zinc-900/90 backdrop-blur-xl border border-white/10 px-4 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-3 overflow-hidden">
                   <span class="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-widest border-r border-white/10 pr-3 mr-1">Servidores</span>
+              </div>
                   <div class="flex overflow-x-auto hide-scrollbar gap-2 max-w-[80vw] md:max-w-4xl snap-x">
                     @for (embed of playersState().embeds; track $index) {
                       <button (click)="$event.stopPropagation(); changeTheaterServer($index)"
@@ -1029,8 +1041,8 @@ export class MovieDetailsComponent {
     this.selectedEmbedIndex.set(index);
     this.resetControlsTimer();
     this.resetPlayerState();
-    // Re-activate immediately to load the new server
-    this.playerActivated.set(true); 
+    // (We intentionally DO NOT re-activate automatically.
+    // The user must click the explicit play button in the backdrop to prevent accidental loads)
   }
 
   private resetPlayerState(): void {
