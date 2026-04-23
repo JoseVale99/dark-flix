@@ -45,3 +45,7 @@ Thumbs.db
 .kiro/*
 .vscode/settings.json
 .claude/settings.json
+.vercel
+.qwen/settings.json
+.qwen/settings.json.orig
+QWEN.md
