@@ -8,13 +8,13 @@
   "theme_color": "#0a0a0a",
   "icons": [
     {
-      "src": "/images/logo/dark-flix.png",
+      "src": "/images/logo/dark-flix-bg.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/images/logo/dark-flix.png",
+      "src": "/images/logo/dark-flix-bg.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
