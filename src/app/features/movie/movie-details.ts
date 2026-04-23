@@ -399,7 +399,6 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                               <iframe
                                 [src]="playerUrl()! | safe:'resourceUrl'"
                                 class="absolute inset-0 w-full h-full"
-                                sandbox="allow-scripts allow-same-origin allow-presentation"
                                 allowfullscreen
                                 dfIframeLoader
                                 [timeoutMs]="10000"
@@ -813,7 +812,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                  </div>
                }
                @if (playerActivated() && playerUrl()) {
-                 <iframe [src]="playerUrl()! | safe:'resourceUrl'" class="w-full h-full border-none" sandbox="allow-scripts allow-same-origin allow-presentation" allowfullscreen
+                 <iframe [src]="playerUrl()! | safe:'resourceUrl'" class="w-full h-full border-none" allowfullscreen
                    dfIframeLoader
                    (loadError)="onIframeError()"
                    (loadTimeout)="onIframeTimeout()"
@@ -884,7 +883,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                   <span class="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-widest border-r border-white/10 pr-3 mr-1">Servidores</span>
                   <div class="flex overflow-x-auto hide-scrollbar gap-2 max-w-[80vw] md:max-w-4xl snap-x">
                     @for (embed of playersState().embeds; track $index) {
-                      <button (click)="$event.stopPropagation(); selectedEmbedIndex.set($index); resetControlsTimer()"
+                      <button (click)="$event.stopPropagation(); changeTheaterServer($index)"
                               [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
                               [class.text-white]="selectedEmbedIndex() === $index"
                               [class.shadow-[0_0_15px_rgba(229,9,20,0.5)]]="selectedEmbedIndex() === $index"
@@ -993,6 +992,7 @@ export class MovieDetailsComponent {
       // Asegurarse de que el scroll baje hacia la sección de episodios de forma fluida
       window.scrollTo({ top: window.innerHeight * 0.65, behavior: 'smooth' });
     } else {
+      this.activatePlayer();
       this.isTheaterMode.set(true);
     }
   }
@@ -1020,13 +1020,25 @@ export class MovieDetailsComponent {
       if (total > 1) {
         this.selectedEmbedIndex.set((this.selectedEmbedIndex() + 1) % total);
       }
-      // Reset state to show poster again - prevents re-loading dead scripts
-      this.iframeError.set(false);
-      this.iframeLoading.set(false);
-      this.playerActivated.set(false);
-      this.lastHandledEmbedUrl = '';
-      this.loader?.reset();
+      this.resetPlayerState();
     }
+  }
+
+  /** Called when user explicitly selects a server in Theater mode */
+  changeTheaterServer(index: number): void {
+    this.selectedEmbedIndex.set(index);
+    this.resetControlsTimer();
+    this.resetPlayerState();
+    // Re-activate immediately to load the new server
+    this.playerActivated.set(true); 
+  }
+
+  private resetPlayerState(): void {
+    this.iframeError.set(false);
+    this.iframeLoading.set(false);
+    this.playerActivated.set(false);
+    this.lastHandledEmbedUrl = '';
+    this.loader?.reset();
   }
 
   /** Called when iframe reports a load error */
