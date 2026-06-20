@@ -3,7 +3,8 @@ import { Title, Meta, DomSanitizer } from '@angular/platform-browser';
 import { WpMediaService } from '@services/wp-media';
 import { MyListService } from '@services/my-list';
 import { WatchHistoryService } from '@services/watch-history';
-import { ApiMedia } from '@models';
+import { EpisodeProgressService } from '@services/episode-progress';
+import { ApiMedia, ApiEpisode } from '@models';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap, combineLatest, filter, concat, delay, distinctUntilChanged, take, debounceTime } from 'rxjs';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
@@ -282,29 +283,78 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                   @if (!episodesResponse()?.posts) {
                     <div class="text-center py-10 text-gray-500 font-bold animate-pulse">Cargando episodios...</div>
                   } @else {
+
+                    <!-- Botón Continuar Viendo -->
+                    @if (lastWatchedEpisode()) {
+                      <div class="flex items-center gap-3 bg-[#e50914]/10 border border-[#e50914]/30 rounded-xl px-5 py-3 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#e50914] shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-white font-bold text-sm truncate">Continuar viendo</p>
+                          <p class="text-gray-400 text-xs truncate">T{{ lastWatchedEpisode()!.seasonNumber }} · E{{ lastWatchedEpisode()!.episodeNumber }} — {{ lastWatchedEpisode()!.title }}</p>
+                        </div>
+                        <button (click)="resumeLastEpisode()"
+                                class="shrink-0 bg-[#e50914] hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer active:scale-95">
+                          Reanudar
+                        </button>
+                      </div>
+                    }
+
                     <div class="flex flex-col gap-3">
                       @for (ep of episodesResponse()!.posts; track ep._id) {
-                        <button (click)="selectedEpisodeId.set(ep._id); activeTab.set('REPRODUCIR'); isTheaterMode.set(true)"
+                        <button (click)="playEpisode(ep)"
                                 class="flex items-center gap-4 text-left p-4 md:p-5 bg-[#161616] hover:bg-white/10 border border-white/5 transition-colors rounded-xl group relative overflow-hidden cursor-pointer"
-                                [class.border-[#e50914]]="selectedEpisodeId() === ep._id">
+                                [class.border-[#e50914]]="selectedEpisodeId() === ep._id"
+                                [class.border-green-600/50]="episodeProgress.isWatched(movie()!._id, ep._id) && selectedEpisodeId() !== ep._id">
 
-                          <!-- Número de capitulo gigante -->
+                          <!-- Número de capítulo gigante -->
                           <div class="text-4xl md:text-5xl font-black text-white/5 group-hover:text-white/10 transition-colors mr-2 shrink-0">
                             {{ ep.episode_number }}
                           </div>
 
-                          <div class="flex flex-col flex-1 z-10">
-                            <h3 class="text-white font-bold text-base md:text-lg group-hover:text-[#e50914] transition-colors leading-tight">
-                              {{ ep.title.split(': ').pop() || ep.title }}
-                            </h3>
+                          <div class="flex flex-col flex-1 z-10 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                              <h3 class="text-white font-bold text-base md:text-lg group-hover:text-[#e50914] transition-colors leading-tight truncate">
+                                {{ ep.title.split(': ').pop() || ep.title }}
+                              </h3>
+                              <!-- Badge VISTO -->
+                              @if (episodeProgress.isWatched(movie()!._id, ep._id)) {
+                                <span class="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-green-400 bg-green-500/15 border border-green-500/30 px-2 py-0.5 rounded-full shrink-0">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                  </svg>
+                                  Visto
+                                </span>
+                              }
+                            </div>
                             <p class="text-gray-500 text-xs md:text-sm font-medium mt-1">Temporada {{ ep.season_number }} • Episodio {{ ep.episode_number }}</p>
+
+                            <!-- Barra de progreso (si hay progreso parcial) -->
+                            @if (!episodeProgress.isWatched(movie()!._id, ep._id) && episodeProgress.getProgressPercent(movie()!._id, ep._id) > 0) {
+                              <div class="mt-2 h-0.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                <div class="h-full bg-[#e50914] rounded-full transition-all"
+                                     [style.width.%]="episodeProgress.getProgressPercent(movie()!._id, ep._id)"></div>
+                              </div>
+                            }
                           </div>
 
-                          <!-- Play icon on hover -->
-                          <div class="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center shrink-0 group-hover:bg-[#e50914] group-hover:border-[#e50914] transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
+                          <!-- Icono derecho: check si visto, play si no -->
+                          <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
+                               [class.border-green-500]="episodeProgress.isWatched(movie()!._id, ep._id) && selectedEpisodeId() !== ep._id"
+                               [class.bg-green-500/10]="episodeProgress.isWatched(movie()!._id, ep._id) && selectedEpisodeId() !== ep._id"
+                               [class.border-white/20]="!episodeProgress.isWatched(movie()!._id, ep._id) || selectedEpisodeId() === ep._id"
+                               [class.group-hover:bg-[#e50914]]="true"
+                               [class.group-hover:border-[#e50914]]="true">
+                            @if (episodeProgress.isWatched(movie()!._id, ep._id) && selectedEpisodeId() !== ep._id) {
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400 group-hover:text-white transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                              </svg>
+                            } @else {
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                            }
                           </div>
                         </button>
                       }
@@ -927,6 +977,7 @@ export class MovieDetailsComponent {
   private location = inject(Location);
   public myListService = inject(MyListService);
   public watchHistoryService = inject(WatchHistoryService);
+  public episodeProgress = inject(EpisodeProgressService);
   private titleService = inject(Title);
   private metaService = inject(Meta);
   private sanitizer = inject(DomSanitizer);
@@ -1007,6 +1058,42 @@ export class MovieDetailsComponent {
       this.activatePlayer();
       this.isTheaterMode.set(true);
     }
+  }
+
+  /** Reproduce un episodio y lo marca como visto en el cache del navegador. */
+  playEpisode(ep: ApiEpisode): void {
+    const movieId = this.movie()?._id;
+    if (!movieId) return;
+    this.selectedEpisodeId.set(ep._id);
+    this.activeTab.set('REPRODUCIR');
+    this.isTheaterMode.set(true);
+    // Marcar el episodio como visto al iniciar la reproducción
+    this.episodeProgress.markAsWatched(
+      movieId,
+      ep._id,
+      Number(ep.season_number),
+      Number(ep.episode_number),
+      ep.title
+    );
+  }
+
+  /**
+   * Computed: último episodio visto/en progreso de la serie actual.
+   * Solo aplica para series y animes.
+   */
+  lastWatchedEpisode = computed(() => {
+    const mv = this.movie();
+    if (!mv || (mv.type !== 'tvshows' && mv.type !== 'animes')) return undefined;
+    return this.episodeProgress.getLastWatchedEpisode(mv._id);
+  });
+
+  /** Reanuda la reproducción del último episodio visto. */
+  resumeLastEpisode(): void {
+    const last = this.lastWatchedEpisode();
+    if (!last) return;
+    this.selectedEpisodeId.set(last.episodeId);
+    this.activeTab.set('REPRODUCIR');
+    this.isTheaterMode.set(true);
   }
 
   /** Comparte la película usando Web Share API o fallback a clipboard */
