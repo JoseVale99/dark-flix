@@ -21,6 +21,7 @@ import { MyListService } from '@services/my-list';
            [lazySrc]="media() | wpImage : 'poster'"
            [alt]="media().title"
            (load)="imageLoaded.set(true)"
+           (error)="onImageError($event)"
            class="w-full h-full object-cover transition-all duration-500 group-hover/card:scale-110 group-hover/card:brightness-50"
            [class.opacity-0]="!imageLoaded()" />
 
@@ -104,5 +105,12 @@ export class MediaCardComponent {
   getRating(): string | null {
     const r = parseFloat(this.media().rating ?? '0');
     return r > 0 ? r.toFixed(1) : null;
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    // SVG inline como data URI — placeholder oscuro con ícono de película
+    img.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Crect width='200' height='300' fill='%231a1a1a'/%3E%3Cpath d='M80 135h40v30H80z' fill='%23333'/%3E%3Ccircle cx='100' cy='120' r='12' fill='%23333'/%3E%3Ctext x='100' y='200' font-family='sans-serif' font-size='11' fill='%23555' text-anchor='middle'%3ESin imagen%3C/text%3E%3C/svg%3E`;
+    this.imageLoaded.set(true);
   }
 }
