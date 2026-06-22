@@ -62,11 +62,11 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
         <div class="absolute top-0 left-0 w-full h-screen overflow-hidden pointer-events-none">
 
           <!-- Capa 1: Fondo escenográfico súper borroso (Proyección de luz) -->
-          <img dfLazyImage [lazySrc]="movie()! | wpImage:'backdrop'" class="absolute inset-0 w-full h-[150%] object-cover z-0 blur-[90px] opacity-40 mix-blend-screen" alt="Atmosphere">
+          <img dfLazyImage [lazySrc]="movie()! | wpImage:'backdrop'" (error)="onImageError($event)" class="absolute inset-0 w-full h-[150%] object-cover z-0 blur-[90px] opacity-40 mix-blend-screen" alt="Atmosphere">
 
           <!-- Capa 2: Backdrop estirado con máscara Tailwind v4 nativa -->
           <div class="absolute top-0 right-0 w-full md:w-[80%] h-[85vh] z-10 flex justify-end opacity-60 md:mask-[linear-gradient(to_right,transparent,black_20%)] mask-[linear-gradient(to_bottom,black_10%,transparent_90%)]">
-            <img dfLazyImage [lazySrc]="movie()! | wpImage:'backdrop'" class="w-full h-full object-cover md:object-right object-top" alt="Backdrop">
+            <img dfLazyImage [lazySrc]="movie()! | wpImage:'backdrop'" (error)="onImageError($event)" class="w-full h-full object-cover md:object-right object-top" alt="Backdrop">
           </div>
 
           <!-- Capa 3: "Humo" (Smoke Fades) usando densidad paralela -->
@@ -98,7 +98,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
           <!-- Left Column: Poster -->
           <div class="hidden md:block w-1/4 shrink-0">
             <div class="aspect-poster rounded-lg shadow-[0_0_40px_rgba(0,0,0,0.9)] overflow-hidden border border-white/5 ring-1 ring-white/10 group">
-              <img dfLazyImage [lazySrc]="movie()! | wpImage:'poster'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Poster">
+              <img dfLazyImage [lazySrc]="movie()! | wpImage:'poster'" (error)="onImageError($event)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Poster">
             </div>
           </div>
 
@@ -393,7 +393,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                             <div class="absolute inset-0 flex flex-col items-center justify-center bg-black cursor-pointer group/play"
                                  (click)="activatePlayer()">
                               @if (movie()?.images?.poster) {
-                              <img [src]="movie() | wpImage" alt="poster"
+                              <img [src]="movie() | wpImage" alt="poster" (error)="onImageError($event)"
                                      class="absolute inset-0 w-full h-full object-cover opacity-40" />
                               }
                               <!-- Botón Play -->
@@ -478,7 +478,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                           {{ embed.server || 'Server ' + ($index + 1) }} ({{ embed.lang }})
                         </button>
                       }
-                      
+
                       <!-- Manual Error Link: siempre visible cuando el player está activo -->
                       @if (playerActivated() && !iframeError()) {
                         <div class="w-full flex justify-end mt-1">
@@ -650,7 +650,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                       @for (rel of relatedState(); track rel._id) {
                         <a [routerLink]="rel | mediaUrl" class="block relative aspect-2/3 rounded-lg overflow-hidden group border border-white/5 bg-df-card">
-                          <img [src]="rel | wpImage:'poster'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                          <img [src]="rel | wpImage:'poster'" (error)="onImageError($event)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                           <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
                             <p class="text-white text-center font-bold text-sm leading-tight border-b-2 border-[#e50914] pb-1">{{ rel.title }}</p>
                           </div>
@@ -723,13 +723,13 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                 <div class="animate-fade-in flex flex-col items-center">
                   @if (trailerUrl()) {
                     <div class="w-full max-w-5xl aspect-video rounded-2xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.7)] border border-white/10 bg-black relative group">
-                      
+
                       @if (!showTrailerPlayer()) {
                         <!-- Poster Overlay View -->
                         <div class="absolute inset-0 z-10 flex items-center justify-center cursor-pointer overflow-hidden" (click)="showTrailerPlayer.set(true)">
                           <!-- Backdrop with blur-in effect -->
-                          <img [src]="movie()! | wpImage:'backdrop'" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-50" alt="Trailer Preview">
-                          
+                          <img [src]="movie()! | wpImage:'backdrop'" (error)="onImageError($event)" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-50" alt="Trailer Preview">
+
                           <!-- Glassmorphism Content -->
                           <div class="absolute inset-0 bg-black/20 flex flex-col items-center justify-center gap-6">
                             <!-- Glowing Play Button -->
@@ -739,7 +739,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                  <path d="M8 5v14l11-7z" />
                                </svg>
                             </div>
-                            
+
                             <div class="text-center">
                               <p class="text-white font-black text-xl md:text-3xl uppercase tracking-tighter drop-shadow-2xl">Reproducir Tráiler</p>
                               <p class="text-white/60 text-xs md:text-sm font-bold uppercase tracking-widest mt-1">Official Teaser &bull; HD</p>
@@ -870,7 +870,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                } @else if (!playerActivated() && !iframeLoading() && !iframeError()) {
                  <div class="absolute inset-0 flex items-center justify-center bg-black cursor-pointer group z-30" (click)="activatePlayer()">
                    @if (movie()?.images?.backdrop) {
-                     <img [src]="movie() | wpImage:'backdrop'" alt="backdrop" class="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm" />
+                     <img [src]="movie() | wpImage:'backdrop'" alt="backdrop" (error)="onImageError($event)" class="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm" />
                    }
                    <div class="relative z-50 w-20 h-20 rounded-full bg-[#e50914] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white ml-2" fill="currentColor" viewBox="0 0 24 24">
@@ -1394,7 +1394,7 @@ export class MovieDetailsComponent {
             this.isTheaterMode.set(false);
             this.showHelperPanel.set(false);
             this.showTrailerPlayer.set(false);
-            
+
             if (typeof window !== 'undefined') {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -1406,5 +1406,10 @@ export class MovieDetailsComponent {
 
   goBack() {
     this.location.back();
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Crect width='200' height='300' fill='%231a1a1a'/%3E%3Cpath d='M80 135h40v30H80z' fill='%23333'/%3E%3Ccircle cx='100' cy='120' r='12' fill='%23333'/%3E%3Ctext x='100' y='200' font-family='sans-serif' font-size='11' fill='%23555' text-anchor='middle'%3ESin imagen%3C/text%3E%3C/svg%3E`;
   }
 }
