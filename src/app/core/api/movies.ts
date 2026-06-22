@@ -1,43 +1,39 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
-import type { CatalogFilters, WpPaginatedResponse, ApiMedia } from '@models';
+import type { CatalogFilters, OrderBy, Order } from '@models';
 import { WpApiService } from '@api/wp-api';
-import { buildFilterParams } from '@api/wp-api.utils';
+import { buildFilterParam } from '@api/wp-api.utils';
+
+/** Respuesta real de la API /wp-api/v1/listing/movies */
+export interface ListingResponse<T> {
+  posts: T[];
+  totalPosts: number;
+  totalPages: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class MoviesService {
   private readonly api = inject(WpApiService);
 
+  /**
+   * GET /wp-api/v1/listing/movies
+   * Params: filter (JSON), page, orderBy, order, postType, postsPerPage
+   */
   getMovies(
     filters: CatalogFilters = {},
-    page = 1
-  ): Observable<WpPaginatedResponse<ApiMedia>> {
-    return this.api
-      .get<ApiMedia[]>('pelicula', {
-        page,
-        per_page: 20,
-        _embed: true,
-        ...buildFilterParams(filters),
-      })
-      .pipe(
-        map((res) => ({
-          data: res.body ?? [],
-          total: Number(res.headers.get('X-WP-Total') ?? 0),
-          totalPages: Number(res.headers.get('X-WP-TotalPages') ?? 0),
-        }))
-      );
-  }
-
-  getMovieBySlug(slug: string): Observable<ApiMedia | undefined> {
-    return this.api
-      .get<ApiMedia[]>('pelicula', { slug, _embed: true })
-      .pipe(map((res) => res.body?.[0]));
-  }
-
-  getMovieById(id: number): Observable<ApiMedia> {
-    return this.api
-      .get<ApiMedia>(`pelicula/${id}`, { _embed: true })
-      .pipe(map((res) => res.body!));
+    page = 1,
+    orderBy: OrderBy = 'latest',
+    order: Order = 'desc',
+    postsPerPage = 18
+  ): Observable<ListingResponse<unknown>> {
+    return this.api.get<ListingResponse<unknown>>('listing/movies', {
+      filter: buildFilterParam(filters),
+      page: String(page),
+      orderBy,
+      order,
+      postType: 'movies',
+      postsPerPage: String(postsPerPage),
+    });
   }
 }

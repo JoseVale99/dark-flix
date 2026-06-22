@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import type { WpTerm } from '@models';
 import { WpApiService } from '@api/wp-api';
@@ -9,24 +9,18 @@ export class TaxonomyService {
   private readonly api = inject(WpApiService);
 
   getGenres(): Observable<WpTerm[]> {
-    return this.fetchTerms('genero', 100);
+    return this.api.get<WpTerm[]>('taxonomy/genres');
+  }
+
+  getCountries(): Observable<WpTerm[]> {
+    return this.api.get<WpTerm[]>('taxonomy/countries');
   }
 
   getYears(): Observable<WpTerm[]> {
-    return this.fetchTerms('anio', 50);
-  }
-
-  getLanguages(): Observable<WpTerm[]> {
-    return this.fetchTerms('idioma', 100);
+    return this.api.get<WpTerm[]>('taxonomy/years');
   }
 
   getQualities(): Observable<WpTerm[]> {
-    return this.fetchTerms('calidad', 100);
-  }
-
-  private fetchTerms(endpoint: string, perPage: number): Observable<WpTerm[]> {
-    return this.api
-      .get<WpTerm[]>(endpoint, { per_page: perPage })
-      .pipe(map((res) => res.body ?? []));
+    return this.api.get<WpTerm[]>('taxonomy/qualities');
   }
 }

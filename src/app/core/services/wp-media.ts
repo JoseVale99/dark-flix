@@ -99,7 +99,7 @@ export class WpMediaService {
   // Obtenemos listado por Tipo y Pagina
   getPagedCatalog(type: string, page: number = 1, filters?: { genres?: (number|string)[], years?: (number|string)[], countries?: (number|string)[] }): Observable<{ posts: ApiMedia[], hasMore: boolean }> {
     let internalEndpoint = 'movies';
-    if (type === 'series') internalEndpoint = 'tvshows';
+    if (type === 'series' || type === 'tvshows') internalEndpoint = 'tvshows';
     if (type === 'animes') internalEndpoint = 'animes';
 
     let url = `${this.baseUrl}/listing/${internalEndpoint}?`;
@@ -115,7 +115,7 @@ export class WpMediaService {
        }
     }
 
-    url += `page=${page}&orderBy=latest&order=desc&postType=${internalEndpoint}&postsPerPage=24`;
+    url += `page=${page}&orderBy=latest&order=desc&postType=${internalEndpoint}&postsPerPage=18`;
 
     return this.http.get<any>(url)
       .pipe(map(res => {

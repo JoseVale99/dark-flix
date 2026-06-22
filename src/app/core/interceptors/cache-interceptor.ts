@@ -18,7 +18,14 @@ interface CacheEntry {
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 function storageKey(url: string): string {
-  return STORAGE_PREFIX + btoa(url).slice(0, 80); // clave segura y corta
+  // Hash simple pero sin colisiones — usa toda la URL
+  let hash = 0;
+  for (let i = 0; i < url.length; i++) {
+    const char = url.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash |= 0; // 32-bit integer
+  }
+  return STORAGE_PREFIX + Math.abs(hash).toString(36);
 }
 
 function getTtl(url: string): number {

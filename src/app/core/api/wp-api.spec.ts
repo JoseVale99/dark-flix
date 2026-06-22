@@ -23,18 +23,14 @@ describe('WpApiService', () => {
 
   /**
    * Propiedad 1: URL siempre construida con BASE correcto
-   * Valida: Requisito 2.1
    */
-  it('Feature: wp-api-core, Property 1 — URL siempre construida con BASE correcto', () => {
+  it('Property 1 — URL siempre construida con BASE correcto', () => {
     fc.assert(
       fc.property(
         fc.stringMatching(/^[a-z][a-z0-9-/]*$/),
         (endpoint) => {
           service.get(endpoint).subscribe();
-
-          const req = httpMock.expectOne((r) =>
-            r.url.startsWith(service.BASE)
-          );
+          const req = httpMock.expectOne((r) => r.url.startsWith(service.BASE));
           expect(req.request.url).toBe(`${service.BASE}/${endpoint}`);
           req.flush([]);
         }
@@ -44,27 +40,13 @@ describe('WpApiService', () => {
   });
 
   /**
-   * Propiedad 2: status='publish' siempre presente
-   * Valida: Requisitos 2.2, 2.3
+   * Propiedad 2: params se pasan correctamente como query string
    */
-  it('Feature: wp-api-core, Property 2 — status=publish siempre presente en los params', () => {
-    fc.assert(
-      fc.property(
-        fc.dictionary(
-          fc.stringMatching(/^[a-z]+$/),
-          fc.oneof(fc.string(), fc.integer().map(String))
-        ),
-        (extraParams) => {
-          service.get('pelicula', extraParams).subscribe();
-
-          const req = httpMock.expectOne((r) =>
-            r.url.startsWith(service.BASE)
-          );
-          expect(req.request.params.get('status')).toBe('publish');
-          req.flush([]);
-        }
-      ),
-      { numRuns: 20 }
-    );
+  it('Property 2 — params se pasan como query string', () => {
+    service.get('listing/movies', { page: '1', orderBy: 'latest' }).subscribe();
+    const req = httpMock.expectOne((r) => r.url.includes('listing/movies'));
+    expect(req.request.params.get('page')).toBe('1');
+    expect(req.request.params.get('orderBy')).toBe('latest');
+    req.flush({});
   });
 });

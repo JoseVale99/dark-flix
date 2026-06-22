@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
-import type { CatalogFilters, WpPaginatedResponse, ApiMedia } from '@models';
+import type { CatalogFilters, OrderBy, Order } from '@models';
 import { WpApiService } from '@api/wp-api';
-import { buildFilterParams } from '@api/wp-api.utils';
+import { buildFilterParam } from '@api/wp-api.utils';
+import type { ListingResponse } from '@api/movies';
 
 @Injectable({ providedIn: 'root' })
 export class AnimeService {
@@ -11,33 +12,18 @@ export class AnimeService {
 
   getAnime(
     filters: CatalogFilters = {},
-    page = 1
-  ): Observable<WpPaginatedResponse<ApiMedia>> {
-    return this.api
-      .get<ApiMedia[]>('anime', {
-        page,
-        per_page: 20,
-        _embed: true,
-        ...buildFilterParams(filters),
-      })
-      .pipe(
-        map((res) => ({
-          data: res.body ?? [],
-          total: Number(res.headers.get('X-WP-Total') ?? 0),
-          totalPages: Number(res.headers.get('X-WP-TotalPages') ?? 0),
-        }))
-      );
-  }
-
-  getAnimeBySlug(slug: string): Observable<ApiMedia | undefined> {
-    return this.api
-      .get<ApiMedia[]>('anime', { slug, _embed: true })
-      .pipe(map((res) => res.body?.[0]));
-  }
-
-  getAnimeById(id: number): Observable<ApiMedia> {
-    return this.api
-      .get<ApiMedia>(`anime/${id}`, { _embed: true })
-      .pipe(map((res) => res.body!));
+    page = 1,
+    orderBy: OrderBy = 'latest',
+    order: Order = 'desc',
+    postsPerPage = 18
+  ): Observable<ListingResponse<unknown>> {
+    return this.api.get<ListingResponse<unknown>>('listing/animes', {
+      filter: buildFilterParam(filters),
+      page: String(page),
+      orderBy,
+      order,
+      postType: 'animes',
+      postsPerPage: String(postsPerPage),
+    });
   }
 }

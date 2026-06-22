@@ -1,44 +1,44 @@
 import * as fc from 'fast-check';
-import { buildFilterParams } from './wp-api.utils';
+import { buildFilterParam } from './wp-api.utils';
 import type { CatalogFilters } from '@models';
 
-/**
- * Propiedad 3: buildFilterParams mapea correctamente los filtros definidos
- * Valida: Requisitos 3.4, 3.5, 3.6, 3.7, 4.4, 5.4
- */
-describe('buildFilterParams', () => {
-  it('Feature: wp-api-core, Property 3 — mapea filtros definidos y omite los undefined', () => {
+describe('buildFilterParam', () => {
+  it('Property 3 — mapea filtros definidos y omite arrays vacíos', () => {
     fc.assert(
       fc.property(
         fc.record<CatalogFilters>({
-          genre:    fc.option(fc.integer({ min: 1, max: 9999 }), { nil: undefined }),
-          year:     fc.option(fc.integer({ min: 1900, max: 2100 }), { nil: undefined }),
-          language: fc.option(fc.integer({ min: 1, max: 9999 }), { nil: undefined }),
-          quality:  fc.option(fc.integer({ min: 1, max: 9999 }), { nil: undefined }),
-          orderBy:  fc.option(fc.constantFrom('date', 'title', 'relevance', 'modified' as const), { nil: undefined }),
-          order:    fc.option(fc.constantFrom('asc', 'desc' as const), { nil: undefined }),
+          genres:    fc.option(fc.array(fc.integer({ min: 1, max: 9999 }), { minLength: 1, maxLength: 3 }), { nil: undefined }),
+          countries: fc.option(fc.array(fc.integer({ min: 1, max: 9999 }), { minLength: 1, maxLength: 3 }), { nil: undefined }),
+          years:     fc.option(fc.array(fc.integer({ min: 1, max: 200 }), { minLength: 1, maxLength: 3 }), { nil: undefined }),
+          qualities: fc.option(fc.array(fc.integer({ min: 1, max: 9999 }), { minLength: 1, maxLength: 3 }), { nil: undefined }),
         }),
         (filters) => {
-          const result = buildFilterParams(filters);
+          const result = buildFilterParam(filters);
+          const parsed = JSON.parse(result);
 
-          // Campos definidos → deben estar presentes con el nombre correcto
-          if (filters.genre    != null) expect(result['genero']).toBe(filters.genre);
-          if (filters.year     != null) expect(result['anio']).toBe(filters.year);
-          if (filters.language != null) expect(result['idioma']).toBe(filters.language);
-          if (filters.quality  != null) expect(result['calidad']).toBe(filters.quality);
-          if (filters.orderBy  != null) expect(result['orderby']).toBe(filters.orderBy);
-          if (filters.order    != null) expect(result['order']).toBe(filters.order);
+          if (filters.genres?.length)    expect(parsed.genres).toEqual(filters.genres);
+          else                           expect(parsed.genres).toBeUndefined();
 
-          // Campos undefined → NO deben estar en el resultado
-          if (filters.genre    == null) expect(result['genero']).toBeUndefined();
-          if (filters.year     == null) expect(result['anio']).toBeUndefined();
-          if (filters.language == null) expect(result['idioma']).toBeUndefined();
-          if (filters.quality  == null) expect(result['calidad']).toBeUndefined();
-          if (filters.orderBy  == null) expect(result['orderby']).toBeUndefined();
-          if (filters.order    == null) expect(result['order']).toBeUndefined();
+          if (filters.countries?.length) expect(parsed.countries).toEqual(filters.countries);
+          else                           expect(parsed.countries).toBeUndefined();
+
+          if (filters.years?.length)     expect(parsed.years).toEqual(filters.years);
+          else                           expect(parsed.years).toBeUndefined();
+
+          if (filters.qualities?.length) expect(parsed.qualities).toEqual(filters.qualities);
+          else                           expect(parsed.qualities).toBeUndefined();
         }
       ),
       { numRuns: 100 }
     );
+  });
+
+  it('retorna {} cuando no hay filtros', () => {
+    expect(buildFilterParam({})).toBe('{}');
+  });
+
+  it('genera JSON válido para filtros reales de hackstore.mx', () => {
+    const result = buildFilterParam({ genres: [855], countries: [910, 728], years: [52] });
+    expect(result).toBe('{"genres":[855],"countries":[910,728],"years":[52]}');
   });
 });

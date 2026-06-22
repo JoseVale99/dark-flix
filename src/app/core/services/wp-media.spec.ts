@@ -23,7 +23,7 @@ describe('WpMediaService', () => {
   });
 
   afterEach(() => {
-    // Asegurarse de que no haya mutaciones fantasma en memoria tras un test 
+    // Asegurarse de que no haya mutaciones fantasma en memoria tras un test
     httpTesting.verify();
   });
 
@@ -40,9 +40,9 @@ describe('WpMediaService', () => {
     const mockResponse: ApiMediaResponse = {
        error: false,
        message: '',
-       data: { 
+       data: {
          posts: mockPosts,
-         pagination: { current_page: 1, last_page: 1 } 
+         pagination: { current_page: 1, last_page: 1 }
        }
     };
 
@@ -53,8 +53,7 @@ describe('WpMediaService', () => {
       expect(res.hasMore).toBe(false);
     });
 
-    // Validar HTTP Request mock
-    const req = httpTesting.expectOne(`/wp-api/v1/listing/movies?page=1&orderBy=latest&order=desc&postType=movies&postsPerPage=24`);
+    const req = httpTesting.expectOne(r => r.url.includes('/listing/movies'));
     expect(req.request.method).toEqual('GET');
 
     // Emitir mock

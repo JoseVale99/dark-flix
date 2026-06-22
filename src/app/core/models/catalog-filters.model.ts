@@ -1,8 +1,14 @@
+/**
+ * Filtros del catálogo — refleja la estructura JSON real de hackstore.mx
+ * La API espera: filter={"genres":[855],"countries":[910,728],"years":[52]}
+ */
 export interface CatalogFilters {
-  genre?: number;
-  year?: number;
-  language?: number;
-  quality?: number;
-  orderBy?: 'date' | 'title' | 'relevance' | 'modified';
-  order?: 'asc' | 'desc';
+  genres?: number[];
+  countries?: number[];
+  years?: number[];
+  qualities?: number[];
 }
+
+export type PostType = 'movies' | 'series' | 'animes';
+export type OrderBy = 'latest' | 'rating' | 'title' | 'year';
+export type Order = 'asc' | 'desc';

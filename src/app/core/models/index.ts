@@ -3,4 +3,4 @@ export type { EpisodeProgress } from './episode-progress.model';
 export type { WpMedia, WpImageSize } from './wp-media.model';
 export type { WpTerm } from './wp-term.model';
 export type { WpPaginatedResponse, WpSearchResult } from './wp-response.model';
-export type { CatalogFilters } from './catalog-filters.model';
+export type { CatalogFilters, PostType, OrderBy, Order } from './catalog-filters.model';

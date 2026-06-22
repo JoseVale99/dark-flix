@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import type { WpSearchResult } from '@models';
 import { WpApiService } from '@api/wp-api';
@@ -10,18 +10,10 @@ export class SearchService {
 
   search(
     query: string,
-    type?: 'pelicula' | 'serie' | 'anime'
+    postType?: 'movies' | 'series' | 'animes'
   ): Observable<WpSearchResult[]> {
-    const params: Record<string, unknown> = {
-      search: query,
-      type: 'post',
-      per_page: 20,
-    };
-
-    if (type != null) params['subtype'] = type;
-
-    return this.api
-      .get<WpSearchResult[]>('search', params)
-      .pipe(map((res) => res.body ?? []));
+    const params: Record<string, string> = { search: query };
+    if (postType) params['postType'] = postType;
+    return this.api.get<WpSearchResult[]>('search', params);
   }
 }
