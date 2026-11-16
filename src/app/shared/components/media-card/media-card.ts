@@ -24,16 +24,16 @@ import { MediaNavigationService } from '@services/media-navigation';
              [alt]="media().title"
              (load)="imageLoaded.set(true)"
              (error)="posterFailed.set(true)"
-             class="w-full h-full object-cover transition-all duration-500 group-hover/card:scale-110 group-hover/card:brightness-50"
+             class="w-full h-full object-cover transition-all duration-500 ease-out group-hover/card:scale-105 group-hover/card:brightness-[0.72]"
              [class.opacity-0]="!imageLoaded()" />
       } @else {
         <df-poster-placeholder class="z-0" />
       }
 
-      <!-- Gradiente base siempre visible desde abajo (título legible) -->
-      <div class="absolute inset-0 z-10 bg-linear-to-t from-black/80 via-black/10 to-transparent
-                  group-hover/card:from-black/95 group-hover/card:via-black/60 group-hover/card:to-black/20
-                  transition-all duration-500">
+      <!-- Scrim inferior: legibilidad del título sin apagar el arte del poster -->
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[68%] bg-linear-to-t
+                  from-black/95 via-black/45 to-transparent
+                  transition-opacity duration-300">
       </div>
 
       <!-- Enlace real: el clic derecho ofrece "Abrir en una pestaña nueva" y
@@ -72,32 +72,51 @@ import { MediaNavigationService } from '@services/media-navigation';
         </button>
       </div>
 
-      <!-- Título siempre visible + Rating + Botón solo en hover desktop -->
-      <div class="absolute bottom-0 left-0 right-0 z-30 p-2.5 flex flex-col gap-1 pointer-events-none">
-        <p class="text-white font-bold text-xs leading-tight line-clamp-2 drop-shadow-lg">
-          {{ media().title }}
-        </p>
-        <!-- Rating badge (solo si hay rating > 0) -->
-        @if (getRating()) {
-          <div class="flex items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-yellow-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-            <span class="text-yellow-400 font-bold text-[10px]">{{ getRating() }}</span>
+      <!-- Pie: título + metadatos; el CTA sube desde abajo al hacer hover en desktop -->
+      <div class="absolute bottom-0 left-0 right-0 z-30 flex flex-col gap-1.5
+                  px-2.5 md:px-3 pt-10 pb-2.5 md:pb-3 pointer-events-none">
+
+        <div class="flex flex-col gap-1.5 transition-transform duration-300 ease-out
+                    md:group-hover/card:-translate-y-10">
+          <p class="text-white font-bold text-[13px] leading-snug line-clamp-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]">
+            {{ media().title }}
+          </p>
+
+          <!-- Metadatos compactos: rating · año -->
+          <div class="flex items-center gap-1.5 text-[10px] font-semibold text-white/55">
+            @if (getRating()) {
+              <span class="inline-flex items-center gap-0.5 text-yellow-400 font-bold">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                {{ getRating() }}
+              </span>
+              @if (getYear()) {
+                <span class="h-1 w-1 rounded-full bg-white/30"></span>
+              }
+            }
+            @if (getYear()) {
+              <span>{{ getYear() }}</span>
+            }
           </div>
-        }
-        <!-- Botones solo visibles en desktop al hacer hover de la TARJETA -->
-        <div class="hidden md:flex gap-1.5 transition-all duration-200
-                    opacity-0 group-hover/card:opacity-100 translate-y-1 group-hover/card:translate-y-0">
-          <a [href]="mediaNavigation.buildUrl(media())"
-             (click)="onCardClick($event)"
-             class="pointer-events-auto flex flex-1 items-center justify-center gap-1.5 bg-df-accent hover:bg-df-accent-dark active:scale-95 text-white text-xs font-bold py-1.5 rounded-md transition-all shadow-lg cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-3 h-3 shrink-0">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-            Ver ahora
-          </a>
         </div>
+
+        <!-- CTA premium (solo desktop, aparece al hacer hover) -->
+        <a [href]="mediaNavigation.buildUrl(media())"
+           (click)="onCardClick($event)"
+           [attr.aria-label]="'Ver ' + media().title"
+           class="pointer-events-auto absolute left-2.5 right-2.5 md:left-3 md:right-3 bottom-2.5 md:bottom-3 hidden md:flex items-center justify-center gap-1.5 py-2 rounded-full
+                  bg-linear-to-b from-df-accent to-df-accent-dark text-white
+                  text-[11px] font-black uppercase tracking-wider
+                  shadow-df-glow transition-all duration-300 cursor-pointer
+                  opacity-0 translate-y-3
+                  group-hover/card:opacity-100 group-hover/card:translate-y-0
+                  hover:from-df-accent-hover hover:to-df-accent-strong hover:shadow-df-glow-lg active:scale-[0.97]">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-3 h-3 shrink-0">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          Ver ahora
+        </a>
       </div>
     </div>
   `,
