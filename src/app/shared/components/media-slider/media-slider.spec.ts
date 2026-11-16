@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MediaSliderComponent } from './media-slider';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { ApiMedia } from '@models';
-import { ComponentRef } from '@angular/core';
+import { ComponentRef, signal } from '@angular/core';
 
 describe('MediaSliderComponent', () => {
   let component: MediaSliderComponent;
@@ -25,9 +25,11 @@ describe('MediaSliderComponent', () => {
     component = fixture.componentInstance;
     componentRef = fixture.componentRef;
     
-    // Configurar Inputs obligatorios
-    componentRef.setInput('title', 'Carrusel Mock');
-    componentRef.setInput('mediaItems', []);
+    // Workaround JIT/Vitest: los inputs signal requeridos no reciben valor con setInput.
+    const titleSignal = signal('Carrusel Mock');
+    const itemsSignal = signal<ApiMedia[]>([]);
+    Object.defineProperty(component, 'title', { get: () => titleSignal });
+    Object.defineProperty(component, 'mediaItems', { get: () => itemsSignal });
 
     fixture.detectChanges();
   });

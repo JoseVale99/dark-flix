@@ -7,6 +7,7 @@ import { BadgeComponent } from '@shared/components/badge/badge';
 import { PosterPlaceholderComponent } from '@shared/components/poster-placeholder/poster-placeholder';
 import { MyListService } from '@services/my-list';
 import { MediaNavigationService } from '@services/media-navigation';
+import { I18nService } from '@core/i18n/i18n.service';
 
 @Component({
   selector: 'df-media-card',
@@ -40,7 +41,7 @@ import { MediaNavigationService } from '@services/media-navigation';
            Ctrl/Cmd/Clic central también funcionan de forma nativa -->
       <a class="absolute inset-0 z-20 cursor-pointer"
          [href]="mediaNavigation.buildUrl(media())"
-         [attr.aria-label]="'Abrir ' + media().title"
+         [attr.aria-label]="i18n.t('card.openAria', { title: media().title })"
          (click)="onCardClick($event)"></a>
 
       <!-- Metadata Badges -->
@@ -57,7 +58,7 @@ import { MediaNavigationService } from '@services/media-navigation';
       <div class="absolute top-2 right-2 z-40 flex gap-1">
         <!-- Quick Favorite Button -->
         <button (click)="$event.stopPropagation(); myListService.toggleList(media())"
-              title="Añadir/Quitar de Mi Lista"
+              [title]="i18n.t('card.toggleList')"
               class="group/fav p-1.5 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 transition-all shadow-md backdrop-blur cursor-pointer
                      opacity-100 md:opacity-0 md:group-hover/card:opacity-100">
         @if (myListService.isInList(media()._id)) {
@@ -104,7 +105,7 @@ import { MediaNavigationService } from '@services/media-navigation';
         <!-- CTA premium (solo desktop, aparece al hacer hover) -->
         <a [href]="mediaNavigation.buildUrl(media())"
            (click)="onCardClick($event)"
-           [attr.aria-label]="'Ver ' + media().title"
+           [attr.aria-label]="i18n.t('card.watchAria', { title: media().title })"
            class="pointer-events-auto absolute left-2.5 right-2.5 md:left-3 md:right-3 bottom-2.5 md:bottom-3 hidden md:flex items-center justify-center gap-1.5 py-2 rounded-full
                   bg-linear-to-b from-df-accent to-df-accent-dark text-white
                   text-[11px] font-black uppercase tracking-wider
@@ -115,7 +116,7 @@ import { MediaNavigationService } from '@services/media-navigation';
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-3 h-3 shrink-0">
             <path d="M8 5v14l11-7z"/>
           </svg>
-          Ver ahora
+          {{ i18n.t('card.watchNow') }}
         </a>
       </div>
     </div>
@@ -132,6 +133,7 @@ export class MediaCardComponent {
   media = input.required<ApiMedia>();
   selected = output<ApiMedia>();
 
+  public readonly i18n = inject(I18nService);
   public myListService = inject(MyListService);
   public mediaNavigation = inject(MediaNavigationService);
 

@@ -9,6 +9,7 @@ import { WpMediaService } from '@services/wp-media';
 import { MediaGridComponent } from '@shared/components/media-grid/media-grid';
 import { ApiMedia } from '@models';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
+import { I18nService } from '@core/i18n/i18n.service';
 
 interface CatalogQuery {
   type: string;
@@ -32,20 +33,23 @@ interface CatalogQuery {
 
         <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
           <df-filter-dropdown
-            title="Género"
-            searchPlaceholder="Buscar género..."
+            kind="genre"
+            [title]="i18n.t('catalog.genre')"
+            [searchPlaceholder]="i18n.t('catalog.searchGenre')"
             [options]="genres"
             [(selected)]="selectedGenres" />
 
           <df-filter-dropdown
-            title="País"
-            searchPlaceholder="Buscar país..."
+            kind="country"
+            [title]="i18n.t('catalog.country')"
+            [searchPlaceholder]="i18n.t('catalog.searchCountry')"
             [options]="countries"
             [(selected)]="selectedCountries" />
 
           <df-filter-dropdown
-            title="Año"
-            searchPlaceholder="Buscar año..."
+            kind="year"
+            [title]="i18n.t('catalog.year')"
+            [searchPlaceholder]="i18n.t('catalog.searchYear')"
             [options]="years"
             [(selected)]="selectedYears" />
         </div>
@@ -74,9 +78,9 @@ interface CatalogQuery {
                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                    </svg>
-                   <span>CARGANDO...</span>
+                   <span>{{ i18n.t('catalog.loading') }}</span>
                  } @else {
-                   <span>CARGAR MÁS</span>
+                   <span>{{ i18n.t('catalog.loadMore') }}</span>
                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-4 h-4 group-hover:translate-y-1 transition-transform duration-300">
                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                    </svg>
@@ -84,7 +88,7 @@ interface CatalogQuery {
                </button>
             } @else {
                <div class="py-4 px-10 bg-df-surface border border-white/10 rounded-full shadow-2xl">
-                 <p class="text-gray-400 text-sm font-semibold tracking-wider uppercase text-center">Has llegado al final del catálogo</p>
+                 <p class="text-gray-400 text-sm font-semibold tracking-wider uppercase text-center">{{ i18n.t('catalog.end') }}</p>
                </div>
             }
           </div>
@@ -99,6 +103,7 @@ export class CatalogViewComponent {
   private wpService = inject(WpMediaService);
   private mediaUrlPipe = inject(MediaUrlPipe);
   private destroyRef = inject(DestroyRef);
+  public readonly i18n = inject(I18nService);
 
   genres = CATALOG_GENRES;
   countries = CATALOG_COUNTRIES;
@@ -205,10 +210,10 @@ export class CatalogViewComponent {
 
   pageTitle = computed(() => {
     const t = this.currentType();
-    if (t === 'movies' || t === 'peliculas') return 'Películas de Estreno';
-    if (t === 'tvshows' || t === 'series') return 'Series de TV';
-    if (t === 'animes') return 'Animes Exclusivos';
-    return 'Catálogo en Línea';
+    if (t === 'movies' || t === 'peliculas') return this.i18n.t('catalog.titleMovies');
+    if (t === 'tvshows' || t === 'series') return this.i18n.t('catalog.titleSeries');
+    if (t === 'animes') return this.i18n.t('catalog.titleAnimes');
+    return this.i18n.t('catalog.titleDefault');
   });
 
   loadMore() {

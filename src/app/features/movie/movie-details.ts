@@ -17,6 +17,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
+import { I18nService } from '@core/i18n/i18n.service';
 
 @Component({
   selector: 'df-movie-details',
@@ -53,9 +54,9 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
           <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <p class="font-semibold text-xl">Archivo dañado o no encontrado</p>
+          <p class="font-semibold text-xl">{{ i18n.t('details.damaged') }}</p>
           <button (click)="goBack()" class="mt-6 text-df-accent hover:text-white transition-colors underline cursor-pointer">
-            Regresar al Inicio
+            {{ i18n.t('details.backHome') }}
           </button>
         </div>
       } @else if (movie()) {
@@ -112,7 +113,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
             <div class="flex flex-wrap gap-2 mb-4">
               @if (getQuality()) { <df-badge [text]="getQuality()!" variant="accent" /> }
               @if (getYear()) { <df-badge [text]="getYear()!" variant="default" /> }
-              <df-badge text="Cinematic" variant="default" />
+              <df-badge [text]="i18n.t('details.cinematic')" variant="default" />
               @if (movie()?.runtime && movie()?.runtime !== '0.0') {
                 <df-badge [text]="movie()!.runtime + ' min'" variant="default" />
               }
@@ -149,7 +150,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
                 </svg>
-                VER AHORA
+                {{ i18n.t('details.watchNow') }}
               </button>
 
               <button (click)="myListService.toggleList(movie()!)"
@@ -158,25 +159,25 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-df-accent" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                   </svg>
-                  En Mi Lista
+                  {{ i18n.t('details.inMyList') }}
                 } @else {
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
-                  Mi Lista
+                  {{ i18n.t('details.myList') }}
                 }
               </button>
 
               <!-- Botón Compartir (Web Share API) -->
               <button (click)="shareMovie()"
-                      title="Compartir"
+                      [title]="i18n.t('details.share')"
                       class="bg-black/40 hover:bg-black/60 border border-white/20 text-white font-bold py-3 px-5 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-xl cursor-pointer relative">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
                 @if (shareCopied()) {
                   <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap animate-fade-in">
-                    ¡Copiado!
+                    {{ i18n.t('details.copied') }}
                   </span>
                 }
               </button>
@@ -187,7 +188,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-df-accent" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
                   </svg>
-                  TRÁILER
+                  {{ i18n.t('details.trailer') }}
                 </button>
               }
             </div>
@@ -208,7 +209,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                       class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                       [class.text-gray-400]="activeTab() !== 'EPISODIOS'"
                       [class.border-transparent]="activeTab() !== 'EPISODIOS'">
-                EPISODIOS
+                {{ i18n.t('details.episodes') }}
               </button>
             }
             @if (movie()?.type === 'movies' || selectedEpisodeId()) {
@@ -218,7 +219,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                       class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                       [class.text-gray-400]="activeTab() !== 'REPRODUCIR'"
                       [class.border-transparent]="activeTab() !== 'REPRODUCIR'">
-                {{ (movie()?.type === 'tvshows' || movie()?.type === 'animes') ? 'VER EPISODIO' : 'REPRODUCTOR' }}
+                {{ (movie()?.type === 'tvshows' || movie()?.type === 'animes') ? i18n.t('details.watchEpisode') : i18n.t('details.player') }}
               </button>
             }
             <button (click)="activeTab.set('REPARTO')"
@@ -227,7 +228,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                     [class.text-gray-400]="activeTab() !== 'REPARTO'"
                     [class.border-transparent]="activeTab() !== 'REPARTO'">
-              REPARTO
+              {{ i18n.t('details.cast') }}
             </button>
             <button (click)="activeTab.set('GALERÍA')"
                     [class.text-white]="activeTab() === 'GALERÍA'"
@@ -235,7 +236,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                     [class.text-gray-400]="activeTab() !== 'GALERÍA'"
                     [class.border-transparent]="activeTab() !== 'GALERÍA'">
-              GALERÍA
+              {{ i18n.t('details.gallery') }}
             </button>
             <button (click)="activeTab.set('SIMILARES')"
                     [class.text-white]="activeTab() === 'SIMILARES'"
@@ -243,7 +244,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                     [class.text-gray-400]="activeTab() !== 'SIMILARES'"
                     [class.border-transparent]="activeTab() !== 'SIMILARES'">
-              SIMILARES
+              {{ i18n.t('details.similar') }}
             </button>
             @if (movie()?.trailer) {
               <button (click)="activeTab.set('TRAILER')"
@@ -252,7 +253,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                       class="shrink-0 snap-start whitespace-nowrap pb-3 font-bold text-xs md:text-sm uppercase tracking-wider transition-all border-b-2 hover:text-white cursor-pointer"
                       [class.text-gray-400]="activeTab() !== 'TRAILER'"
                       [class.border-transparent]="activeTab() !== 'TRAILER'">
-                TRAILER
+                {{ i18n.t('details.trailerTab') }}
               </button>
             }
           </div>
@@ -265,16 +266,16 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                 <div class="animate-fade-in max-w-5xl mx-auto flex flex-col gap-6">
                   <!-- Control de Temporada -->
                   <div class="flex justify-between items-center bg-df-elevated border border-white/5 py-3 px-6 rounded-xl">
-                    <h2 class="text-white font-bold text-lg md:text-xl">Selecciona un Episodio</h2>
+                    <h2 class="text-white font-bold text-lg md:text-xl">{{ i18n.t('details.selectEpisode') }}</h2>
                     <div class="relative min-w-40">
                       <select [ngModel]="selectedSeason()" (ngModelChange)="selectedSeason.set($event)"
                               class="w-full bg-black border border-white/20 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:border-df-accent appearance-none cursor-pointer hover:bg-white/5 transition-colors">
                         @if (episodesResponse()?.seasons) {
                           @for (s of episodesResponse()!.seasons; track s) {
-                            <option [value]="s">Temporada {{ s }}</option>
+                            <option [value]="s">{{ i18n.t('details.season', { n: s }) }}</option>
                           }
                         } @else {
-                          <option value="1">Temporada 1</option>
+                          <option value="1">{{ i18n.t('details.season', { n: 1 }) }}</option>
                         }
                       </select>
                       <!-- Custom caret icon -->
@@ -286,7 +287,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
 
                   <!-- Lista de Episodios -->
                   @if (!episodesResponse()?.posts) {
-                    <div class="text-center py-10 text-gray-500 font-bold animate-pulse">Cargando episodios...</div>
+                    <div class="text-center py-10 text-gray-500 font-bold animate-pulse">{{ i18n.t('details.loadingEpisodes') }}</div>
                   } @else {
 
                     <!-- Botón Continuar Viendo -->
@@ -296,12 +297,12 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                           <path d="M8 5v14l11-7z"/>
                         </svg>
                         <div class="flex-1 min-w-0">
-                          <p class="text-white font-bold text-sm truncate">Continuar viendo</p>
+                          <p class="text-white font-bold text-sm truncate">{{ i18n.t('details.continueWatching') }}</p>
                           <p class="text-gray-400 text-xs truncate">T{{ lastWatchedEpisode()!.seasonNumber }} · E{{ lastWatchedEpisode()!.episodeNumber }} — {{ lastWatchedEpisode()!.title }}</p>
                         </div>
                         <button (click)="resumeLastEpisode()"
                                 class="shrink-0 bg-df-accent hover:bg-df-accent-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer active:scale-95">
-                          Reanudar
+                          {{ i18n.t('details.resume') }}
                         </button>
                       </div>
                     }
@@ -329,11 +330,11 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                   </svg>
-                                  Visto
+                                  {{ i18n.t('details.watched') }}
                                 </span>
                               }
                             </div>
-                            <p class="text-gray-500 text-xs md:text-sm font-medium mt-1">Temporada {{ ep.season_number }} • Episodio {{ ep.episode_number }}</p>
+                            <p class="text-gray-500 text-xs md:text-sm font-medium mt-1">{{ i18n.t('details.seasonEpisode', { s: ep.season_number, e: ep.episode_number }) }}</p>
 
                             <!-- Barra de progreso (si hay progreso parcial) -->
                             @if (!episodeProgress.isWatched(movie()!._id, ep._id) && episodeProgress.getProgressPercent(movie()!._id, ep._id) > 0) {
@@ -370,7 +371,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                 <div class="animate-fade-in flex flex-col gap-4">
                   @if (playersState().embeds.length === 0) {
                     <div class="text-gray-400 min-h-75 flex items-center justify-center border border-white/5 rounded-xl bg-black/20">
-                      Buscando enlaces de reproducción...
+                      {{ i18n.t('details.searchingLinks') }}
                     </div>
                   } @else {
                     <!-- Iframe Container (solo visible cuando NO está en theater mode) -->
@@ -384,9 +385,9 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                 <path d="M8 5v14l11-7z"/>
                               </svg>
                             </div>
-                            <p class="text-df-accent font-bold text-sm">Reproduciendo en Modo Cine</p>
+                            <p class="text-df-accent font-bold text-sm">{{ i18n.t('details.theater') }}</p>
                             <button (click)="isTheaterMode.set(false)" class="text-xs text-gray-400 hover:text-white underline cursor-pointer transition-colors">
-                              Volver al modo normal
+                              {{ i18n.t('details.normalMode') }}
                             </button>
                           </div>
                         } @else {
@@ -407,7 +408,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                     <path d="M8 5v14l11-7z"/>
                                   </svg>
                                 </div>
-                                <span class="text-white font-bold text-sm tracking-wider uppercase">Reproducir</span>
+                                <span class="text-white font-bold text-sm tracking-wider uppercase">{{ i18n.t('details.play') }}</span>
                                 @if (currentEmbed()) {
                                   <span class="text-gray-400 text-xs">{{ currentEmbed()!.server }} &bull; {{ currentEmbed()!.lang }}</span>
                                 }
@@ -419,7 +420,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                               <div class="absolute inset-0 flex items-center justify-center bg-black z-10">
                                 <div class="flex flex-col items-center gap-3">
                                   <div class="w-12 h-12 border-4 border-df-accent/30 border-t-df-accent rounded-full animate-spin"></div>
-                                  <p class="text-gray-400 text-sm font-medium">Cargando video...</p>
+                                  <p class="text-gray-400 text-sm font-medium">{{ i18n.t('details.loadingVideo') }}</p>
                                 </div>
                               </div>
                             }
@@ -432,17 +433,17 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
                                   </div>
-                                  <h3 class="text-white font-bold text-lg mb-2">Error al cargar el video</h3>
-                                  <p class="text-gray-400 text-sm mb-4">Este servidor no está disponible.</p>
+                                  <h3 class="text-white font-bold text-lg mb-2">{{ i18n.t('details.videoError') }}</h3>
+                                  <p class="text-gray-400 text-sm mb-4">{{ i18n.t('details.serverUnavailable') }}</p>
                                   <div class="flex flex-col gap-2">
                                     <button (click)="tryNextServer()" class="bg-df-accent hover:bg-df-accent-dark text-white font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
                                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                       </svg>
-                                      {{ hasMoreServers() ? 'Probar otro servidor' : 'Reintentar carga' }}
+                                      {{ hasMoreServers() ? i18n.t('details.tryOtherServer') : i18n.t('details.retry') }}
                                     </button>
                                     <a [href]="hackstorePostUrl()" target="_blank" class="bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
-                                      Ver página original
+                                      {{ i18n.t('details.viewOriginal') }}
                                     </a>
                                   </div>
                                 </div>
@@ -478,7 +479,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                 [class.text-gray-400]="selectedEmbedIndex() !== $index"
                                 [class.border-white/10]="selectedEmbedIndex() !== $index"
                                 class="shrink-0 whitespace-nowrap px-5 py-2 rounded-xl text-[10px] md:text-sm font-black transition-all border cursor-pointer hover:bg-white/10 active:scale-95 shadow-lg">
-                          {{ embed.server || 'Server ' + ($index + 1) }} ({{ embed.lang }})
+                          {{ embed.server || i18n.t('details.serverFallback', { n: $index + 1 }) }} ({{ embed.lang }})
                         </button>
                       }
 
@@ -489,7 +490,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
-                            ¿No carga? Toca aquí
+                            {{ i18n.t('details.notLoading') }}
                           </button>
                         </div>
                       }
@@ -502,7 +503,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                 <div class="animate-fade-in max-w-5xl mx-auto flex flex-col gap-3">
                   @if (groupedDownloads().length === 0) {
                     <div class="text-gray-400 min-h-30 flex items-center justify-center bg-white/5 rounded-xl border border-white/5">
-                      Verificando descargas disponibles...
+                      {{ i18n.t('details.checkingDownloads') }}
                     </div>
                   } @else {
                     @for (group of groupedDownloads(); track group.quality) {
@@ -529,24 +530,24 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                              <!-- Formato -->
                              <div class="bg-black/30 rounded-lg py-2 px-4 border border-white/5 min-w-25">
                                 <p class="text-white font-medium text-sm">{{ group.format }}</p>
-                                <p class="text-gray-500 text-xs">Formato</p>
+                                <p class="text-gray-500 text-xs">{{ i18n.t('details.format') }}</p>
                              </div>
                              <!-- Tamaño -->
                              <div class="bg-black/30 rounded-lg py-2 px-4 border border-white/5 min-w-25">
                                 <p class="text-white font-medium text-sm">{{ group.size }}</p>
-                                <p class="text-gray-500 text-xs">Tamaño</p>
+                                <p class="text-gray-500 text-xs">{{ i18n.t('details.size') }}</p>
                              </div>
                              <!-- Resolución -->
                              <div class="bg-black/30 rounded-lg py-2 px-4 border border-white/5 min-w-35">
                                 <p class="text-white font-medium text-sm">{{ group.resolution }}</p>
-                                <p class="text-gray-500 text-xs">Resolución</p>
+                                <p class="text-gray-500 text-xs">{{ i18n.t('details.resolution') }}</p>
                              </div>
                           </div>
 
                           <!-- Derecha: Botón Dropdown (Rojo estilo DarkFlix) -->
                           <div class="w-full md:w-auto mt-4 md:mt-0 flex justify-end">
                             <div class="bg-df-accent-dark hover:bg-df-accent text-white px-6 py-3 rounded text-sm md:text-base font-bold flex items-center justify-between min-w-45 transition-colors gap-4">
-                              <span>Descargar</span>
+                              <span>{{ i18n.t('details.download') }}</span>
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-open:rotate-180 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                               </svg>
@@ -596,7 +597,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-yellow-600/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                       </svg>
-                                      Enlace Acortado Protegido
+                                      {{ i18n.t('details.protectedLink') }}
                                     </span>
                                   </div>
                                </div>
@@ -623,7 +624,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
               @case ('REPARTO') {
                 <div class="animate-fade-in">
                   @if (castState().length === 0) {
-                    <div class="text-gray-400">Cargando reparto...</div>
+                    <div class="text-gray-400">{{ i18n.t('details.loadingCast') }}</div>
                   } @else {
                     <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-x-4 gap-y-8 pb-6 justify-items-center">
                       @for (actor of castState(); track actor.term_id) {
@@ -648,7 +649,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
               @case ('SIMILARES') {
                 <div class="animate-fade-in">
                   @if (relatedState().length === 0) {
-                    <div class="text-gray-400">Buscando títulos relacionados...</div>
+                    <div class="text-gray-400">{{ i18n.t('details.searchingRelated') }}</div>
                   } @else {
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                       @for (rel of relatedState(); track rel._id) {
@@ -667,7 +668,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
               @case ('GALERÍA') {
                 <div class="animate-fade-in">
                   @if (galleryImages().length === 0) {
-                    <div class="text-gray-400 py-8">Esta película no tiene galería de imágenes disponible.</div>
+                    <div class="text-gray-400 py-8">{{ i18n.t('details.noGallery') }}</div>
                   } @else {
                     <!-- Grid of thumbnails -->
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -744,8 +745,8 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                             </div>
 
                             <div class="text-center">
-                              <p class="text-white font-black text-xl md:text-3xl uppercase tracking-tighter drop-shadow-2xl">Reproducir Tráiler</p>
-                              <p class="text-white/60 text-xs md:text-sm font-bold uppercase tracking-widest mt-1">Official Teaser &bull; HD</p>
+                              <p class="text-white font-black text-xl md:text-3xl uppercase tracking-tighter drop-shadow-2xl">{{ i18n.t('details.playTrailer') }}</p>
+                              <p class="text-white/60 text-xs md:text-sm font-bold uppercase tracking-widest mt-1">{{ i18n.t('details.officialTeaser') }}</p>
                             </div>
                           </div>
                         </div>
@@ -766,14 +767,14 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
 
                     <div class="mt-10 flex flex-col md:flex-row items-center justify-between w-full max-w-5xl gap-6">
                       <div class="text-center md:text-left">
-                        <h3 class="text-2xl md:text-3xl font-black text-white mb-2 uppercase tracking-tight">Tráiler Oficial</h3>
+                        <h3 class="text-2xl md:text-3xl font-black text-white mb-2 uppercase tracking-tight">{{ i18n.t('details.officialTrailer') }}</h3>
                         <p class="text-gray-400 max-w-2xl text-sm md:text-base font-medium">
-                          Disfruta de un vistazo exclusivo a <span class="text-white font-bold">{{ movie()?.title }}</span>.
-                          Prepárate para la experiencia completa en DarkFlix.
+                          {{ i18n.t('details.trailerEnjoy') }} <span class="text-white font-bold">{{ movie()?.title }}</span>.
+                          {{ i18n.t('details.trailerReady') }}
                         </p>
                       </div>
                       <button (click)="playMedia()" class="shrink-0 bg-white text-black hover:bg-df-accent hover:text-white font-black py-3 px-8 rounded-full transition-all active:scale-95 uppercase tracking-widest text-xs cursor-pointer shadow-2xl">
-                        Ver Película Ahora
+                        {{ i18n.t('details.watchMovieNow') }}
                       </button>
                     </div>
                   } @else {
@@ -783,7 +784,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
                       </div>
-                      <p class="font-bold tracking-wide uppercase text-xs">El tráiler no está disponible temporalmente</p>
+                      <p class="font-bold tracking-wide uppercase text-xs">{{ i18n.t('details.trailerUnavailable') }}</p>
                     </div>
                   }
                 </div>
@@ -794,7 +795,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
       } @placeholder {
         <div class="max-w-7xl mx-auto px-6 pb-24 flex flex-col items-center justify-center min-h-64 text-white/20">
           <div class="w-10 h-10 border-4 border-white/5 border-t-df-accent rounded-full animate-spin mb-4"></div>
-          <p class="text-xs font-bold uppercase tracking-widest animate-pulse">Cargando detalles...</p>
+          <p class="text-xs font-bold uppercase tracking-widest animate-pulse">{{ i18n.t('details.loadingDetails') }}</p>
         </div>
       }
 
@@ -812,7 +813,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                [class.pointer-events-none]="!showControls()">
             <div class="flex items-center justify-between max-w-7xl mx-auto">
               <h2 class="text-white font-bold tracking-wide text-xs md:text-lg uppercase drop-shadow-md truncate flex-1 mr-4">
-                {{ movie()?.title }} <span class="mx-1 text-df-accent">•</span> <span class="font-normal text-gray-400 capitalize">{{ currentEmbed()?.server || 'Servidor' }}</span>
+                {{ movie()?.title }} <span class="mx-1 text-df-accent">•</span> <span class="font-normal text-gray-400 capitalize">{{ currentEmbed()?.server || i18n.t('details.server') }}</span>
               </h2>
               <button (click)="isTheaterMode.set(false)" class="text-white bg-white/10 hover:bg-df-accent border border-white/10 rounded-full p-2.5 transition-all backdrop-blur-md cursor-pointer shadow-2xl shrink-0 active:scale-90">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-7 md:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -830,7 +831,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                  <div class="absolute inset-0 flex items-center justify-center bg-black z-10">
                    <div class="flex flex-col items-center gap-3">
                      <div class="w-12 h-12 border-4 border-df-accent/30 border-t-df-accent rounded-full animate-spin"></div>
-                     <p class="text-gray-400 text-sm font-medium">Cargando video...</p>
+                     <p class="text-gray-400 text-sm font-medium">{{ i18n.t('details.loadingVideo') }}</p>
                    </div>
                  </div>
                }
@@ -843,22 +844,22 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                        </svg>
                      </div>
-                     <h3 class="text-white font-bold text-lg mb-2">Error al cargar el video</h3>
-                     <p class="text-gray-400 text-sm mb-4">Este servidor no está disponible. Prueba con otro servidor o reporta el error.</p>
+                     <h3 class="text-white font-bold text-lg mb-2">{{ i18n.t('details.videoError') }}</h3>
+                     <p class="text-gray-400 text-sm mb-4">{{ i18n.t('details.serverUnavailableLong') }}</p>
                      <div class="flex flex-col gap-2">
                        @if (hasMoreServers()) {
                          <button (click)="tryNextServer()" class="bg-df-accent hover:bg-df-accent-dark text-white font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                            </svg>
-                           Probar otro servidor
+                           {{ i18n.t('details.tryOtherServer') }}
                          </button>
                        }
                        <a [href]="hackstorePostUrl()" target="_blank" class="bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                          </svg>
-                         Ver página original
+                         {{ i18n.t('details.viewOriginal') }}
                        </a>
                      </div>
                    </div>
@@ -903,13 +904,13 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    ¿Problemas con el video?
+                    {{ i18n.t('details.problemsVideo') }}
                   </button>
                 } @else {
                   <!-- Panel de ayuda expandido -->
                   <div class="bg-black/95 backdrop-blur-xl rounded-2xl border border-white/10 p-4 shadow-2xl w-64 animate-fade-in border-b-4 border-b-df-accent">
                     <div class="flex items-center justify-between mb-3">
-                      <p class="text-white font-bold text-sm">¿Problemas para ver?</p>
+                      <p class="text-white font-bold text-sm">{{ i18n.t('details.problemsWatching') }}</p>
                       <button (click)="showHelperPanel.set(false)" class="text-gray-400 hover:text-white cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -923,7 +924,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
-                          Probar otro servidor
+                          {{ i18n.t('details.tryOtherServer') }}
                         </button>
                       }
                       <a [href]="hackstorePostUrl()" target="_blank"
@@ -931,7 +932,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                         </svg>
-                        Ver página original
+                        {{ i18n.t('details.viewOriginal') }}
                       </a>
                     </div>
                   </div>
@@ -944,7 +945,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                    [class.translate-y-full]="!showControls()"
                    [class.pointer-events-none]="!showControls()">
                 <div class="bg-zinc-900/90 backdrop-blur-xl border border-white/10 px-4 py-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-3 overflow-hidden">
-                  <span class="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-widest border-r border-white/10 pr-3 mr-1">Servidores</span>
+                  <span class="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-widest border-r border-white/10 pr-3 mr-1">{{ i18n.t('details.servers') }}</span>
               </div>
                   <div class="flex overflow-x-auto hide-scrollbar gap-2 max-w-[80vw] md:max-w-4xl snap-x">
                     @for (embed of playersState().embeds; track $index) {
@@ -958,7 +959,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                               [class.text-gray-400]="selectedEmbedIndex() !== $index"
                                [class.border-white/10]="selectedEmbedIndex() !== $index"
                               class="shrink-0 snap-start whitespace-nowrap px-4 py-2 rounded-xl text-[10px] md:text-xs font-black transition-all border cursor-pointer hover:bg-white/10 active:scale-95">
-                        {{ embed.server || 'Server ' + ($index + 1) }} ({{ embed.lang }})
+                        {{ embed.server || i18n.t('details.serverFallback', { n: $index + 1 }) }} ({{ embed.lang }})
                       </button>
                     }
                   </div>
@@ -976,6 +977,7 @@ export class MovieDetailsComponent {
   typeSlug = input.required<string>();
   slug = input.required<string>();
 
+  public readonly i18n = inject(I18nService);
   private wpService = inject(WpMediaService);
   private location = inject(Location);
   public myListService = inject(MyListService);
@@ -1105,7 +1107,7 @@ export class MovieDetailsComponent {
     const mv = this.movie();
     if (!mv) return;
     const url = window.location.href;
-    const text = `${mv.title} — mírala en DarkFlix`;
+    const text = this.i18n.t('details.shareText', { title: mv.title });
     if (navigator.share) {
       navigator.share({ title: mv.title, text, url }).catch(() => {});
     } else {
@@ -1374,8 +1376,8 @@ export class MovieDetailsComponent {
       const currentMovie = this.movie();
       if (currentMovie) {
         // Actualizar META/SEO nativo
-        this.titleService.setTitle(`Ver ${currentMovie.title} | DarkFlix`);
-        this.metaService.updateTag({ name: 'description', content: currentMovie.overview || 'Disfruta de este título en DarkFlix.' });
+        this.titleService.setTitle(this.i18n.t('details.documentTitle', { title: currentMovie.title }));
+        this.metaService.updateTag({ name: 'description', content: currentMovie.overview || this.i18n.t('details.metaDescription') });
         this.metaService.updateTag({ property: 'og:title', content: currentMovie.title });
         this.metaService.updateTag({ property: 'og:description', content: currentMovie.overview || '' });
         if (currentMovie.images?.poster) {

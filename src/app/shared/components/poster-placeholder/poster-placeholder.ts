@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { I18nService } from '@core/i18n/i18n.service';
 
 /**
  * Portada genérica para contenidos sin imagen (o cuya imagen falló).
@@ -38,7 +39,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       <p
         class="relative mt-3 px-4 text-center text-[9px] md:text-[10px] font-bold uppercase tracking-[0.22em] text-white/35"
       >
-        Sin portada
+        {{ i18n.t('poster.noPoster') }}
       </p>
 
       @if (title()) {
@@ -52,6 +53,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   `,
 })
 export class PosterPlaceholderComponent {
+  public readonly i18n = inject(I18nService);
   /** Título opcional mostrado dentro del placeholder. */
   title = input<string>('');
 }

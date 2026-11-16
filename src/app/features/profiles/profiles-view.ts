@@ -3,11 +3,13 @@ import { Router } from '@angular/router';
 import { ProfileService, DfProfile } from '@services/profile';
 import { PROFILE_ICON_PATHS, PROFILE_ICON_KEYS, ProfileIconKey } from '@core/models/profile-icons';
 import { FormsModule } from '@angular/forms';
+import { I18nService } from '@core/i18n/i18n.service';
+import { LanguageSwitcherComponent } from '@shared/components/language-switcher/language-switcher';
 
 @Component({
   selector: 'df-profiles-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
+  imports: [FormsModule, LanguageSwitcherComponent],
   template: `
     <div class="min-h-screen bg-df-surface flex flex-col items-center justify-center px-4 relative overflow-hidden">
       <!-- Background atmosphere -->
@@ -16,14 +18,15 @@ import { FormsModule } from '@angular/forms';
       <!-- Header: Logo PNG -->
       <div class="absolute top-0 left-0 w-full p-5 md:p-8 flex items-center justify-between z-200">
         <img src="images/logo/dark-flix.png" class="h-8 md:h-12 object-contain" alt="DarkFlix">
+        <df-language-switcher />
       </div>
 
       @if (!editMode()) {
         <!-- ── SELECCIÓN DE PERFIL ── -->
         <div class="flex flex-col items-center gap-12 animate-fade-in mt-12">
           <div class="text-center">
-            <h1 class="text-white text-3xl md:text-5xl font-black tracking-tight mb-2">¿Quién está viendo?</h1>
-            <p class="text-gray-500 text-sm md:text-base">Selecciona tu perfil para continuar</p>
+            <h1 class="text-white text-3xl md:text-5xl font-black tracking-tight mb-2">{{ i18n.t('profiles.who') }}</h1>
+            <p class="text-gray-500 text-sm md:text-base">{{ i18n.t('profiles.select') }}</p>
           </div>
 
           <div class="flex flex-wrap justify-center gap-6 md:gap-10 max-w-2xl">
@@ -64,7 +67,7 @@ import { FormsModule } from '@angular/forms';
                     <path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z" />
                   </svg>
                 </div>
-                <span class="text-gray-500 group-hover:text-white font-semibold text-sm transition-colors">Añadir perfil</span>
+                <span class="text-gray-500 group-hover:text-white font-semibold text-sm transition-colors">{{ i18n.t('profiles.add') }}</span>
               </button>
             }
           </div>
@@ -72,14 +75,14 @@ import { FormsModule } from '@angular/forms';
           <button (click)="editMode.set('manage')"
                   class="border border-white/30 hover:border-white text-white/60 hover:text-white font-bold
                          px-8 py-3 rounded text-sm tracking-widest uppercase transition-all cursor-pointer">
-            Gestionar Perfiles
+            {{ i18n.t('profiles.manage') }}
           </button>
         </div>
 
       } @else if (editMode() === 'manage') {
         <!-- ── GESTIONAR PERFILES ── -->
         <div class="flex flex-col items-center gap-8 w-full max-w-lg animate-fade-in">
-          <h2 class="text-white text-2xl md:text-4xl font-black tracking-tight w-full">Gestionar Perfiles</h2>
+          <h2 class="text-white text-2xl md:text-4xl font-black tracking-tight w-full">{{ i18n.t('profiles.manage') }}</h2>
 
           <div class="flex flex-col gap-3 w-full">
             @for (profile of profileService.profiles(); track profile.id) {
@@ -93,18 +96,18 @@ import { FormsModule } from '@angular/forms';
                 <div class="flex-1 min-w-0">
                   <p class="text-white font-bold truncate text-sm">{{ profile.name }}</p>
                   @if (profileService.activeProfile()?.id === profile.id) {
-                    <p class="text-[10px] font-semibold" [style.color]="profile.color">Perfil activo</p>
+                    <p class="text-[10px] font-semibold" [style.color]="profile.color">{{ i18n.t('profiles.active') }}</p>
                   }
                 </div>
                 <div class="flex gap-1.5 shrink-0">
                   <button (click)="startEdit(profile)"
                           class="text-gray-400 hover:text-white transition-colors text-xs border border-white/20 hover:border-white px-2.5 py-1.5 rounded cursor-pointer whitespace-nowrap">
-                    Editar
+                    {{ i18n.t('profiles.edit') }}
                   </button>
                   @if (profileService.profiles().length > 1) {
                     <button (click)="profileService.deleteProfile(profile.id)"
                             class="text-gray-400 hover:text-df-accent transition-colors border border-white/10 hover:border-df-accent/50 px-2.5 py-1.5 rounded text-xs cursor-pointer whitespace-nowrap">
-                      Borrar
+                      {{ i18n.t('profiles.delete') }}
                     </button>
                   }
                 </div>
@@ -115,7 +118,7 @@ import { FormsModule } from '@angular/forms';
           <button (click)="editMode.set(null)"
                   class="border border-white/30 hover:border-white text-white/60 hover:text-white font-bold
                          px-8 py-3 rounded text-sm tracking-widest uppercase transition-all cursor-pointer">
-            Hecho
+            {{ i18n.t('profiles.done') }}
           </button>
         </div>
 
@@ -124,9 +127,9 @@ import { FormsModule } from '@angular/forms';
         <div class="flex flex-col items-center gap-8 w-full max-w-md animate-fade-in">
           <div class="text-center w-full">
             <h2 class="text-white text-2xl md:text-4xl font-black tracking-tight">
-              {{ editMode() === 'add' ? 'Nuevo Perfil' : 'Editar Perfil' }}
+              {{ editMode() === 'add' ? i18n.t('profiles.new') : i18n.t('profiles.editTitle') }}
             </h2>
-            <p class="text-gray-500 text-sm mt-1">Personaliza tu experiencia</p>
+            <p class="text-gray-500 text-sm mt-1">{{ i18n.t('profiles.customize') }}</p>
           </div>
 
           <!-- Preview Avatar -->
@@ -139,15 +142,15 @@ import { FormsModule } from '@angular/forms';
 
           <!-- Nombre -->
           <div class="w-full">
-            <label class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2 block">Nombre</label>
-            <input [(ngModel)]="editName" maxlength="18" placeholder="Nombre del perfil"
+            <label class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2 block">{{ i18n.t('profiles.name') }}</label>
+            <input [(ngModel)]="editName" maxlength="18" [placeholder]="i18n.t('profiles.namePlaceholder')"
                    class="w-full bg-white/10 border border-white/20 focus:border-white text-white placeholder-gray-500
                           font-bold py-3 px-4 rounded-lg outline-none transition-colors text-lg">
           </div>
 
           <!-- Selección de Icono -->
           <div class="w-full">
-            <label class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2 block">Icono</label>
+            <label class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2 block">{{ i18n.t('profiles.icon') }}</label>
             <div class="grid grid-cols-6 gap-2">
               @for (key of iconKeys; track key) {
                 <button (click)="selectedAvatar.set(key)"
@@ -165,7 +168,7 @@ import { FormsModule } from '@angular/forms';
 
           <!-- Selección de Color -->
           <div class="w-full">
-            <label class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2 block">Color</label>
+            <label class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2 block">{{ i18n.t('profiles.color') }}</label>
             <div class="flex gap-3 flex-wrap">
               @for (color of colors; track color) {
                 <button (click)="selectedColor.set(color)"
@@ -182,11 +185,11 @@ import { FormsModule } from '@angular/forms';
           <div class="flex gap-4 w-full">
             <button (click)="cancelEdit()"
                     class="flex-1 border border-white/30 hover:border-white text-white/60 hover:text-white font-bold py-3 rounded transition-all cursor-pointer">
-              Cancelar
+              {{ i18n.t('profiles.cancel') }}
             </button>
             <button (click)="saveProfile()"
                     class="flex-1 bg-white text-black font-black py-3 rounded hover:bg-gray-200 transition-all cursor-pointer">
-              {{ editMode() === 'add' ? 'Crear' : 'Guardar' }}
+              {{ editMode() === 'add' ? i18n.t('profiles.create') : i18n.t('profiles.save') }}
             </button>
           </div>
         </div>
@@ -195,6 +198,7 @@ import { FormsModule } from '@angular/forms';
   `
 })
 export class ProfilesViewComponent {
+  public readonly i18n = inject(I18nService);
   public profileService = inject(ProfileService);
   private router = inject(Router);
 

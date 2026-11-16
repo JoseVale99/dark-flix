@@ -10,11 +10,13 @@ import { ProfileService } from '@services/profile';
 import { PROFILE_ICON_PATHS, ProfileIconKey } from '@core/models/profile-icons';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 import { WpImagePipe } from '@shared/pipes/wp-image';
+import { I18nService } from '@core/i18n/i18n.service';
+import { LanguageSwitcherComponent } from '@shared/components/language-switcher/language-switcher';
 
 @Component({
   selector: 'df-top-nav',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterLinkActive, FormsModule, MediaUrlPipe, WpImagePipe],
+  imports: [RouterLink, RouterLinkActive, FormsModule, MediaUrlPipe, WpImagePipe, LanguageSwitcherComponent],
   template: `
     <nav class="fixed top-0 left-0 right-0 z-100 transition-all duration-300"
          [class.bg-df-surface]="isScrolled() || isSearchActive()"
@@ -34,15 +36,17 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 
         <!-- Desktop Global Navigation -->
         <div class="hidden lg:flex items-center gap-6 ml-10 flex-1 text-sm font-medium text-gray-400">
-           <a routerLink="/" routerLinkActive="font-bold text-white drop-shadow-md" [routerLinkActiveOptions]="{exact: true}" class="hover:text-white transition-all cursor-pointer">Inicio</a>
-          <a routerLink="/series" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">Series</a>
-          <a routerLink="/movies" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">Películas</a>
-          <a routerLink="/animes" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">Animes</a>
-          <a routerLink="/mi-lista" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">Mi Lista</a>
+           <a routerLink="/" routerLinkActive="font-bold text-white drop-shadow-md" [routerLinkActiveOptions]="{exact: true}" class="hover:text-white transition-all cursor-pointer">{{ i18n.t('nav.home') }}</a>
+          <a routerLink="/series" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">{{ i18n.t('nav.series') }}</a>
+          <a routerLink="/movies" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">{{ i18n.t('nav.movies') }}</a>
+          <a routerLink="/animes" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">{{ i18n.t('nav.animes') }}</a>
+          <a routerLink="/mi-lista" routerLinkActive="font-bold text-white drop-shadow-md" class="hover:text-white transition-all cursor-pointer">{{ i18n.t('nav.myList') }}</a>
         </div>
 
         <!-- Right Side: Search & Profile -->
         <div class="flex items-center gap-4 md:gap-6 ml-auto relative">
+
+          <df-language-switcher class="shrink-0" />
 
           <!-- Lupa Trigger (Botón de Búsqueda Fijo) -->
           <div class="flex items-center justify-end">
@@ -69,13 +73,13 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
                 <div class="absolute right-0 top-12 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl w-48 py-2 z-50 animate-fade-in">
                   <div class="px-4 py-2 border-b border-white/10 mb-1">
                     <p class="text-white font-bold text-sm">{{ profile.name }}</p>
-                    <p class="text-gray-500 text-xs">Perfil activo</p>
+                    <p class="text-gray-500 text-xs">{{ i18n.t('nav.activeProfile') }}</p>
                   </div>
                   <button (click)="changeProfile()" class="w-full flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm transition-colors cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    Cambiar Perfil
+                    {{ i18n.t('nav.changeProfile') }}
                   </button>
                 </div>
               }
@@ -92,7 +96,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 
         <!-- Controles Superiores del Modal -->
         <div class="flex justify-between items-center mb-6">
-           <h2 class="text-df-accent font-black tracking-widest text-lg md:text-xl uppercase drop-shadow-df-glow-sm">Búsqueda Global</h2>
+           <h2 class="text-df-accent font-black tracking-widest text-lg md:text-xl uppercase drop-shadow-df-glow-sm">{{ i18n.t('nav.globalSearch') }}</h2>
            <button (click)="forceHideSearch()" class="bg-white/5 hover:bg-df-accent transition-colors rounded-full p-2 md:p-3 border border-white/10 hover:scale-110 hover:border-df-accent cursor-pointer shadow-xl">
              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 md:w-8 md:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -107,7 +111,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
                  [(ngModel)]="searchQuery"
                  (ngModelChange)="onSearchInput($event)"
                  (keydown.enter)="handleEnterSearch()"
-                 placeholder="¿Qué te gustaría ver hoy?"
+                 [placeholder]="i18n.t('search.placeholder')"
                  class="w-full bg-transparent border-b-2 border-white/20 focus:border-df-accent text-white text-3xl md:text-5xl outline-none py-4 md:py-6 font-black placeholder-white/30 transition-colors drop-shadow-lg">
 
           @if (isSearching()) {
@@ -119,8 +123,8 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
           @if (!searchQuery() && searchHistoryService.history().length > 0) {
             <div class="w-full max-w-5xl mx-auto mt-6">
               <div class="flex items-center justify-between mb-3">
-                <span class="text-gray-400 text-xs font-bold uppercase tracking-widest">Búsquedas recientes</span>
-                <button (click)="searchHistoryService.clear()" class="text-gray-500 hover:text-white text-xs transition-colors cursor-pointer">Limpiar</button>
+                <span class="text-gray-400 text-xs font-bold uppercase tracking-widest">{{ i18n.t('search.recent') }}</span>
+                <button (click)="searchHistoryService.clear()" class="text-gray-500 hover:text-white text-xs transition-colors cursor-pointer">{{ i18n.t('search.clear') }}</button>
               </div>
               <div class="flex flex-wrap gap-2">
                 @for (q of searchHistoryService.history(); track q) {
@@ -142,13 +146,13 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
         <div class="flex-1 mt-8 w-full max-w-7xl mx-auto overflow-y-auto hide-scrollbar pb-32">
           @if (searchQuery() && !isSearching() && searchResults().length === 0) {
             <div class="flex flex-col items-center justify-center mt-20 text-white/50">
-               <p class="text-xl md:text-3xl font-bold">Sin resultados para "{{ searchQuery() }}"</p>
-               <p class="mt-2 text-sm md:text-base font-medium">Intenta usar otras palabras o verifica tu ortografía.</p>
+               <p class="text-xl md:text-3xl font-bold">{{ i18n.t('search.noResultsFor', { query: searchQuery() }) }}</p>
+               <p class="mt-2 text-sm md:text-base font-medium">{{ i18n.t('search.tryOtherWords') }}</p>
             </div>
           } @else if (searchResults().length > 0) {
             <div class="flex items-center gap-2 mb-6 text-gray-400 font-medium px-2">
                <div class="w-6 h-1 bg-df-accent rounded-full"></div>
-               <span class="tracking-widest uppercase text-xs mx-auto md:text-sm">Explorando {{ searchTotal() }} títulos</span>
+               <span class="tracking-widest uppercase text-xs mx-auto md:text-sm">{{ i18n.t('search.exploring', { total: searchTotal() }) }}</span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 px-2">
               @for (res of searchResults(); track res._id) {
@@ -157,7 +161,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
                      <img [src]="res | wpImage:'poster'" class="w-full h-full object-cover">
                      <div class="absolute bottom-0 left-0 right-0 p-2 bg-linear-to-t from-black/90 to-transparent z-20">
                        <p class="text-white text-xs font-bold truncate group-hover:text-df-accent transition-colors">{{res.title}}</p>
-                       <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5">{{res.type === 'tvshows' ? 'Serie' : res.type === 'movies' ? 'Película' : 'Anime'}}</p>
+                       <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5">{{ i18n.mediaTypeLabel(res.type) }}</p>
                      </div>
                    </div>
                 </a>
@@ -172,6 +176,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 export class TopNavComponent {
   private router = inject(Router);
   private wpService = inject(WpMediaService);
+  public readonly i18n = inject(I18nService);
 
   isScrolled = signal(false);
   isSearchActive = signal(false);

@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, input, output, ViewChild, ElementRef, signal, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, output, ViewChild, ElementRef, signal, AfterViewInit, OnDestroy } from '@angular/core';
+import { I18nService } from '@core/i18n/i18n.service';
 import { ApiMedia } from '@models';
 import { MediaCardComponent } from '@shared/components/media-card/media-card';
 import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton-card';
@@ -9,7 +10,7 @@ import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton
     <div class="w-full mb-8 md:mb-12 relative group" (mouseenter)="checkScroll()">
       <h2 class="text-lg md:text-2xl font-bold text-gray-200 mb-2 md:mb-4 px-14 md:px-20 transition-colors hover:text-white cursor-pointer inline-flex items-center gap-2 group/title">
         {{ title() }}
-        <span class="text-sm text-df-accent opacity-0 group-hover/title:opacity-100 transition-opacity font-bold tracking-wider hidden md:block">Explorar todos ❯</span>
+        <span class="text-sm text-df-accent opacity-0 group-hover/title:opacity-100 transition-opacity font-bold tracking-wider hidden md:block">{{ i18n.t('slider.exploreAll') }}</span>
       </h2>
 
       <!-- Zona del Carrusel con padding Vertical para que el scale-110 de las tarjetas no se recite -->
@@ -52,7 +53,7 @@ import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton
                       <df-media-card [media]="media" (selected)="mediaSelected.emit($event)" />
                   </div>
               } @empty {
-                  <p class="text-gray-500">No hay contenido disponible.</p>
+                  <p class="text-gray-500">{{ i18n.t('slider.empty') }}</p>
               }
           }
         </div>
@@ -63,6 +64,7 @@ import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton
   imports: [MediaCardComponent, SkeletonCardComponent]
 })
 export class MediaSliderComponent implements AfterViewInit, OnDestroy {
+  public readonly i18n = inject(I18nService);
   title = input.required<string>();
   mediaItems = input.required<ApiMedia[]>();
   loading = input<boolean>(false);

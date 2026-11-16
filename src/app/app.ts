@@ -16,6 +16,7 @@ import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav';
 import { TopNavComponent } from '@shared/components/top-nav/top-nav';
 import { PwaInstallBannerComponent } from '@shared/components/pwa-install-banner/pwa-install-banner';
 import { SplashScreenComponent } from '@shared/components/splash-screen/splash-screen';
+import { I18nService } from '@core/i18n/i18n.service';
 
 @Component({
   selector: 'app-root',
@@ -35,6 +36,7 @@ export class App {
   private readonly router      = inject(Router);
   private readonly progressSvc = inject(ProgressBarService);
   public readonly networkService = inject(NetworkService);
+  public readonly i18n = inject(I18nService);
 
   public readonly isProfilesPage = toSignal(
     this.router.events.pipe(

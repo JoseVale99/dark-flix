@@ -7,6 +7,7 @@ import { WatchHistoryService } from '@services/watch-history';
 import { HeroBannerComponent } from '@shared/components/hero-banner/hero-banner';
 import { MediaSliderComponent } from '@shared/components/media-slider/media-slider';
 import { ApiMedia } from '@models';
+import { I18nService } from '@core/i18n/i18n.service';
 
 @Component({
   selector: 'df-browse-home',
@@ -20,26 +21,26 @@ import { ApiMedia } from '@models';
 
         @if (watchHistory().length > 0) {
           <df-media-slider
-            title="Vistos Recientemente"
+            [title]="i18n.t('browse.recentlyWatched')"
             [mediaItems]="watchHistory()"
             [loading]="false"
             (mediaSelected)="onMediaSelected($event)" />
         }
 
         <df-media-slider
-          title="Películas Recientes"
+          [title]="i18n.t('browse.recentMovies')"
           [mediaItems]="moviesResponse().data || []"
           [loading]="moviesResponse().loading"
           (mediaSelected)="onMediaSelected($event)" />
 
         <df-media-slider
-          title="Series Destacadas"
+          [title]="i18n.t('browse.featuredSeries')"
           [mediaItems]="tvShowsResponse().data || []"
           [loading]="tvShowsResponse().loading"
           (mediaSelected)="onMediaSelected($event)" />
 
         <df-media-slider
-          title="Animes Populares"
+          [title]="i18n.t('browse.popularAnime')"
           [mediaItems]="animesResponse().data || []"
           [loading]="animesResponse().loading"
           (mediaSelected)="onMediaSelected($event)" />
@@ -51,6 +52,7 @@ import { ApiMedia } from '@models';
   imports: [HeroBannerComponent, MediaSliderComponent]
 })
 export class BrowseHomeComponent {
+  public readonly i18n = inject(I18nService);
   private wpService = inject(WpMediaService);
   private router = inject(Router);
   private watchHistoryService = inject(WatchHistoryService);

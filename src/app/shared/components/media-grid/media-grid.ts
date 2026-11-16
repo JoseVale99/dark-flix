@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, output } from '@angular/core';
+import { I18nService } from '@core/i18n/i18n.service';
 import { ApiMedia } from '@models';
 import { MediaCardComponent } from '@shared/components/media-card/media-card';
 
@@ -14,7 +15,7 @@ import { MediaCardComponent } from '@shared/components/media-card/media-card';
         @for (item of mediaItems(); track item._id) {
           <df-media-card [media]="item" (selected)="mediaSelected.emit($event)" />
         } @empty {
-          <p class="text-gray-500 col-span-full">Aún no hay contenido disponible.</p>
+          <p class="text-gray-500 col-span-full">{{ i18n.t('grid.empty') }}</p>
         }
       </div>
     </div>
@@ -23,6 +24,7 @@ import { MediaCardComponent } from '@shared/components/media-card/media-card';
   imports: [MediaCardComponent]
 })
 export class MediaGridComponent {
+  public readonly i18n = inject(I18nService);
   mediaItems = input.required<ApiMedia[]>();
   title = input<string>();
   mediaSelected = output<ApiMedia>();

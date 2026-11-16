@@ -17,6 +17,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 import { BadgeComponent } from '@shared/components/badge/badge';
 import { PosterPlaceholderComponent } from '@shared/components/poster-placeholder/poster-placeholder';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
+import { I18nService } from '@core/i18n/i18n.service';
 
 @Component({
   selector: 'df-hero-banner',
@@ -84,10 +85,10 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           class="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left"
         >
           <div class="flex items-center gap-2 mb-4">
-            <df-badge variant="accent" text="TOP HIT" />
+            <df-badge variant="accent" [text]="i18n.t('hero.topHit')" />
             <span
               class="text-xs md:text-sm tracking-widest text-df-accent font-bold drop-shadow-md shadow-black"
-              >TENDENCIA MUNDIAL</span
+              >{{ i18n.t('hero.trending') }}</span
             >
           </div>
 
@@ -101,14 +102,14 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           } @else {
             <h1
               class="text-5xl md:text-7xl font-black text-white uppercase tracking-tight leading-none mb-6 drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]"
-              [innerHTML]="featuredPost()?.title || 'EXCLUSIVA MUNDIAL'"
+              [innerHTML]="featuredPost()?.title || i18n.t('hero.worldExclusive')"
             ></h1>
           }
 
           <p
             class="text-gray-200 text-sm md:text-lg lg:text-xl font-medium mb-8 line-clamp-3 md:line-clamp-4 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] max-w-xl"
           >
-            {{ featuredPost()?.overview || 'Sinopsis no disponible en este momento.' }}
+            {{ featuredPost()?.overview || i18n.t('hero.noSynopsis') }}
           </p>
 
           <div class="flex flex-wrap justify-center md:justify-start gap-4 w-full">
@@ -125,7 +126,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
               >
                 <path d="M5 3l14 9-14 9V3z" />
               </svg>
-              REPRODUCIR
+              {{ i18n.t('hero.play') }}
             </a>
             <a
               [routerLink]="featuredPost() | mediaUrl"
@@ -146,7 +147,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
                   d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
                 />
               </svg>
-              MÁS INFO
+              {{ i18n.t('hero.moreInfo') }}
             </a>
           </div>
         </div>
@@ -190,6 +191,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
   `,
 })
 export class HeroBannerComponent {
+  public readonly i18n = inject(I18nService);
   featuredPost = input<ApiMedia | undefined>();
   private sanitizer = inject(DomSanitizer);
   private platformId = inject(PLATFORM_ID);

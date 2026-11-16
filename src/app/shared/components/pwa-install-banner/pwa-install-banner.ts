@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
+import { I18nService } from '@core/i18n/i18n.service';
 
 @Component({
   selector: 'df-pwa-install-banner',
@@ -24,19 +25,19 @@ import { filter, map } from 'rxjs';
 
         <!-- Texto -->
         <div class="flex-1 min-w-0">
-          <p class="text-white font-bold text-sm leading-tight">Instalar DarkFlix</p>
-          <p class="text-gray-400 text-xs mt-0.5 leading-tight">Acceso rápido desde tu pantalla de inicio, sin navegador</p>
+          <p class="text-white font-bold text-sm leading-tight">{{ i18n.t('pwa.title') }}</p>
+          <p class="text-gray-400 text-xs mt-0.5 leading-tight">{{ i18n.t('pwa.subtitle') }}</p>
         </div>
 
         <!-- Botones -->
         <div class="flex flex-col gap-1.5 shrink-0">
           <button (click)="install()"
                   class="bg-df-accent hover:bg-df-accent-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-all cursor-pointer shadow">
-            Instalar
+            {{ i18n.t('pwa.install') }}
           </button>
           <button (click)="dismiss()"
                   class="text-gray-500 hover:text-white text-xs text-center transition-colors cursor-pointer">
-            Ahora no
+            {{ i18n.t('pwa.later') }}
           </button>
         </div>
       </div>
@@ -44,6 +45,7 @@ import { filter, map } from 'rxjs';
   `
 })
 export class PwaInstallBannerComponent {
+  public readonly i18n = inject(I18nService);
   private platformId = inject(PLATFORM_ID);
   private router     = inject(Router);
   visible = signal(false);

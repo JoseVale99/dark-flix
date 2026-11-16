@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, model, computed, signal, ElementRef, inject, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FilterOption } from '../../../core/constants/filter-config';
+import { I18nService } from '@core/i18n/i18n.service';
 
 @Component({
   selector: 'df-filter-dropdown',
@@ -32,7 +33,7 @@ import { FilterOption } from '../../../core/constants/filter-config';
             <div class="relative">
               <input type="text"
                      [(ngModel)]="searchQuery"
-                     [placeholder]="searchPlaceholder()"
+                     [placeholder]="searchPlaceholder() ?? i18n.t('filter.searchPlaceholder')"
                      class="w-full bg-df-background border border-white/10 text-white text-sm rounded px-3 py-2 pr-8 focus:outline-none focus:border-white/30 placeholder-gray-500"
                      (click)="$event.stopPropagation()">
               @if (searchQuery()) {
@@ -63,14 +64,14 @@ import { FilterOption } from '../../../core/constants/filter-config';
                   </div>
                 </div>
                 <span class="text-sm text-gray-300 group-hover/item:text-white" [class.text-white]="isSelected(opt.id)">
-                  {{ opt.name }}
+                  {{ optionLabel(opt) }}
                 </span>
               </label>
             }
 
             @if (filteredOptions().length === 0) {
               <div class="px-3 py-4 text-center text-sm text-gray-500">
-                No hay resultados
+                {{ i18n.t('filter.noResults') }}
               </div>
             }
           </div>
@@ -86,12 +87,15 @@ import { FilterOption } from '../../../core/constants/filter-config';
   `]
 })
 export class FilterDropdownComponent {
+  public readonly i18n = inject(I18nService);
   private elementRef = inject(ElementRef);
 
   // Inputs
   title = input.required<string>();
-  searchPlaceholder = input<string>('Buscar...');
+  searchPlaceholder = input<string | undefined>(undefined);
   options = input.required<FilterOption[]>();
+  /** Tipo de taxonomía para localizar los nombres (género/país). */
+  kind = input<'genre' | 'country' | 'year'>('genre');
 
   // Two-way bound model
   selected = model<Array<string|number>>([]);
@@ -104,8 +108,14 @@ export class FilterDropdownComponent {
   filteredOptions = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
     if (!q) return this.options();
-    return this.options().filter(o => o.name.toLowerCase().includes(q));
+    return this.options().filter((o) => this.optionLabel(o).toLowerCase().includes(q));
   });
+
+  /** Nombre del término en el idioma activo (fallback al nombre de la API). */
+  optionLabel(option: FilterOption): string {
+    const kind = this.kind();
+    return kind === 'year' ? option.name : this.i18n.term(kind, option.slug, option.name);
+  }
 
   toggle() {
     this.isOpen.update(v => !v);

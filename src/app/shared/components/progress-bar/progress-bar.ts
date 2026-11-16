@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ProgressBarService } from '@services/progress-bar';
+import { I18nService } from '@core/i18n/i18n.service';
 
 @Component({
   selector: 'df-progress-bar',
@@ -12,7 +13,7 @@ import { ProgressBarService } from '@services/progress-bar';
         [attr.aria-valuenow]="progress()"
         aria-valuemin="0"
         aria-valuemax="100"
-        aria-label="Cargando"
+        [attr.aria-label]="i18n.t('progress.loading')"
       >
         <!-- Barra principal -->
         <div
@@ -29,6 +30,7 @@ import { ProgressBarService } from '@services/progress-bar';
   `,
 })
 export class ProgressBarComponent {
+  public readonly i18n = inject(I18nService);
   private readonly svc = inject(ProgressBarService);
 
   readonly visible  = this.svc.visible;

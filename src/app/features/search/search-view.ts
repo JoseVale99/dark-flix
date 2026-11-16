@@ -6,6 +6,7 @@ import { ApiMedia } from '@models';
 import { switchMap, map, catchError, of, tap, debounceTime } from 'rxjs';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
 import { MediaGridComponent } from '@shared/components/media-grid/media-grid';
+import { I18nService } from '@core/i18n/i18n.service';
 
 @Component({
   selector: 'df-search-view',
@@ -21,7 +22,7 @@ import { MediaGridComponent } from '@shared/components/media-grid/media-grid';
       } @else {
         @if (searchQuery()) {
           <h1 class="text-2xl md:text-3xl font-bold mb-8">
-            Resultados para: <span class="text-gray-400">"{{ searchQuery() }}"</span>
+            {{ i18n.t('search.resultsFor') }} <span class="text-gray-400">"{{ searchQuery() }}"</span>
           </h1>
         }
 
@@ -35,8 +36,8 @@ import { MediaGridComponent } from '@shared/components/media-grid/media-grid';
              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
              </svg>
-             <p class="text-xl text-gray-400">No encontramos coincidencias para tu búsqueda.</p>
-             <p class="text-sm text-gray-600 mt-2">Intenta buscar usando otras palabras clave o el título de la película.</p>
+             <p class="text-xl text-gray-400">{{ i18n.t('search.noMatches') }}</p>
+             <p class="text-sm text-gray-600 mt-2">{{ i18n.t('search.tryKeywords') }}</p>
            </div>
         }
 
@@ -45,8 +46,8 @@ import { MediaGridComponent } from '@shared/components/media-grid/media-grid';
                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-gray-600 mb-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                </svg>
-               <h2 class="text-3xl font-bold text-gray-400">¿Qué te gustaría ver hoy?</h2>
-               <p class="text-gray-500 mt-4 text-lg">Escribe en la barra superior para descubrir contenido espectacular.</p>
+               <h2 class="text-3xl font-bold text-gray-400">{{ i18n.t('search.placeholder') }}</h2>
+               <p class="text-gray-500 mt-4 text-lg">{{ i18n.t('search.emptyHint') }}</p>
             </div>
         }
       }
@@ -54,6 +55,7 @@ import { MediaGridComponent } from '@shared/components/media-grid/media-grid';
   `
 })
 export class SearchViewComponent {
+  public readonly i18n = inject(I18nService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private wpService = inject(WpMediaService);
