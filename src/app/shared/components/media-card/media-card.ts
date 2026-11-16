@@ -12,7 +12,8 @@ import { MediaNavigationService } from '@services/media-navigation';
   template: `
     <div class="group/card relative aspect-poster bg-df-card rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:z-50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] hover:ring-1 hover:ring-white/20"
          (click)="onCardClick($event)"
-         (auxclick)="onAuxClick($event)">
+         (auxclick)="onAuxClick($event)"
+         (contextmenu)="onContextMenu($event)">
 
       @if (!imageLoaded()) {
         <df-skeleton-card class="absolute inset-0 z-0" />
@@ -43,19 +44,8 @@ import { MediaNavigationService } from '@services/media-navigation';
         }
       </div>
 
-      <!-- Acciones rápidas: abrir en pestaña nueva + favorito -->
+      <!-- Acción rápida: favorito -->
       <div class="absolute top-2 right-2 z-30 flex gap-1">
-        <!-- Abrir en pestaña nueva (funciona también en móvil) -->
-        <button (click)="openInNewTab($event)"
-                title="Abrir en pestaña nueva"
-                aria-label="Abrir en pestaña nueva"
-                class="md:hidden p-1.5 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 transition-all shadow-md backdrop-blur cursor-pointer
-                       text-white hover:text-[#e50914]">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H18m0 0v4.5M18 6l-7.5 7.5M6 6.75h4.5v10.5h10.5V12" />
-          </svg>
-        </button>
-
         <!-- Quick Favorite Button -->
         <button (click)="$event.stopPropagation(); myListService.toggleList(media())"
               title="Añadir/Quitar de Mi Lista"
@@ -96,14 +86,6 @@ import { MediaNavigationService } from '@services/media-navigation';
             </svg>
             Ver ahora
           </button>
-          <button (click)="openInNewTab($event)"
-                  title="Abrir en pestaña nueva"
-                  aria-label="Abrir en pestaña nueva"
-                  class="flex items-center justify-center px-2 bg-white/15 hover:bg-white/30 active:scale-95 text-white rounded-md transition-all shadow-lg cursor-pointer border border-white/10">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H18m0 0v4.5M18 6l-7.5 7.5M6 6.75h4.5v10.5h10.5V12" />
-            </svg>
-          </button>
         </div>
       </div>
     </div>
@@ -137,8 +119,12 @@ export class MediaCardComponent {
     this.mediaNavigation.openInNewTab(this.media());
   }
 
-  openInNewTab(event: MouseEvent): void {
-    event.stopPropagation();
+  /**
+   * Click derecho (o pulsación larga en móvil) = abrir en pestaña nueva.
+   * Evita el menú contextual nativo para no necesitar un botón dedicado.
+   */
+  onContextMenu(event: MouseEvent): void {
+    event.preventDefault();
     this.mediaNavigation.openInNewTab(this.media());
   }
 
