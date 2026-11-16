@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
-      class="absolute inset-0 flex flex-col items-center justify-center overflow-hidden bg-[#0d0d0d] select-none"
+      class="absolute inset-0 flex flex-col items-center justify-center overflow-hidden bg-df-background select-none"
     >
       <!-- Trama de puntos sutil -->
       <div
@@ -19,7 +19,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
       <!-- Resplandor rojo inferior -->
       <div
-        class="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-[#e50914]/25 via-[#e50914]/5 to-transparent"
+        class="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-df-accent/25 via-df-accent/5 to-transparent"
       ></div>
 
       <!-- Marco con play -->

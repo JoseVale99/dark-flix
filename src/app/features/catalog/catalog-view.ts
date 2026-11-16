@@ -67,7 +67,7 @@ interface CatalogQuery {
                <button
                  type="button"
                  [disabled]="loading()"
-                 class="group relative px-12 py-4 bg-linear-to-r from-[#e50914] to-[#b80811] hover:from-[#f60b16] hover:to-[#d60a12] active:scale-95 disabled:opacity-75 disabled:pointer-events-none text-white font-black tracking-widest text-sm rounded-full transition-all duration-300 shadow-[0_8px_30px_rgba(229,9,20,0.3)] hover:shadow-[0_12px_40px_rgba(229,9,20,0.5)] cursor-pointer flex items-center justify-center gap-3 select-none"
+                 class="group relative px-12 py-4 bg-linear-to-r from-df-accent to-df-accent-dark hover:from-df-accent-hover hover:to-df-accent-strong active:scale-95 disabled:opacity-75 disabled:pointer-events-none text-white font-black tracking-widest text-sm rounded-full transition-all duration-300 shadow-df-glow hover:shadow-df-glow-lg cursor-pointer flex items-center justify-center gap-3 select-none"
                  (click)="loadMore()">
                  @if (loading()) {
                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -83,7 +83,7 @@ interface CatalogQuery {
                  }
                </button>
             } @else {
-               <div class="py-4 px-10 bg-[#141414] border border-white/10 rounded-full shadow-2xl">
+               <div class="py-4 px-10 bg-df-surface border border-white/10 rounded-full shadow-2xl">
                  <p class="text-gray-400 text-sm font-semibold tracking-wider uppercase text-center">Has llegado al final del catálogo</p>
                </div>
             }

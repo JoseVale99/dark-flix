@@ -16,7 +16,7 @@ import { ProgressBarService } from '@services/progress-bar';
       >
         <!-- Barra principal -->
         <div
-          class="h-full bg-df-accent transition-all duration-300 ease-out shadow-[0_0_8px_#e50914]"
+          class="h-full bg-df-accent transition-all duration-300 ease-out shadow-df-glow-sm"
           [style.width.%]="progress()"
         ></div>
         <!-- Brillo en el extremo derecho -->

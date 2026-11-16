@@ -24,32 +24,32 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
     <div class="min-h-screen w-full bg-df-background pb-20 overflow-x-hidden relative">
       @if (loadingOrPending()) {
         <!-- Skeleton Cinematic Backdrop -->
-        <div class="relative w-full h-[60vh] md:h-[85vh] bg-linear-to-r from-[#141414] via-[#202020] to-[#141414] bg-size-[200%_100%] animate-shimmer overflow-hidden">
+        <div class="relative w-full h-[60vh] md:h-[85vh] bg-linear-to-r from-df-surface via-df-overlay to-df-surface bg-size-[200%_100%] animate-shimmer overflow-hidden">
            <div class="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-df-background to-transparent z-10"></div>
         </div>
         <!-- Skeleton Content Area -->
         <div class="relative z-30 -mt-32 md:-mt-48 px-4 md:px-12 max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
            <!-- Poster Skeleton -->
            <div class="hidden md:block w-1/4 shrink-0 shadow-2xl">
-              <div class="aspect-poster rounded-lg bg-linear-to-r from-[#18181b] via-[#27272a] to-[#18181b] bg-size-[200%_100%] animate-shimmer ring-1 ring-white/5"></div>
+              <div class="aspect-poster rounded-lg bg-linear-to-r from-df-skeleton-soft via-df-skeleton to-df-skeleton-soft bg-size-[200%_100%] animate-shimmer ring-1 ring-white/5"></div>
            </div>
            <!-- Info Skeleton -->
            <div class="flex-1 space-y-6 pt-4 w-full">
-              <div class="h-10 md:h-14 bg-linear-to-r from-[#18181b] via-[#27272a] to-[#18181b] bg-size-[200%_100%] animate-shimmer rounded w-3/4"></div>
+              <div class="h-10 md:h-14 bg-linear-to-r from-df-skeleton-soft via-df-skeleton to-df-skeleton-soft bg-size-[200%_100%] animate-shimmer rounded w-3/4"></div>
               <div class="flex gap-2">
-                 <div class="h-6 w-16 bg-[#18181b] rounded animate-pulse"></div>
-                 <div class="h-6 w-20 bg-[#18181b] rounded animate-pulse"></div>
+                 <div class="h-6 w-16 bg-df-skeleton-soft rounded animate-pulse"></div>
+                 <div class="h-6 w-20 bg-df-skeleton-soft rounded animate-pulse"></div>
               </div>
               <div class="space-y-3 max-w-3xl">
-                 <div class="h-4 bg-linear-to-r from-[#18181b] via-[#27272a] to-[#18181b] bg-size-[200%_100%] animate-shimmer rounded w-full"></div>
-                 <div class="h-4 bg-linear-to-r from-[#18181b] via-[#27272a] to-[#18181b] bg-size-[200%_100%] animate-shimmer rounded w-[90%]"></div>
-                 <div class="h-4 bg-linear-to-r from-[#18181b] via-[#27272a] to-[#18181b] bg-size-[200%_100%] animate-shimmer rounded w-[80%]"></div>
+                 <div class="h-4 bg-linear-to-r from-df-skeleton-soft via-df-skeleton to-df-skeleton-soft bg-size-[200%_100%] animate-shimmer rounded w-full"></div>
+                 <div class="h-4 bg-linear-to-r from-df-skeleton-soft via-df-skeleton to-df-skeleton-soft bg-size-[200%_100%] animate-shimmer rounded w-[90%]"></div>
+                 <div class="h-4 bg-linear-to-r from-df-skeleton-soft via-df-skeleton to-df-skeleton-soft bg-size-[200%_100%] animate-shimmer rounded w-[80%]"></div>
               </div>
-              <div class="h-12 w-40 bg-[#e50914]/20 rounded animate-pulse mt-8"></div>
+              <div class="h-12 w-40 bg-df-accent/20 rounded animate-pulse mt-8"></div>
            </div>
         </div>
       } @else if (hasError()) {
-        <div class="flex flex-col items-center justify-center h-screen text-red-500">
+        <div class="flex flex-col items-center justify-center h-screen text-df-accent">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
@@ -87,7 +87,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
         </div>
 
         <!-- Botón Volver -->
-        <button (click)="goBack()" class="absolute top-6 left-4 md:left-12 z-50 text-white/80 hover:text-white bg-df-background/50 hover:bg-[#e50914] rounded-full p-3 backdrop-blur-md transition-all duration-300 focus:outline-none hover:scale-110 shadow-lg border border-white/5 cursor-pointer">
+        <button (click)="goBack()" class="absolute top-6 left-4 md:left-12 z-50 text-white/80 hover:text-white bg-df-background/50 hover:bg-df-accent rounded-full p-3 backdrop-blur-md transition-all duration-300 focus:outline-none hover:scale-110 shadow-lg border border-white/5 cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
@@ -145,7 +145,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 mt-6">
-              <button (click)="playMedia()" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(229,9,20,0.5)] active:scale-95 text-center text-lg w-fit cursor-pointer">
+              <button (click)="playMedia()" class="bg-df-accent hover:bg-df-accent-dark text-white font-bold py-3 px-8 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-df-glow active:scale-95 text-center text-lg w-fit cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
                 </svg>
@@ -155,7 +155,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
               <button (click)="myListService.toggleList(movie()!)"
                       class="bg-black/40 hover:bg-black/60 border border-white/20 text-white font-bold py-3 px-6 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-xl text-center text-lg w-fit cursor-pointer">
                 @if (myListService.isInList(movie()!._id)) {
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#e50914]" fill="currentColor" viewBox="0 0 24 24">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-df-accent" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                   </svg>
                   En Mi Lista
@@ -184,7 +184,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
               @if (movie()?.trailer) {
                 <button (click)="activeTab.set('TRAILER'); scrollToTabs()"
                         class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3 px-6 rounded flex items-center justify-center gap-2 transition-transform hover:scale-105 shadow-xl text-center text-lg w-fit cursor-pointer backdrop-blur-md">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-df-accent" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
                   </svg>
                   TRÁILER
@@ -264,11 +264,11 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
               @case ('EPISODIOS') {
                 <div class="animate-fade-in max-w-5xl mx-auto flex flex-col gap-6">
                   <!-- Control de Temporada -->
-                  <div class="flex justify-between items-center bg-[#161616] border border-white/5 py-3 px-6 rounded-xl">
+                  <div class="flex justify-between items-center bg-df-elevated border border-white/5 py-3 px-6 rounded-xl">
                     <h2 class="text-white font-bold text-lg md:text-xl">Selecciona un Episodio</h2>
                     <div class="relative min-w-40">
                       <select [ngModel]="selectedSeason()" (ngModelChange)="selectedSeason.set($event)"
-                              class="w-full bg-black border border-white/20 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:border-[#e50914] appearance-none cursor-pointer hover:bg-white/5 transition-colors">
+                              class="w-full bg-black border border-white/20 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:border-df-accent appearance-none cursor-pointer hover:bg-white/5 transition-colors">
                         @if (episodesResponse()?.seasons) {
                           @for (s of episodesResponse()!.seasons; track s) {
                             <option [value]="s">Temporada {{ s }}</option>
@@ -291,8 +291,8 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
 
                     <!-- Botón Continuar Viendo -->
                     @if (lastWatchedEpisode()) {
-                      <div class="flex items-center gap-3 bg-[#e50914]/10 border border-[#e50914]/30 rounded-xl px-5 py-3 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#e50914] shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      <div class="flex items-center gap-3 bg-df-accent/10 border border-df-accent/30 rounded-xl px-5 py-3 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-df-accent shrink-0" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z"/>
                         </svg>
                         <div class="flex-1 min-w-0">
@@ -300,7 +300,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                           <p class="text-gray-400 text-xs truncate">T{{ lastWatchedEpisode()!.seasonNumber }} · E{{ lastWatchedEpisode()!.episodeNumber }} — {{ lastWatchedEpisode()!.title }}</p>
                         </div>
                         <button (click)="resumeLastEpisode()"
-                                class="shrink-0 bg-[#e50914] hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer active:scale-95">
+                                class="shrink-0 bg-df-accent hover:bg-df-accent-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer active:scale-95">
                           Reanudar
                         </button>
                       </div>
@@ -309,8 +309,8 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     <div class="flex flex-col gap-3">
                       @for (ep of episodesResponse()!.posts; track ep._id) {
                         <button (click)="playEpisode(ep)"
-                                class="flex items-center gap-4 text-left p-4 md:p-5 bg-[#161616] hover:bg-white/10 border border-white/5 transition-colors rounded-xl group relative overflow-hidden cursor-pointer"
-                                [class.border-[#e50914]]="selectedEpisodeId() === ep._id"
+                                class="flex items-center gap-4 text-left p-4 md:p-5 bg-df-elevated hover:bg-white/10 border border-white/5 transition-colors rounded-xl group relative overflow-hidden cursor-pointer"
+                                [class.border-df-accent]="selectedEpisodeId() === ep._id"
                                 [class.border-green-600/50]="episodeProgress.isWatched(movie()!._id, ep._id) && selectedEpisodeId() !== ep._id">
 
                           <!-- Número de capítulo gigante -->
@@ -320,7 +320,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
 
                           <div class="flex flex-col flex-1 z-10 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
-                              <h3 class="text-white font-bold text-base md:text-lg group-hover:text-[#e50914] transition-colors leading-tight truncate">
+                              <h3 class="text-white font-bold text-base md:text-lg group-hover:text-df-accent transition-colors leading-tight truncate">
                                 {{ ep.title.split(': ').pop() || ep.title }}
                               </h3>
                               <!-- Badge VISTO -->
@@ -338,19 +338,17 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                             <!-- Barra de progreso (si hay progreso parcial) -->
                             @if (!episodeProgress.isWatched(movie()!._id, ep._id) && episodeProgress.getProgressPercent(movie()!._id, ep._id) > 0) {
                               <div class="mt-2 h-0.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div class="h-full bg-[#e50914] rounded-full transition-all"
+                                <div class="h-full bg-df-accent rounded-full transition-all"
                                      [style.width.%]="episodeProgress.getProgressPercent(movie()!._id, ep._id)"></div>
                               </div>
                             }
                           </div>
 
                           <!-- Icono derecho: check si visto, play si no -->
-                          <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
+                          <div class="w-12 h-12 rounded-full border-2 flex items-center justify-center shrink-0 transition-all group-hover:bg-df-accent group-hover:border-df-accent"
                                [class.border-green-500]="episodeProgress.isWatched(movie()!._id, ep._id) && selectedEpisodeId() !== ep._id"
                                [class.bg-green-500/10]="episodeProgress.isWatched(movie()!._id, ep._id) && selectedEpisodeId() !== ep._id"
-                               [class.border-white/20]="!episodeProgress.isWatched(movie()!._id, ep._id) || selectedEpisodeId() === ep._id"
-                               [class.group-hover:bg-[#e50914]]="true"
-                               [class.group-hover:border-[#e50914]]="true">
+                               [class.border-white/20]="!episodeProgress.isWatched(movie()!._id, ep._id) || selectedEpisodeId() === ep._id">
                             @if (episodeProgress.isWatched(movie()!._id, ep._id) && selectedEpisodeId() !== ep._id) {
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400 group-hover:text-white transition-colors" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -381,8 +379,8 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                         @if (isTheaterMode()) {
                           <!-- Placeholder: el video se muestra en el modal -->
                           <div class="flex flex-col items-center gap-3 text-center p-4">
-                            <div class="w-16 h-16 rounded-full bg-[#e50914]/20 flex items-center justify-center border border-[#e50914]/30">
-                              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[#e50914]" fill="currentColor" viewBox="0 0 24 24">
+                            <div class="w-16 h-16 rounded-full bg-df-accent/20 flex items-center justify-center border border-df-accent/30">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-df-accent" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M8 5v14l11-7z"/>
                               </svg>
                             </div>
@@ -403,7 +401,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                               }
                               <!-- Botón Play -->
                               <div class="relative z-10 flex flex-col items-center gap-3">
-                                <div class="w-20 h-20 rounded-full bg-[#e50914] flex items-center justify-center shadow-2xl shadow-red-900/60
+                                <div class="w-20 h-20 rounded-full bg-df-accent flex items-center justify-center shadow-2xl shadow-df-accent-dark/60
                                             group-hover/play:scale-110 transition-transform duration-200 active:scale-95">
                                   <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M8 5v14l11-7z"/>
@@ -420,7 +418,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                             @if (iframeLoading()) {
                               <div class="absolute inset-0 flex items-center justify-center bg-black z-10">
                                 <div class="flex flex-col items-center gap-3">
-                                  <div class="w-12 h-12 border-4 border-[#e50914]/30 border-t-[#e50914] rounded-full animate-spin"></div>
+                                  <div class="w-12 h-12 border-4 border-df-accent/30 border-t-df-accent rounded-full animate-spin"></div>
                                   <p class="text-gray-400 text-sm font-medium">Cargando video...</p>
                                 </div>
                               </div>
@@ -429,15 +427,15 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                             @if (iframeError()) {
                               <div class="absolute inset-0 flex items-center justify-center bg-black z-20 p-6">
                                 <div class="text-center max-w-sm">
-                                  <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/30">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-df-accent/20 flex items-center justify-center border border-df-accent/30">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-df-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
                                   </div>
                                   <h3 class="text-white font-bold text-lg mb-2">Error al cargar el video</h3>
                                   <p class="text-gray-400 text-sm mb-4">Este servidor no está disponible.</p>
                                   <div class="flex flex-col gap-2">
-                                    <button (click)="tryNextServer()" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
+                                    <button (click)="tryNextServer()" class="bg-df-accent hover:bg-df-accent-dark text-white font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
                                       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                       </svg>
@@ -471,11 +469,11 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     <div class="flex flex-wrap gap-2 mt-4">
                       @for (embed of playersState().embeds; track $index) {
                         <button (click)="selectedEmbedIndex.set($index); playerActivated.set(false); iframeError.set(false)"
-                                [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
+                                [class.bg-df-accent]="selectedEmbedIndex() === $index"
                                 [class.text-white]="selectedEmbedIndex() === $index"
-                                [class.shadow-[0_0_20px_rgba(229,9,20,0.4)]]="selectedEmbedIndex() === $index"
+                                [class.shadow-df-glow]="selectedEmbedIndex() === $index"
                                 [class.scale-105]="selectedEmbedIndex() === $index"
-                                [class.border-[#e50914]]="selectedEmbedIndex() === $index"
+                                [class.border-df-accent]="selectedEmbedIndex() === $index"
                                 [class.bg-white/5]="selectedEmbedIndex() !== $index"
                                 [class.text-gray-400]="selectedEmbedIndex() !== $index"
                                 [class.border-white/10]="selectedEmbedIndex() !== $index"
@@ -487,7 +485,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                       <!-- Manual Error Link: siempre visible cuando el player está activo -->
                       @if (playerActivated() && !iframeError()) {
                         <div class="w-full flex justify-end mt-1">
-                          <button (click)="triggerManualError()" class="text-[10px] text-gray-500 hover:text-red-500 transition-colors flex items-center gap-1 opacity-60 hover:opacity-100 cursor-pointer">
+                          <button (click)="triggerManualError()" class="text-[10px] text-gray-500 hover:text-df-accent transition-colors flex items-center gap-1 opacity-60 hover:opacity-100 cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
@@ -508,7 +506,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     </div>
                   } @else {
                     @for (group of groupedDownloads(); track group.quality) {
-                      <details class="group bg-[#161616] border border-white/5 rounded-xl overflow-hidden transition-all duration-300">
+                      <details class="group bg-df-elevated border border-white/5 rounded-xl overflow-hidden transition-all duration-300">
                         <summary class="flex flex-col md:flex-row items-center cursor-pointer p-4 md:p-6 list-none hover:bg-white/5 transition-colors gap-4 relative">
 
                           <!-- Ocultar el marcador nativo de "details" -->
@@ -547,7 +545,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
 
                           <!-- Derecha: Botón Dropdown (Rojo estilo DarkFlix) -->
                           <div class="w-full md:w-auto mt-4 md:mt-0 flex justify-end">
-                            <div class="bg-[#ba0811] hover:bg-[#e50914] text-white px-6 py-3 rounded text-sm md:text-base font-bold flex items-center justify-between min-w-45 transition-colors gap-4">
+                            <div class="bg-df-accent-dark hover:bg-df-accent text-white px-6 py-3 rounded text-sm md:text-base font-bold flex items-center justify-between min-w-45 transition-colors gap-4">
                               <span>Descargar</span>
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-open:rotate-180 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -567,7 +565,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                <div class="flex items-center gap-4 z-10">
                                   <!-- Server Icons Customization -->
                                   @if (dl.url.includes('mega.nz')) {
-                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-red-600/40 to-black flex items-center justify-center shrink-0 border border-red-500/50 shadow-[0_0_15px_rgba(220,38,38,0.3)]">
+                                     <div class="w-10 h-10 rounded-full bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-df-accent-strong/40 to-black flex items-center justify-center shrink-0 border border-df-accent/50 shadow-df-glow">
                                         <span class="font-black text-white text-lg tracking-tighter shadow-black drop-shadow-md">M</span>
                                      </div>
                                   } @else if (dl.url.includes('mediafire')) {
@@ -606,7 +604,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                                <!-- Right Accents -->
                                <div class="flex items-center gap-3 md:gap-6 z-10">
                                  <span class="text-gray-400 font-medium tracking-wide text-[10px] md:text-xs bg-black/40 px-3 py-1.5 rounded-lg hidden sm:inline-block border border-white/5 uppercase shadow-inner">{{ dl.lang }}</span>
-                                 <div class="text-[#e50914] group-hover/link:scale-110 transition-transform bg-[#e50914]/10 p-2 md:p-3 rounded-full border border-[#e50914]/20 flex items-center gap-1">
+                                 <div class="text-df-accent group-hover/link:scale-110 transition-transform bg-df-accent/10 p-2 md:p-3 rounded-full border border-df-accent/20 flex items-center gap-1">
                                    <!-- External link icon instead of download to indicate redirect -->
                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5">
                                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
@@ -657,7 +655,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                         <a [routerLink]="rel | mediaUrl" class="block relative aspect-2/3 rounded-lg overflow-hidden group border border-white/5 bg-df-card">
                           <img [src]="rel | wpImage:'poster'" (error)="onImageError($event)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                           <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-                            <p class="text-white text-center font-bold text-sm leading-tight border-b-2 border-[#e50914] pb-1">{{ rel.title }}</p>
+                            <p class="text-white text-center font-bold text-sm leading-tight border-b-2 border-df-accent pb-1">{{ rel.title }}</p>
                           </div>
                         </a>
                       }
@@ -696,7 +694,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                        (click)="lightboxIndex.set(null)">
                     <!-- Prev -->
                     <button (click)="$event.stopPropagation(); lightboxIndex.set((lightboxIndex()! - 1 + galleryImages().length) % galleryImages().length)"
-                            class="absolute left-2 md:left-6 z-10 bg-black/60 hover:bg-[#e50914] text-white rounded-full p-3 border border-white/10 transition-all cursor-pointer shadow-2xl">
+                            class="absolute left-2 md:left-6 z-10 bg-black/60 hover:bg-df-accent text-white rounded-full p-3 border border-white/10 transition-all cursor-pointer shadow-2xl">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                       </svg>
@@ -707,7 +705,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                          class="max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-2xl border border-white/10">
                     <!-- Next -->
                     <button (click)="$event.stopPropagation(); lightboxIndex.set((lightboxIndex()! + 1) % galleryImages().length)"
-                            class="absolute right-2 md:right-6 z-10 bg-black/60 hover:bg-[#e50914] text-white rounded-full p-3 border border-white/10 transition-all cursor-pointer shadow-2xl">
+                            class="absolute right-2 md:right-6 z-10 bg-black/60 hover:bg-df-accent text-white rounded-full p-3 border border-white/10 transition-all cursor-pointer shadow-2xl">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                       </svg>
@@ -715,7 +713,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     <!-- Counter + close -->
                     <div class="absolute top-4 right-4 flex items-center gap-3">
                       <span class="text-white/70 text-sm font-medium">{{ lightboxIndex()! + 1 }} / {{ galleryImages().length }}</span>
-                      <button (click)="lightboxIndex.set(null)" class="bg-black/60 hover:bg-[#e50914] text-white rounded-full p-2 border border-white/10 transition-all cursor-pointer">
+                      <button (click)="lightboxIndex.set(null)" class="bg-black/60 hover:bg-df-accent text-white rounded-full p-2 border border-white/10 transition-all cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -738,8 +736,8 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                           <!-- Glassmorphism Content -->
                           <div class="absolute inset-0 bg-black/20 flex flex-col items-center justify-center gap-6">
                             <!-- Glowing Play Button -->
-                            <div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-[#e50914] flex items-center justify-center shadow-[0_0_50px_rgba(229,9,20,0.6)] group-hover:scale-110 transition-transform duration-500 relative">
-                               <div class="absolute inset-0 rounded-full animate-ping bg-[#e50914] opacity-20"></div>
+                            <div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-df-accent flex items-center justify-center shadow-df-glow-lg group-hover:scale-110 transition-transform duration-500 relative">
+                               <div class="absolute inset-0 rounded-full animate-ping bg-df-accent opacity-20"></div>
                                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 md:w-14 md:h-14 text-white ml-2" fill="currentColor" viewBox="0 0 24 24">
                                  <path d="M8 5v14l11-7z" />
                                </svg>
@@ -762,8 +760,8 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                       }
 
                       <!-- Decorative corner accents -->
-                      <div class="absolute top-0 left-0 w-24 h-24 border-t-2 border-l-2 border-[#e50914]/40 rounded-tl-2xl pointer-events-none group-hover:border-[#e50914]/70 transition-colors z-20"></div>
-                      <div class="absolute bottom-0 right-0 w-24 h-24 border-b-2 border-r-2 border-[#e50914]/40 rounded-br-2xl pointer-events-none group-hover:border-[#e50914]/70 transition-colors z-20"></div>
+                      <div class="absolute top-0 left-0 w-24 h-24 border-t-2 border-l-2 border-df-accent/40 rounded-tl-2xl pointer-events-none group-hover:border-df-accent/70 transition-colors z-20"></div>
+                      <div class="absolute bottom-0 right-0 w-24 h-24 border-b-2 border-r-2 border-df-accent/40 rounded-br-2xl pointer-events-none group-hover:border-df-accent/70 transition-colors z-20"></div>
                     </div>
 
                     <div class="mt-10 flex flex-col md:flex-row items-center justify-between w-full max-w-5xl gap-6">
@@ -774,7 +772,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                           Prepárate para la experiencia completa en DarkFlix.
                         </p>
                       </div>
-                      <button (click)="playMedia()" class="shrink-0 bg-white text-black hover:bg-[#e50914] hover:text-white font-black py-3 px-8 rounded-full transition-all active:scale-95 uppercase tracking-widest text-xs cursor-pointer shadow-2xl">
+                      <button (click)="playMedia()" class="shrink-0 bg-white text-black hover:bg-df-accent hover:text-white font-black py-3 px-8 rounded-full transition-all active:scale-95 uppercase tracking-widest text-xs cursor-pointer shadow-2xl">
                         Ver Película Ahora
                       </button>
                     </div>
@@ -795,7 +793,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
         </div>
       } @placeholder {
         <div class="max-w-7xl mx-auto px-6 pb-24 flex flex-col items-center justify-center min-h-64 text-white/20">
-          <div class="w-10 h-10 border-4 border-white/5 border-t-[#e50914] rounded-full animate-spin mb-4"></div>
+          <div class="w-10 h-10 border-4 border-white/5 border-t-df-accent rounded-full animate-spin mb-4"></div>
           <p class="text-xs font-bold uppercase tracking-widest animate-pulse">Cargando detalles...</p>
         </div>
       }
@@ -814,9 +812,9 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                [class.pointer-events-none]="!showControls()">
             <div class="flex items-center justify-between max-w-7xl mx-auto">
               <h2 class="text-white font-bold tracking-wide text-xs md:text-lg uppercase drop-shadow-md truncate flex-1 mr-4">
-                {{ movie()?.title }} <span class="mx-1 text-[#e50914]">•</span> <span class="font-normal text-gray-400 capitalize">{{ currentEmbed()?.server || 'Servidor' }}</span>
+                {{ movie()?.title }} <span class="mx-1 text-df-accent">•</span> <span class="font-normal text-gray-400 capitalize">{{ currentEmbed()?.server || 'Servidor' }}</span>
               </h2>
-              <button (click)="isTheaterMode.set(false)" class="text-white bg-white/10 hover:bg-[#e50914] border border-white/10 rounded-full p-2.5 transition-all backdrop-blur-md cursor-pointer shadow-2xl shrink-0 active:scale-90">
+              <button (click)="isTheaterMode.set(false)" class="text-white bg-white/10 hover:bg-df-accent border border-white/10 rounded-full p-2.5 transition-all backdrop-blur-md cursor-pointer shadow-2xl shrink-0 active:scale-90">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-7 md:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -831,7 +829,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                @if (iframeLoading()) {
                  <div class="absolute inset-0 flex items-center justify-center bg-black z-10">
                    <div class="flex flex-col items-center gap-3">
-                     <div class="w-12 h-12 border-4 border-[#e50914]/30 border-t-[#e50914] rounded-full animate-spin"></div>
+                     <div class="w-12 h-12 border-4 border-df-accent/30 border-t-df-accent rounded-full animate-spin"></div>
                      <p class="text-gray-400 text-sm font-medium">Cargando video...</p>
                    </div>
                  </div>
@@ -840,8 +838,8 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                @if (iframeError()) {
                  <div class="absolute inset-0 flex items-center justify-center bg-black z-20 p-6">
                    <div class="text-center max-w-sm">
-                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/30">
-                       <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-df-accent/20 flex items-center justify-center border border-df-accent/30">
+                       <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-df-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                        </svg>
                      </div>
@@ -849,7 +847,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                      <p class="text-gray-400 text-sm mb-4">Este servidor no está disponible. Prueba con otro servidor o reporta el error.</p>
                      <div class="flex flex-col gap-2">
                        @if (hasMoreServers()) {
-                         <button (click)="tryNextServer()" class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
+                         <button (click)="tryNextServer()" class="bg-df-accent hover:bg-df-accent-dark text-white font-bold py-2.5 px-6 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2">
                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                            </svg>
@@ -877,7 +875,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                    @if (movie()?.images?.backdrop) {
                      <img [src]="movie() | wpImage:'backdrop'" alt="backdrop" (error)="onImageError($event)" class="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm" />
                    }
-                   <div class="relative z-50 w-20 h-20 rounded-full bg-[#e50914] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                   <div class="relative z-50 w-20 h-20 rounded-full bg-df-accent flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white ml-2" fill="currentColor" viewBox="0 0 24 24">
                        <path d="M8 5v14l11-7z"></path>
                      </svg>
@@ -901,7 +899,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                   [class.pointer-events-none]="!showControls()">
                 @if (!showHelperPanel()) {
                   <button (click)="showHelperPanel.set(true)"
-                          class="bg-black/60 hover:bg-[#e50914] text-white text-[10px] md:text-xs font-bold px-4 py-2.5 rounded-full border border-white/20 backdrop-blur-md cursor-pointer transition-all shadow-lg flex items-center gap-2">
+                          class="bg-black/60 hover:bg-df-accent text-white text-[10px] md:text-xs font-bold px-4 py-2.5 rounded-full border border-white/20 backdrop-blur-md cursor-pointer transition-all shadow-lg flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -909,7 +907,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                   </button>
                 } @else {
                   <!-- Panel de ayuda expandido -->
-                  <div class="bg-black/95 backdrop-blur-xl rounded-2xl border border-white/10 p-4 shadow-2xl w-64 animate-fade-in border-b-4 border-b-[#e50914]">
+                  <div class="bg-black/95 backdrop-blur-xl rounded-2xl border border-white/10 p-4 shadow-2xl w-64 animate-fade-in border-b-4 border-b-df-accent">
                     <div class="flex items-center justify-between mb-3">
                       <p class="text-white font-bold text-sm">¿Problemas para ver?</p>
                       <button (click)="showHelperPanel.set(false)" class="text-gray-400 hover:text-white cursor-pointer">
@@ -921,7 +919,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                     <div class="flex flex-col gap-2">
                       @if (playersState().embeds.length > 1) {
                         <button (click)="tryNextServer(); showHelperPanel.set(false)"
-                                class="w-full flex items-center gap-2 bg-white/10 hover:bg-[#e50914] text-white text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-white/5">
+                                class="w-full flex items-center gap-2 bg-white/10 hover:bg-df-accent text-white text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-white/5">
                           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
@@ -951,11 +949,11 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
                   <div class="flex overflow-x-auto hide-scrollbar gap-2 max-w-[80vw] md:max-w-4xl snap-x">
                     @for (embed of playersState().embeds; track $index) {
                       <button (click)="$event.stopPropagation(); changeTheaterServer($index)"
-                              [class.bg-[#e50914]]="selectedEmbedIndex() === $index"
+                              [class.bg-df-accent]="selectedEmbedIndex() === $index"
                               [class.text-white]="selectedEmbedIndex() === $index"
-                              [class.shadow-[0_0_15px_rgba(229,9,20,0.5)]]="selectedEmbedIndex() === $index"
+                              [class.shadow-df-glow]="selectedEmbedIndex() === $index"
                               [class.scale-105]="selectedEmbedIndex() === $index"
-                              [class.border-[#e50914]]="selectedEmbedIndex() === $index"
+                              [class.border-df-accent]="selectedEmbedIndex() === $index"
                               [class.bg-white/5]="selectedEmbedIndex() !== $index"
                               [class.text-gray-400]="selectedEmbedIndex() !== $index"
                                [class.border-white/10]="selectedEmbedIndex() !== $index"

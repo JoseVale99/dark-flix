@@ -61,11 +61,11 @@ import { MediaNavigationService } from '@services/media-navigation';
               class="group/fav p-1.5 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 transition-all shadow-md backdrop-blur cursor-pointer
                      opacity-100 md:opacity-0 md:group-hover/card:opacity-100">
         @if (myListService.isInList(media()._id)) {
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#e50914]" fill="currentColor" viewBox="0 0 24 24">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-df-accent" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
         } @else {
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white group-hover/fav:text-[#e50914] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white group-hover/fav:text-df-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
           </svg>
         }
@@ -91,7 +91,7 @@ import { MediaNavigationService } from '@services/media-navigation';
                     opacity-0 group-hover/card:opacity-100 translate-y-1 group-hover/card:translate-y-0">
           <a [href]="mediaNavigation.buildUrl(media())"
              (click)="onCardClick($event)"
-             class="pointer-events-auto flex flex-1 items-center justify-center gap-1.5 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-1.5 rounded-md transition-all shadow-lg cursor-pointer">
+             class="pointer-events-auto flex flex-1 items-center justify-center gap-1.5 bg-df-accent hover:bg-df-accent-dark active:scale-95 text-white text-xs font-bold py-1.5 rounded-md transition-all shadow-lg cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-3 h-3 shrink-0">
               <path d="M8 5v14l11-7z"/>
             </svg>

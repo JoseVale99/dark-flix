@@ -16,7 +16,7 @@ import { filter, map } from 'rxjs';
                   flex items-center gap-4 px-5 py-4 animate-fade-in">
 
         <!-- Logo / Ícono -->
-        <div class="shrink-0 w-12 h-12 bg-[#e50914] rounded-xl flex items-center justify-center shadow-lg">
+        <div class="shrink-0 w-12 h-12 bg-df-accent rounded-xl flex items-center justify-center shadow-lg">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
@@ -31,7 +31,7 @@ import { filter, map } from 'rxjs';
         <!-- Botones -->
         <div class="flex flex-col gap-1.5 shrink-0">
           <button (click)="install()"
-                  class="bg-[#e50914] hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all cursor-pointer shadow">
+                  class="bg-df-accent hover:bg-df-accent-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-all cursor-pointer shadow">
             Instalar
           </button>
           <button (click)="dismiss()"

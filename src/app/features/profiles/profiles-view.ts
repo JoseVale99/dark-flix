@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule],
   template: `
-    <div class="min-h-screen bg-[#141414] flex flex-col items-center justify-center px-4 relative overflow-hidden">
+    <div class="min-h-screen bg-df-surface flex flex-col items-center justify-center px-4 relative overflow-hidden">
       <!-- Background atmosphere -->
       <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,9,20,0.08)_0%,transparent_70%)] pointer-events-none"></div>
 
@@ -103,7 +103,7 @@ import { FormsModule } from '@angular/forms';
                   </button>
                   @if (profileService.profiles().length > 1) {
                     <button (click)="profileService.deleteProfile(profile.id)"
-                            class="text-gray-400 hover:text-[#e50914] transition-colors border border-white/10 hover:border-[#e50914]/50 px-2.5 py-1.5 rounded text-xs cursor-pointer whitespace-nowrap">
+                            class="text-gray-400 hover:text-df-accent transition-colors border border-white/10 hover:border-df-accent/50 px-2.5 py-1.5 rounded text-xs cursor-pointer whitespace-nowrap">
                       Borrar
                     </button>
                   }

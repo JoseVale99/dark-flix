@@ -17,7 +17,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
   imports: [RouterLink, RouterLinkActive, FormsModule, MediaUrlPipe, WpImagePipe],
   template: `
     <nav class="fixed top-0 left-0 right-0 z-100 transition-all duration-300"
-         [class.bg-[#141414]]="isScrolled() || isSearchActive()"
+         [class.bg-df-surface]="isScrolled() || isSearchActive()"
          [class.shadow-lg]="isScrolled() || isSearchActive()"
          [class.py-4]="!isScrolled() && !isSearchActive()"
          [class.py-2]="isScrolled() || isSearchActive()"
@@ -49,7 +49,7 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
                <svg xmlns="http://www.w3.org/2000/svg"
                     (click)="toggleSearch()"
                     fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"
-                    class="w-6 h-6 md:w-7 md:h-7 text-white cursor-pointer hover:text-[#e50914] transition-colors drop-shadow-md hover:scale-110">
+                    class="w-6 h-6 md:w-7 md:h-7 text-white cursor-pointer hover:text-df-accent transition-colors drop-shadow-md hover:scale-110">
                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                </svg>
           </div>
@@ -92,8 +92,8 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
 
         <!-- Controles Superiores del Modal -->
         <div class="flex justify-between items-center mb-6">
-           <h2 class="text-[#e50914] font-black tracking-widest text-lg md:text-xl uppercase drop-shadow-[0_0_10px_rgba(229,9,20,0.8)]">Búsqueda Global</h2>
-           <button (click)="forceHideSearch()" class="bg-white/5 hover:bg-[#e50914] transition-colors rounded-full p-2 md:p-3 border border-white/10 hover:scale-110 hover:border-[#e50914] cursor-pointer shadow-xl">
+           <h2 class="text-df-accent font-black tracking-widest text-lg md:text-xl uppercase drop-shadow-df-glow-sm">Búsqueda Global</h2>
+           <button (click)="forceHideSearch()" class="bg-white/5 hover:bg-df-accent transition-colors rounded-full p-2 md:p-3 border border-white/10 hover:scale-110 hover:border-df-accent cursor-pointer shadow-xl">
              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 md:w-8 md:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
              </svg>
@@ -108,10 +108,10 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
                  (ngModelChange)="onSearchInput($event)"
                  (keydown.enter)="handleEnterSearch()"
                  placeholder="¿Qué te gustaría ver hoy?"
-                 class="w-full bg-transparent border-b-2 border-white/20 focus:border-[#e50914] text-white text-3xl md:text-5xl outline-none py-4 md:py-6 font-black placeholder-white/30 transition-colors drop-shadow-lg">
+                 class="w-full bg-transparent border-b-2 border-white/20 focus:border-df-accent text-white text-3xl md:text-5xl outline-none py-4 md:py-6 font-black placeholder-white/30 transition-colors drop-shadow-lg">
 
           @if (isSearching()) {
-            <div class="absolute right-4 bottom-6 animate-spin rounded-full h-8 w-8 border-t-4 border-[#e50914] border-r-transparent"></div>
+            <div class="absolute right-4 bottom-6 animate-spin rounded-full h-8 w-8 border-t-4 border-df-accent border-r-transparent"></div>
           }
         </div>
 
@@ -147,16 +147,16 @@ import { WpImagePipe } from '@shared/pipes/wp-image';
             </div>
           } @else if (searchResults().length > 0) {
             <div class="flex items-center gap-2 mb-6 text-gray-400 font-medium px-2">
-               <div class="w-6 h-1 bg-[#e50914] rounded-full"></div>
+               <div class="w-6 h-1 bg-df-accent rounded-full"></div>
                <span class="tracking-widest uppercase text-xs mx-auto md:text-sm">Explorando {{ searchTotal() }} títulos</span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 px-2">
               @for (res of searchResults(); track res._id) {
                 <a [routerLink]="res | mediaUrl" (click)="forceHideSearch()" class="flex flex-col gap-2 group cursor-pointer animate-fade-in">
-                   <div class="relative aspect-poster rounded-lg overflow-hidden border border-white/10 shadow-lg group-hover:shadow-[0_10px_30px_rgba(229,9,20,0.4)] transition-all group-hover:scale-105 group-hover:border-[#e50914]/50">
+                   <div class="relative aspect-poster rounded-lg overflow-hidden border border-white/10 shadow-lg group-hover:shadow-df-glow transition-all group-hover:scale-105 group-hover:border-df-accent/50">
                      <img [src]="res | wpImage:'poster'" class="w-full h-full object-cover">
                      <div class="absolute bottom-0 left-0 right-0 p-2 bg-linear-to-t from-black/90 to-transparent z-20">
-                       <p class="text-white text-xs font-bold truncate group-hover:text-[#e50914] transition-colors">{{res.title}}</p>
+                       <p class="text-white text-xs font-bold truncate group-hover:text-df-accent transition-colors">{{res.title}}</p>
                        <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5">{{res.type === 'tvshows' ? 'Serie' : res.type === 'movies' ? 'Película' : 'Anime'}}</p>
                      </div>
                    </div>

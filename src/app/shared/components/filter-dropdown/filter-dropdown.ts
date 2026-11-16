@@ -11,7 +11,7 @@ import { FilterOption } from '../../../core/constants/filter-config';
       <!-- Dropdown Toggle Button -->
       <button type="button"
               (click)="toggle()"
-              class="w-full flex items-center justify-between bg-[#191919] border border-white/10 text-gray-300 font-medium text-sm rounded px-4 py-2 hover:bg-white/5 hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-white/20">
+              class="w-full flex items-center justify-between bg-df-elevated border border-white/10 text-gray-300 font-medium text-sm rounded px-4 py-2 hover:bg-white/5 hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-white/20">
         <span>
           {{ title() }}
           @if (selected().length > 0) {
@@ -25,7 +25,7 @@ import { FilterOption } from '../../../core/constants/filter-config';
 
       <!-- Dropdown Menu -->
       @if (isOpen()) {
-        <div class="absolute z-50 left-0 top-full mt-2 w-64 bg-[#1e1e1e] border border-white/10 rounded-lg shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div class="absolute z-50 left-0 top-full mt-2 w-64 bg-df-elevated border border-white/10 rounded-lg shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
 
           <!-- Search Box -->
           <div class="p-3 border-b border-white/5">
@@ -33,7 +33,7 @@ import { FilterOption } from '../../../core/constants/filter-config';
               <input type="text"
                      [(ngModel)]="searchQuery"
                      [placeholder]="searchPlaceholder()"
-                     class="w-full bg-[#111] border border-white/10 text-white text-sm rounded px-3 py-2 pr-8 focus:outline-none focus:border-white/30 placeholder-gray-500"
+                     class="w-full bg-df-background border border-white/10 text-white text-sm rounded px-3 py-2 pr-8 focus:outline-none focus:border-white/30 placeholder-gray-500"
                      (click)="$event.stopPropagation()">
               @if (searchQuery()) {
                 <button (click)="clearSearch($event)" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1">

@@ -86,7 +86,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
           <div class="flex items-center gap-2 mb-4">
             <df-badge variant="accent" text="TOP HIT" />
             <span
-              class="text-xs md:text-sm tracking-widest text-[#e50914] font-bold drop-shadow-md shadow-black"
+              class="text-xs md:text-sm tracking-widest text-df-accent font-bold drop-shadow-md shadow-black"
               >TENDENCIA MUNDIAL</span
             >
           </div>
@@ -115,7 +115,7 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
             <a
               [routerLink]="featuredPost() | mediaUrl"
               [state]="{ media: featuredPost() }"
-              class="bg-[#e50914] hover:bg-red-700 text-white font-bold py-3 md:py-4 px-8 md:px-12 rounded flex items-center justify-center gap-3 transition-transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(229,9,20,0.4)] text-lg cursor-pointer"
+              class="bg-df-accent hover:bg-df-accent-dark text-white font-bold py-3 md:py-4 px-8 md:px-12 rounded flex items-center justify-center gap-3 transition-transform hover:scale-105 active:scale-95 shadow-df-glow text-lg cursor-pointer"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
