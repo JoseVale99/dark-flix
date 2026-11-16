@@ -16,6 +16,7 @@ import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
 import { BadgeComponent } from '@shared/components/badge/badge';
 import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
+import { MediaNavigationService } from '@services/media-navigation';
 
 @Component({
   selector: 'df-hero-banner',
@@ -140,6 +141,27 @@ import { MediaUrlPipe } from '@shared/pipes/media-url.pipe';
               </svg>
               MÁS INFO
             </button>
+            <button
+              (click)="openInNewTab()"
+              title="Abrir en pestaña nueva"
+              aria-label="Abrir en pestaña nueva"
+              class="bg-gray-500/30 hover:bg-gray-500/50 backdrop-blur-md border border-white/10 text-white py-3 md:py-4 px-4 md:px-5 rounded transition-colors flex justify-center items-center gap-2 cursor-pointer"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 6H18m0 0v4.5M18 6l-7.5 7.5M6 6.75h4.5v10.5h10.5V12"
+                />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -172,6 +194,12 @@ export class HeroBannerComponent {
   featuredPost = input<ApiMedia | undefined>();
   private sanitizer = inject(DomSanitizer);
   private platformId = inject(PLATFORM_ID);
+  private mediaNavigation = inject(MediaNavigationService);
+
+  openInNewTab(): void {
+    const post = this.featuredPost();
+    if (post) this.mediaNavigation.openInNewTab(post);
+  }
 
   /** Se activa solo en desktop tras 2 segundos de delay para no bloquear el primer render */
   trailerReady = signal(false);

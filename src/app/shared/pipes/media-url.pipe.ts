@@ -1,22 +1,15 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 import { ApiMedia } from '@models';
+import { MediaNavigationService } from '@services/media-navigation';
 
 @Pipe({
   name: 'mediaUrl',
   standalone: true
 })
 export class MediaUrlPipe implements PipeTransform {
-  transform(media: ApiMedia | undefined | null): string {
-    if (!media) return '/';
-    
-    // Traducimos el postType interno a prefijos SEO en español
-    let prefix = 'peliculas'; // valor por defecto
-    if (media.type === 'tvshows') {
-      prefix = 'series';
-    } else if (media.type === 'animes') {
-      prefix = 'animes';
-    }
+  private mediaNavigation = inject(MediaNavigationService);
 
-    return `/${prefix}/${media.slug}`;
+  transform(media: ApiMedia | undefined | null): string {
+    return this.mediaNavigation.buildUrl(media);
   }
 }
