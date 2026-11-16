@@ -3,8 +3,20 @@
 @import 'tailwindcss';
 
 @theme {
+  /* Paleta del design system DarkFlix (documentada en ARCHITECTURE.md) */
+  --color-df-background: #0a0a0a;
+  --color-df-surface: #141414;
+  --color-df-card: #1a1a1a;
+  --color-df-border: #2a2a2a;
+  --color-df-muted: #b3b3b3;
+  --color-df-accent: #e50914;
+
+  /* Proporciones usadas por tarjetas, posters y heroes */
+  --aspect-poster: 2 / 3;
+  --aspect-backdrop: 16 / 9;
+
   --animate-shimmer: shimmer 2s linear infinite;
-  
+
   @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }

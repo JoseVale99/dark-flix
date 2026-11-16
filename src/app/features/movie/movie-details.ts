@@ -10,6 +10,7 @@ import { catchError, map, of, switchMap, combineLatest, filter, concat, delay, d
 import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
 import { BadgeComponent } from '@shared/components/badge/badge';
+import { PosterPlaceholderComponent } from '@shared/components/poster-placeholder/poster-placeholder';
 import { Location } from '@angular/common';
 import { SafePipe } from '@shared/pipes/safe';
 import { RouterModule } from '@angular/router';
@@ -97,8 +98,12 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
 
           <!-- Left Column: Poster -->
           <div class="hidden md:block w-1/4 shrink-0">
-            <div class="aspect-poster rounded-lg shadow-[0_0_40px_rgba(0,0,0,0.9)] overflow-hidden border border-white/5 ring-1 ring-white/10 group">
-              <img dfLazyImage [lazySrc]="movie()! | wpImage:'poster'" (error)="onImageError($event)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Poster">
+            <div class="relative aspect-poster rounded-lg shadow-[0_0_40px_rgba(0,0,0,0.9)] overflow-hidden border border-white/5 ring-1 ring-white/10 group">
+              @if (!posterFailed() && (movie()?.images?.poster || movie()?.images?.backdrop)) {
+                <img dfLazyImage [lazySrc]="movie()! | wpImage:'poster'" (error)="posterFailed.set(true)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Poster">
+              } @else {
+                <df-poster-placeholder [title]="movie()?.title || ''" />
+              }
             </div>
           </div>
 
@@ -967,7 +972,7 @@ import { IframeLoaderDirective } from '@shared/directives/iframe-loader';
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterModule, LazyImageDirective, WpImagePipe, BadgeComponent, SafePipe, FormsModule, MediaUrlPipe, IframeLoaderDirective]
+  imports: [RouterModule, LazyImageDirective, WpImagePipe, BadgeComponent, SafePipe, FormsModule, MediaUrlPipe, IframeLoaderDirective, PosterPlaceholderComponent]
 })
 export class MovieDetailsComponent {
   typeSlug = input.required<string>();
@@ -991,6 +996,7 @@ export class MovieDetailsComponent {
   );
   selectedEmbedIndex = signal<number>(0);
   isTheaterMode = signal(false);
+  posterFailed = signal(false);
   showHelperPanel = signal(false);
   lightboxIndex = signal<number | null>(null);
   shareCopied = signal(false);

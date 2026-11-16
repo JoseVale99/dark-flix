@@ -1,9 +1,10 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, inject, computed } from '@angular/core';
 import { ApiMedia } from '@models';
 import { SkeletonCardComponent } from '@shared/components/skeleton-card/skeleton-card';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
 import { WpImagePipe } from '@shared/pipes/wp-image';
 import { BadgeComponent } from '@shared/components/badge/badge';
+import { PosterPlaceholderComponent } from '@shared/components/poster-placeholder/poster-placeholder';
 import { MyListService } from '@services/my-list';
 import { MediaNavigationService } from '@services/media-navigation';
 
@@ -12,18 +13,22 @@ import { MediaNavigationService } from '@services/media-navigation';
   template: `
     <div class="group/card relative aspect-poster bg-df-card rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:z-50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] hover:ring-1 hover:ring-white/20">
 
-      @if (!imageLoaded()) {
+      @if (posterUrl() && !imageLoaded()) {
         <df-skeleton-card class="absolute inset-0 z-0" />
       }
 
-      <!-- Imagen del poster -->
-      <img dfLazyImage
-           [lazySrc]="media() | wpImage : 'poster'"
-           [alt]="media().title"
-           (load)="imageLoaded.set(true)"
-           (error)="onImageError($event)"
-           class="w-full h-full object-cover transition-all duration-500 group-hover/card:scale-110 group-hover/card:brightness-50"
-           [class.opacity-0]="!imageLoaded()" />
+      <!-- Imagen del poster (o portada genérica si no hay) -->
+      @if (posterUrl()) {
+        <img dfLazyImage
+             [lazySrc]="posterUrl()"
+             [alt]="media().title"
+             (load)="imageLoaded.set(true)"
+             (error)="posterFailed.set(true)"
+             class="w-full h-full object-cover transition-all duration-500 group-hover/card:scale-110 group-hover/card:brightness-50"
+             [class.opacity-0]="!imageLoaded()" />
+      } @else {
+        <df-poster-placeholder class="z-0" />
+      }
 
       <!-- Gradiente base siempre visible desde abajo (título legible) -->
       <div class="absolute inset-0 z-10 bg-linear-to-t from-black/80 via-black/10 to-transparent
@@ -97,7 +102,12 @@ import { MediaNavigationService } from '@services/media-navigation';
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SkeletonCardComponent, LazyImageDirective, WpImagePipe, BadgeComponent]
+  imports: [
+    SkeletonCardComponent,
+    LazyImageDirective,
+    BadgeComponent,
+    PosterPlaceholderComponent,
+  ]
 })
 export class MediaCardComponent {
   media = input.required<ApiMedia>();
@@ -106,7 +116,15 @@ export class MediaCardComponent {
   public myListService = inject(MyListService);
   public mediaNavigation = inject(MediaNavigationService);
 
+  private readonly wpImage = new WpImagePipe();
+
   imageLoaded = signal(false);
+  posterFailed = signal(false);
+
+  /** URL del poster; vacía si no existe o si la imagen falló al cargar. */
+  posterUrl = computed(() =>
+    this.posterFailed() ? '' : this.wpImage.transform(this.media(), 'poster'),
+  );
 
   /**
    * Click normal = navegación SPA (emite `selected`).
@@ -131,12 +149,5 @@ export class MediaCardComponent {
   getRating(): string | null {
     const r = parseFloat(this.media().rating ?? '0');
     return r > 0 ? r.toFixed(1) : null;
-  }
-
-  onImageError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    // SVG inline como data URI — placeholder oscuro con ícono de película
-    img.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Crect width='200' height='300' fill='%231a1a1a'/%3E%3Cpath d='M80 135h40v30H80z' fill='%23333'/%3E%3Ccircle cx='100' cy='120' r='12' fill='%23333'/%3E%3Ctext x='100' y='200' font-family='sans-serif' font-size='11' fill='%23555' text-anchor='middle'%3ESin imagen%3C/text%3E%3C/svg%3E`;
-    this.imageLoaded.set(true);
   }
 }
