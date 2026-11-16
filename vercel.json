@@ -5,13 +5,24 @@
       "destination": "https://hackstore.mx/wp-api/:path*"
     },
     {
-      "source": "/((?!wp-api).*)",
+      "source": "/lm-api/:path*",
+      "destination": "https://lamovie.org/wp-api/:path*"
+    },
+    {
+      "source": "/((?!wp-api|lm-api).*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
     {
       "source": "/wp-api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS" }
+      ]
+    },
+    {
+      "source": "/lm-api/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS" }

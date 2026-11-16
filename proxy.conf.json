@@ -3,5 +3,11 @@
     "target": "https://hackstore.mx",
     "secure": false,
     "changeOrigin": true
+  },
+  "/lm-api": {
+    "target": "https://lamovie.org",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": { "^/lm-api": "/wp-api" }
   }
 }

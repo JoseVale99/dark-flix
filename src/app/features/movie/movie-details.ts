@@ -4,7 +4,8 @@ import { WpMediaService } from '@services/wp-media';
 import { MyListService } from '@services/my-list';
 import { WatchHistoryService } from '@services/watch-history';
 import { EpisodeProgressService } from '@services/episode-progress';
-import { ApiMedia, ApiEpisode } from '@models';
+import { LamovieService } from '@api/lamovie';
+import { ApiMedia, ApiEpisode, ApiEmbed } from '@models';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap, combineLatest, filter, concat, delay, distinctUntilChanged, take, debounceTime } from 'rxjs';
 import { LazyImageDirective } from '@shared/directives/lazy-image';
@@ -369,7 +370,7 @@ import { I18nService } from '@core/i18n/i18n.service';
 
               @case ('REPRODUCIR') {
                 <div class="animate-fade-in flex flex-col gap-4">
-                  @if (playersState().embeds.length === 0) {
+                  @if (allEmbeds().length === 0) {
                     <div class="text-gray-400 min-h-75 flex items-center justify-center border border-white/5 rounded-xl bg-black/20">
                       {{ i18n.t('details.searchingLinks') }}
                     </div>
@@ -468,7 +469,7 @@ import { I18nService } from '@core/i18n/i18n.service';
 
                     <!-- Server Selector Responsive -->
                     <div class="flex flex-wrap gap-2 mt-4">
-                      @for (embed of playersState().embeds; track $index) {
+                      @for (embed of allEmbeds(); track $index) {
                         <button (click)="selectedEmbedIndex.set($index); playerActivated.set(false); iframeError.set(false)"
                                 [class.bg-df-accent]="selectedEmbedIndex() === $index"
                                 [class.text-white]="selectedEmbedIndex() === $index"
@@ -918,7 +919,7 @@ import { I18nService } from '@core/i18n/i18n.service';
                       </button>
                     </div>
                     <div class="flex flex-col gap-2">
-                      @if (playersState().embeds.length > 1) {
+                      @if (allEmbeds().length > 1) {
                         <button (click)="tryNextServer(); showHelperPanel.set(false)"
                                 class="w-full flex items-center gap-2 bg-white/10 hover:bg-df-accent text-white text-xs font-bold py-2.5 px-3 rounded-lg transition-all cursor-pointer border border-white/5">
                           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -948,7 +949,7 @@ import { I18nService } from '@core/i18n/i18n.service';
                   <span class="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-widest border-r border-white/10 pr-3 mr-1">{{ i18n.t('details.servers') }}</span>
               </div>
                   <div class="flex overflow-x-auto hide-scrollbar gap-2 max-w-[80vw] md:max-w-4xl snap-x">
-                    @for (embed of playersState().embeds; track $index) {
+                    @for (embed of allEmbeds(); track $index) {
                       <button (click)="$event.stopPropagation(); changeTheaterServer($index)"
                               [class.bg-df-accent]="selectedEmbedIndex() === $index"
                               [class.text-white]="selectedEmbedIndex() === $index"
@@ -979,6 +980,7 @@ export class MovieDetailsComponent {
 
   public readonly i18n = inject(I18nService);
   private wpService = inject(WpMediaService);
+  private lamovieService = inject(LamovieService);
   private location = inject(Location);
   public myListService = inject(MyListService);
   public watchHistoryService = inject(WatchHistoryService);
@@ -1119,7 +1121,7 @@ export class MovieDetailsComponent {
   }
 
   tryNextServer(): void {
-    const embeds = this.playersState().embeds;
+    const embeds = this.allEmbeds();
     const total = embeds.length;
     if (total > 0) {
       if (total > 1) {
@@ -1182,7 +1184,7 @@ export class MovieDetailsComponent {
 
   /** Computed: whether there are more servers to try */
   hasMoreServers = computed(() => {
-    return this.playersState().embeds.length > 1;
+    return this.allEmbeds().length > 1;
   });
 
   activeMediaId = computed(() => {
@@ -1244,6 +1246,47 @@ export class MovieDetailsComponent {
     ), { initialValue: [] }
   );
 
+  selectedEpisode = computed(() => {
+    const episodeId = this.selectedEpisodeId();
+    if (!episodeId) return undefined;
+    return this.episodesResponse()?.posts?.find((ep) => ep._id === episodeId);
+  });
+
+  /**
+   * Ficha + episodio que se está reproduciendo, listo para consultar LaMovie.
+   * La clave evita volver a pedir los mismos embeds.
+   */
+  private playbackTarget = computed(() => {
+    const media = this.movie();
+    if (!media) return null;
+
+    const isSeries =
+      media.type === 'tvshows' || media.type === 'animes' || media.type === 'series';
+    const episode = isSeries ? this.selectedEpisode() : undefined;
+
+    if (isSeries && !episode) return null;
+
+    return {
+      key: `${media._id}|${episode?._id ?? ''}`,
+      media,
+      episode,
+    };
+  });
+
+  /** Embeds internos de LaMovie (se suman a los de hackstore). */
+  lamovieEmbeds = toSignal(
+    toObservable(this.playbackTarget).pipe(
+      distinctUntilChanged((prev, curr) => prev?.key === curr?.key),
+      switchMap((target) =>
+        target ? this.lamovieService.getEmbeds(target.media, target.episode) : of([]),
+      ),
+    ),
+    { initialValue: [] as ApiEmbed[] },
+  );
+
+  /** Lista combinada de servidores: hackstore + LaMovie. */
+  allEmbeds = computed(() => [...this.playersState().embeds, ...this.lamovieEmbeds()]);
+
   groupedDownloads = computed(() => {
     const downloads = this.downloadsState();
     if (!downloads) return [];
@@ -1268,7 +1311,7 @@ export class MovieDetailsComponent {
   loadingOrPending = computed(() => this.mediaState() === undefined && !this.hasError());
 
   currentEmbed = computed(() => {
-    const embeds = this.playersState().embeds;
+    const embeds = this.allEmbeds();
     if (!embeds || embeds.length === 0) return null;
     return embeds[this.selectedEmbedIndex()] || embeds[0];
   });
