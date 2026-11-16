@@ -10,10 +10,7 @@ import { MediaNavigationService } from '@services/media-navigation';
 @Component({
   selector: 'df-media-card',
   template: `
-    <div class="group/card relative aspect-poster bg-df-card rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:z-50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] hover:ring-1 hover:ring-white/20"
-         (click)="onCardClick($event)"
-         (auxclick)="onAuxClick($event)"
-         (contextmenu)="onContextMenu($event)">
+    <div class="group/card relative aspect-poster bg-df-card rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:z-50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] hover:ring-1 hover:ring-white/20">
 
       @if (!imageLoaded()) {
         <df-skeleton-card class="absolute inset-0 z-0" />
@@ -34,8 +31,15 @@ import { MediaNavigationService } from '@services/media-navigation';
                   transition-all duration-500">
       </div>
 
+      <!-- Enlace real: el clic derecho ofrece "Abrir en una pestaña nueva" y
+           Ctrl/Cmd/Clic central también funcionan de forma nativa -->
+      <a class="absolute inset-0 z-20 cursor-pointer"
+         [href]="mediaNavigation.buildUrl(media())"
+         [attr.aria-label]="'Abrir ' + media().title"
+         (click)="onCardClick($event)"></a>
+
       <!-- Metadata Badges -->
-      <div class="absolute top-2 left-2 flex gap-1 z-20">
+      <div class="absolute top-2 left-2 flex gap-1 z-30 pointer-events-none">
         @if (getQuality()) {
           <df-badge [text]="getQuality()!" variant="quality" />
         }
@@ -45,7 +49,7 @@ import { MediaNavigationService } from '@services/media-navigation';
       </div>
 
       <!-- Acción rápida: favorito -->
-      <div class="absolute top-2 right-2 z-30 flex gap-1">
+      <div class="absolute top-2 right-2 z-40 flex gap-1">
         <!-- Quick Favorite Button -->
         <button (click)="$event.stopPropagation(); myListService.toggleList(media())"
               title="Añadir/Quitar de Mi Lista"
@@ -64,7 +68,7 @@ import { MediaNavigationService } from '@services/media-navigation';
       </div>
 
       <!-- Título siempre visible + Rating + Botón solo en hover desktop -->
-      <div class="absolute bottom-0 left-0 right-0 z-20 p-2.5 flex flex-col gap-1">
+      <div class="absolute bottom-0 left-0 right-0 z-30 p-2.5 flex flex-col gap-1 pointer-events-none">
         <p class="text-white font-bold text-xs leading-tight line-clamp-2 drop-shadow-lg">
           {{ media().title }}
         </p>
@@ -80,12 +84,14 @@ import { MediaNavigationService } from '@services/media-navigation';
         <!-- Botones solo visibles en desktop al hacer hover de la TARJETA -->
         <div class="hidden md:flex gap-1.5 transition-all duration-200
                     opacity-0 group-hover/card:opacity-100 translate-y-1 group-hover/card:translate-y-0">
-          <button class="flex flex-1 items-center justify-center gap-1.5 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-1.5 rounded-md transition-all shadow-lg cursor-pointer">
+          <a [href]="mediaNavigation.buildUrl(media())"
+             (click)="onCardClick($event)"
+             class="pointer-events-auto flex flex-1 items-center justify-center gap-1.5 bg-[#e50914] hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-1.5 rounded-md transition-all shadow-lg cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-3 h-3 shrink-0">
               <path d="M8 5v14l11-7z"/>
             </svg>
             Ver ahora
-          </button>
+          </a>
         </div>
       </div>
     </div>
@@ -98,34 +104,19 @@ export class MediaCardComponent {
   selected = output<ApiMedia>();
 
   public myListService = inject(MyListService);
-  private mediaNavigation = inject(MediaNavigationService);
+  public mediaNavigation = inject(MediaNavigationService);
 
   imageLoaded = signal(false);
 
-  /** Click normal = abrir en la misma pestaña; con Ctrl/Cmd/Shift = pestaña nueva. */
-  onCardClick(event: MouseEvent): void {
-    if (event.ctrlKey || event.metaKey || event.shiftKey) {
-      event.preventDefault();
-      this.mediaNavigation.openInNewTab(this.media());
-      return;
-    }
-    this.selected.emit(this.media());
-  }
-
-  /** Click con la rueda del ratón = abrir en pestaña nueva. */
-  onAuxClick(event: MouseEvent): void {
-    if (event.button !== 1) return;
-    event.preventDefault();
-    this.mediaNavigation.openInNewTab(this.media());
-  }
-
   /**
-   * Click derecho (o pulsación larga en móvil) = abrir en pestaña nueva.
-   * Evita el menú contextual nativo para no necesitar un botón dedicado.
+   * Click normal = navegación SPA (emite `selected`).
+   * Con Ctrl/Cmd/Shift/Alt no se cancela el evento: el navegador abre el enlace
+   * en una pestaña nueva de forma nativa, igual que el clic derecho o el botón central.
    */
-  onContextMenu(event: MouseEvent): void {
+  onCardClick(event: MouseEvent): void {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    this.mediaNavigation.openInNewTab(this.media());
+    this.selected.emit(this.media());
   }
 
   getQuality(): string | null {
